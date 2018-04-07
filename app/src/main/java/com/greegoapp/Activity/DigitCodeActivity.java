@@ -32,6 +32,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
     Context context;
     private View snackBarView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
