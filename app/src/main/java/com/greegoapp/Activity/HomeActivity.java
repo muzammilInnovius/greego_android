@@ -23,6 +23,7 @@ import com.greegoapp.Fragment.FreeTripsFragment;
 import com.greegoapp.Fragment.HelpFragment;
 import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.Fragment.PaymentFragment;
+import com.greegoapp.Fragment.SettingFragment;
 import com.greegoapp.Fragment.TripHistoryFragment;
 import com.greegoapp.R;
 import com.greegoapp.Utils.SnackBar;
@@ -204,7 +205,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 4:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new SettingFragment();
                             break;
 
 //                        default:

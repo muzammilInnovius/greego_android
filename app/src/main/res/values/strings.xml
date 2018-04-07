@@ -27,7 +27,8 @@
     <string name="hint_lname">Last name</string>
     <string name="whats_agreement">Do you agree with Greego?</string>
     -
-    - <string name="desc_agreement">
+    -
+    <string name="desc_agreement">
 - <![CDATA[  It is the term & condition for users
 
   ]]>
@@ -91,7 +92,8 @@
     <string name="greego_help_title">greego.co/help</string>
     <string name="how_help">HOW CAN WE</string>
     <string name="help">HELP?</string>
-    - <string name="lost_found">
+    -
+    <string name="lost_found">
 - <![CDATA[ Lost & Found
   ]]>
   </string>
@@ -102,6 +104,22 @@
     <string name="vehicle">Vehicle</string>
     <string name="payment">Payment</string>
     <string name="update_note">Before you use Greego, please complete the remain set up</string>
+    <string name="setting">Setting</string>
+    <string name="username">Joy</string>
+    <string name="joinDate">February 2017</string>
+    <string name="join">Joined</string>
+    <string name="unverify">Unverified</string>
+    <string name="phone">+1 123 123 1231</string>
+    <string name="logout">Log out</string>
+    <string name="who">Who are you?</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="btn_update">Update</string>
+    <string name="vehicle_year">2017</string>
+    <string name="vehicle_model">Lexus Rx</string>
+    <string name="vehicle_make">350</string>
+    <string name="vehicle_color">White</string>
 
 
 </resources>

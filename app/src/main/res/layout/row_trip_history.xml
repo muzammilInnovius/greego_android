@@ -45,18 +45,18 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                     android:textSize="@dimen/scale_15dp"
+                    android:textSize="@dimen/scale_15dp"
                     android:layout_toRightOf="@+id/ivProPicTripHistory"
                     android:text="@string/trip_date_time"
-                tools:ignore="NotSibling" />
+                    tools:ignore="NotSibling" />
               <TextView
-                  android:id="@+id/tvTripTime"
+                    android:id="@+id/tvTripTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/scale_6dp"
                     android:layout_weight="1"
-                  android:textSize="@dimen/scale_15dp"
-                  android:layout_below="@+id/tvTripDate"
+                    android:textSize="@dimen/scale_15dp"
+                    android:layout_below="@+id/tvTripDate"
                     android:text="@string/trip_history_mi"/>
 
                 <TextView
