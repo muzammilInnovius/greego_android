@@ -19,7 +19,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.greegoapp.Adapter.DrawerLayoutAdapter;
+import com.greegoapp.Fragment.FreeTripsFragment;
+import com.greegoapp.Fragment.HelpFragment;
 import com.greegoapp.Fragment.MapHomeFragment;
+import com.greegoapp.Fragment.PaymentFragment;
+import com.greegoapp.Fragment.TripHistoryFragment;
 import com.greegoapp.R;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.databinding.ActivityHomeBinding;
@@ -183,20 +187,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Fragment fragment = null;
                     switch (pos) {
                         case 0:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
-//                            fragment = new JobsListingJobSeekerFragment();
+
+                            fragment = new PaymentFragment();
                             break;
 
                         case 1:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new TripHistoryFragment();
                             break;
 
                         case 2:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new FreeTripsFragment();
                             break;
 
                         case 3:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new HelpFragment();
                             break;
 
                         case 4:
