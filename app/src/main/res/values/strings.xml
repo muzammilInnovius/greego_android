@@ -97,6 +97,11 @@
   </string>
     <string name="help_report">Report an accident, safety Incident, or citation</string>
 
+    <string name="update">Updates</string>
+    <string name="profile">Profile</string>
+    <string name="vehicle">Vehicle</string>
+    <string name="payment">Payment</string>
+    <string name="update_note">Before you use Greego, please complete the remain set up</string>
 
 
 </resources>
