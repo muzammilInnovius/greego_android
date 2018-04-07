@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".Fragment.MapHomeFragment">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.androidtutorialpoint.googlemapsdrawroute.activity.MapsActivity" />
+
+        <RelativeLayout
+            android:id="@+id/rlWhereDoYou"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/scale_30dp"
+            android:layout_marginRight="@dimen/scale_30dp"
+            android:layout_marginTop="@dimen/scale_120dp"
+            android:background="@drawable/map_button">
+
+            <ImageView
+                android:layout_width="@dimen/scale_25dp"
+                android:layout_height="@dimen/scale_25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/scale_10dp"
+                android:layout_marginRight="@dimen/scale_15dp"
+                android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:padding="@dimen/scale_5dp"
+                android:text="Where do you want to go?"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rlWhereDoYou"
+            android:layout_marginLeft="@dimen/scale_30dp"
+            android:layout_marginRight="@dimen/scale_30dp"
+            android:layout_marginTop="@dimen/scale_1dp"
+            android:background="@drawable/map_button">
+
+
+            <RelativeLayout
+                android:id="@+id/rlUpdate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/txtVwUpdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="4dp"
+                    android:padding="@dimen/scale_5dp"
+                    android:text="@string/update"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_20"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_marginTop="@dimen/scale_5dp"
+                    android:layout_centerInParent="true"
+                    android:layout_width="@dimen/scale_25dp"
+                    android:layout_height="@dimen/scale_25dp"
+                    android:layout_toRightOf="@+id/txtVwUpdate"
+                    android:background="@drawable/round_bg">
+
+                    <TextView
+                        android:id="@+id/txtVwCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:text="3"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/txt_20"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/txtVwUpdateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rlUpdate"
+                android:layout_marginLeft="@dimen/scale_15dp"
+                android:layout_marginRight="@dimen/scale_15dp"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:gravity="center"
+                android:text="@string/update_note"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_14"
+                android:textStyle="bold" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtVwUpdateTitle"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txtVwProfileNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/scale_15dp"
+                        android:layout_marginTop="@dimen/scale_30dp"
+                        android:gravity="center"
+                        android:text="1."
+                        android:textColor="@color/profile_no"
+                        android:textSize="@dimen/txt_14"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtVwProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/scale_15dp"
+                        android:layout_marginTop="@dimen/scale_30dp"
+                        android:layout_toRightOf="@+id/txtVwProfileNo"
+                        android:gravity="center"
+                        android:text="@string/profile"
+                        android:textColor="@color/profile_no"
+                        android:textSize="@dimen/txt_14"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginRight="@dimen/scale_25dp"
+                    android:background="@color/txt_hint" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txtVwVehicleNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/scale_15dp"
+                        android:gravity="center"
+                        android:text="2."
+                        android:textColor="@color/profile_no"
+                        android:textSize="@dimen/txt_14"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtVwVehicleName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/scale_15dp"
+                        android:layout_toRightOf="@+id/txtVwVehicleNo"
+                        android:gravity="center"
+                        android:text="@string/vehicle"
+                        android:textColor="@color/profile_no"
+                        android:textSize="@dimen/txt_14"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginRight="@dimen/scale_25dp"
+                    android:background="@color/txt_hint" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/scale_15dp">
+
+                    <TextView
+                        android:id="@+id/txtVwpaymentNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/scale_15dp"
+                        android:gravity="center"
+                        android:text="3."
+                        android:textColor="@color/profile_no"
+                        android:textSize="@dimen/txt_14"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtVwpayment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/scale_15dp"
+                        android:layout_toRightOf="@+id/txtVwpaymentNo"
+                        android:gravity="center"
+                        android:text="@string/payment"
+                        android:textColor="@color/profile_no"
+                        android:textSize="@dimen/txt_14"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginRight="@dimen/scale_25dp"
+                    android:background="@color/txt_hint" />
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</layout>

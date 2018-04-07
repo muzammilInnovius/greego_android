@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.greegoapp.Activity.HomeActivity">
+
+        <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.greegoapp.Utils.RoundedImageView
+                    android:id="@+id/ivProPicHome"
+                    android:layout_width="@dimen/scale_40dp"
+                    android:layout_height="@dimen/scale_40dp"
+                    android:layout_marginLeft="@dimen/scale_10dp"
+                    android:layout_marginTop="@dimen/scale_10dp"
+                    android:background="@mipmap/ic_place_holder"
+                    android:scaleType="fitXY"
+                    android:elevation="4dp"
+                    app:border_color="@color/app_bg"
+                    app:border_width="1dp"
+                    app:corner_radius="@dimen/scale_20dp"
+                    app:round_background="true" />
+
+
+                <FrameLayout
+                    android:id="@+id/containerBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" />
+
+            </RelativeLayout>
+
+
+            <!--<FrameLayout-->
+            <!--android:layout_width="@dimen/scale_250dp"-->
+            <!--android:layout_height=""></FrameLayout>-->
+            <!--android:layout_gravity="start"-->
+            <RelativeLayout
+                android:layout_gravity="start"
+                android:id="@+id/drawerlist"
+                android:layout_width="@dimen/scale_250dp"
+                android:layout_height="match_parent"
+                android:background="@color/white">
+
+                <RelativeLayout
+                    android:id="@+id/nav_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scale_160dp"
+                    android:background="@drawable/slider_home_bg">
+
+                    <com.greegoapp.Utils.RoundedImageView
+                        android:id="@+id/ivPro"
+                        android:layout_width="@dimen/scale_80dp"
+                        android:layout_height="@dimen/scale_80dp"
+                        android:layout_marginLeft="@dimen/scale_10dp"
+                        android:layout_marginTop="@dimen/scale_10dp"
+                        android:background="@mipmap/ic_place_holder"
+                        android:scaleType="fitXY"
+                        app:border_color="@color/app_bg"
+                        app:border_width="2dp"
+                        app:corner_radius="@dimen/scale_40dp"
+                        app:round_background="true" />
+
+                    <TextView
+                        android:id="@+id/tvDrawUsername"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivPro"
+                        android:layout_marginLeft="@dimen/scale_10dp"
+                        android:layout_marginTop="@dimen/scale_10dp"
+                        android:text="@string/app_name"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/txt_25" />
+
+                    <!--<View-->
+                    <!--android:layout_marginTop="@dimen/scale_15dp"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:layout_below="@+id/tvDrawUsername"-->
+                    <!--android:background="@color/app_bg"-->
+                    <!--android:layout_width="@dimen/scale_150dp"-->
+                    <!--android:layout_height="1dp"/>-->
+                    <!--<TextView-->
+                    <!--android:id="@+id/tvDrawHomeAdd"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_below="@+id/tvDrawUsername"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:layout_centerInParent="true"-->
+                    <!--android:text="@string/tv_home_add"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/txt_14" />-->
+
+                </RelativeLayout>
+
+                <ListView
+                    android:id="@+id/menuList"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scale_250dp"
+                    android:layout_alignParentTop="@+id/view"
+                    android:layout_below="@+id/nav_header"
+                    android:layout_gravity="start"
+                    android:background="#FFF8F8"
+                    android:choiceMode="singleChoice"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:horizontalSpacing="@dimen/scale_5dp"
+                    android:scrollbars="vertical"
+                    android:verticalSpacing="@dimen/scale_5dp" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/menuList"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/app_bg" />
+
+
+                <TextView
+                    android:id="@+id/tvDriveGreego"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/view"
+                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginTop="@dimen/scale_15dp"
+                    android:text="@string/driver_with_geego"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+
+                <View
+                    android:id="@+id/view1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/tvDriveGreego"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginRight="@dimen/scale_25dp"
+                    android:layout_marginTop="@dimen/scale_15dp"
+                    android:background="@color/app_bg" />
+
+                <TextView
+                    android:id="@+id/tvLegal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/view1"
+                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginTop="@dimen/scale_15dp"
+                    android:text="Legal"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/tvAppNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/view1"
+                    android:layout_marginRight="@dimen/scale_15dp"
+                    android:layout_marginTop="@dimen/scale_15dp"
+                    android:text="v1.01.01"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+        </android.support.v4.widget.DrawerLayout>
+
+
+    </RelativeLayout>
+
+</layout>
