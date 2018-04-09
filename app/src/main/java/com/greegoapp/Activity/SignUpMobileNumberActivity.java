@@ -13,7 +13,10 @@ import com.greegoapp.R;
 import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.Utils.SnackBar;
+import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivitySignUpMobileNumberBinding;
+
+import org.json.JSONObject;
 
 public class SignUpMobileNumberActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -49,7 +52,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.ibBack:
                 Intent in = new Intent(context, MainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -74,10 +77,76 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
     }
 
     private void callMobileNumberAPI() {
-        Intent in = new Intent(context, DigitCodeActivity.class);
-        in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(in);
-        overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(WebFields.USERID, SessionManager.getUserID(context));
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_FIRSTNAME, strFirstName);
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_LASTNAME, strLastName);
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_PROFILEPIC, strProPicBase64);
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_CONTACTNUMBER, strContactNumber);
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_NOTES, strNotesPersnlMsg);
+            //Please check bank id(Int values) as per yr requirment
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_BANKID, 0);
+
+
+            JSONObject physicalAddress = new JSONObject();
+            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_ADDRESS, address);
+            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_CITY, city);
+            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_STATE, state);
+            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_COUNTRY, GlobalValues.COUNTRY);
+            physicalAddress.put(WebFields.EDIT_PROFILE.RESP_PINCODE, zipCode);
+
+            jsonObject.put(WebFields.EDIT_PROFILE.REQ_PHYSICALADDRESS, physicalAddress);
+
+            Applog.e("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.EDIT_PROFILE.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.e("success: " + response.toString());
+
+                    try {
+                        if (response.getInt("status") == 1) {
+                            MyProgressDialog.hideProgressDialog();
+//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
+                            callMyFragment.callProfileFragmentMethod();
+                            backPressed.onBackPressed(getContext());
+
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.e("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            });
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        Intent in = new Intent(context, DigitCodeActivity.class);
+//        in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(in);
+//        overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
     }
 
     private boolean isValid() {
@@ -87,9 +156,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
             edtTvMobileNo.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_mobile_no_empty));
             return false;
-        }
-        else if(strMobileNo.length()< 8 || strMobileNo.length()>10)
-        {
+        } else if (strMobileNo.length() < 8 || strMobileNo.length() > 10) {
             edtTvMobileNo.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.mobile_no_length));
             return false;
