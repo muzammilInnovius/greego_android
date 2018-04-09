@@ -105,6 +105,9 @@
     <string name="vehicle">Vehicle</string>
     <string name="payment">Payment</string>
     <string name="update_note">Before you use Greego, please complete the remain set up</string>
+<<<<<<< HEAD
+    <string name="title_activity_maps_home">Map</string>
+=======
     <string name="setting">Setting</string>
     <string name="username">Joy</string>
     <string name="joinDate">February 2017</string>
@@ -121,6 +124,7 @@
     <string name="vehicle_model">Lexus Rx</string>
     <string name="vehicle_make">350</string>
     <string name="vehicle_color">White</string>
+>>>>>>> 8ccb47ce5a24aa40fa64143737c31e22012fd0cf
 
 
 </resources>

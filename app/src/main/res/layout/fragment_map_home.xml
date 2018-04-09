@@ -50,13 +50,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/rlWhereDoYou"
-            android:layout_marginLeft="@dimen/scale_30dp"
-            android:layout_marginRight="@dimen/scale_30dp"
-            android:layout_marginTop="@dimen/scale_1dp"
+            android:layout_marginLeft="@dimen/scale_50dp"
+            android:layout_marginRight="@dimen/scale_50dp"
+            android:layout_marginTop="1dp"
             android:background="@drawable/map_button">
 
 
             <RelativeLayout
+                android:layout_centerHorizontal="true"
                 android:id="@+id/rlUpdate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -73,11 +74,13 @@
                     android:textSize="@dimen/txt_20"
                     android:textStyle="bold" />
 
+                <!--android:layout_width="@dimen/scale_50dp"-->
+                <!--android:layout_height="@dimen/scale_25dp"-->
                 <RelativeLayout
                     android:layout_marginTop="@dimen/scale_5dp"
                     android:layout_centerInParent="true"
-                    android:layout_width="@dimen/scale_25dp"
-                    android:layout_height="@dimen/scale_25dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/scale_30dp"
                     android:layout_toRightOf="@+id/txtVwUpdate"
                     android:background="@drawable/round_bg">
 
@@ -85,11 +88,10 @@
                         android:id="@+id/txtVwCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true"
                         android:text="3"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/txt_20"
+                        android:textSize="@dimen/txt_16"
                         android:textStyle="bold" />
                 </RelativeLayout>
 
@@ -194,7 +196,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/scale_15dp">
+                    >
 
                     <TextView
                         android:id="@+id/txtVwpaymentNo"
@@ -227,6 +229,15 @@
                     android:layout_marginLeft="@dimen/scale_25dp"
                     android:layout_marginRight="@dimen/scale_25dp"
                     android:background="@color/txt_hint" />
+
+                <View
+                    android:layout_marginBottom="@dimen/scale_15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginRight="@dimen/scale_25dp"
+                     />
+
 
             </LinearLayout>
 
