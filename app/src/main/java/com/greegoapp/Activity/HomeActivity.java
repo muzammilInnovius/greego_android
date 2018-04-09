@@ -1,6 +1,7 @@
 package com.greegoapp.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.greegoapp.Adapter.DrawerLayoutAdapter;
+import com.greegoapp.Fragment.FreeTripsFragment;
+import com.greegoapp.Fragment.HelpFragment;
 import com.greegoapp.Fragment.MapHomeFragment;
+import com.greegoapp.Fragment.PaymentFragment;
+import com.greegoapp.Fragment.SettingFragment;
+import com.greegoapp.Fragment.TripHistoryFragment;
 import com.greegoapp.R;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.databinding.ActivityHomeBinding;
@@ -70,6 +76,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setHomeValues() {
         try {
+
             Fragment fragmentPro = null;
             fragmentPro = new MapHomeFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -183,24 +190,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Fragment fragment = null;
                     switch (pos) {
                         case 0:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
-//                            fragment = new JobsListingJobSeekerFragment();
+
+                            fragment = new PaymentFragment();
                             break;
 
                         case 1:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new TripHistoryFragment();
                             break;
 
                         case 2:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new FreeTripsFragment();
                             break;
 
                         case 3:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new HelpFragment();
                             break;
 
                         case 4:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+                            fragment = new SettingFragment();
                             break;
 
 //                        default:

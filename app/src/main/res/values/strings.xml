@@ -3,7 +3,6 @@
     <string name="app_name_title">GREEGO</string>
     <string name="welcome_app_name">Welcome GreegoApp</string>
     <string name="header_title">Title</string>
-
     <string name="dont_we_drive">Don\'t Drive, We Drive</string>
     <string name="mobile_no_hint">Please enter your mobile number</string>
     <string name="whats_mobile_no">What\'s Your mobile number?</string>
@@ -13,29 +12,30 @@
     <string name="mobile_no_length">Please enter valid mobile number.</string>
     <string name="no_checked_agreement">Please first accept the term &amp; condition.</string>
     <string name="whats_digit_code">What\'s your 6 digit code?</string>
-    <string name="enter_digit_code">Enter the 6-digit code sent to  </string>
+    <string name="enter_digit_code">Please enter pin.</string>
     <string name="resend">Resend</string>
     <string name="whats_email">What\'s your email address?</string>
     <string name="email_for_reach_user">It is the best way to reach you</string>
-
-    <string name="mobile_number_hint"> (201) 555 - 5555</string>
+    <string name="mobile_number_hint">(201) 555 - 5555</string>
     <string name="enter_valid_email">Please enter valid email.</string>
     <string name="whats_name">What\'s your name?</string>
     <string name="desc_user_name">When they meet you,they will identify/verify you through your photo</string>
-
     <string name="hint_email">name@gmail.com</string>
     <string name="in_progress">In Progress</string>
     <string name="driver_with_geego">Drive With Greego</string>
-
     <string name="hint_fname">First name</string>
     <string name="hint_lname">Last name</string>
     <string name="whats_agreement">Do you agree with Greego?</string>
-    - <string name="desc_agreement">
-- <![CDATA[ It is the term & condition for users
+
+    <string name="desc_agreement">
+- <![CDATA[  It is the term & condition for users
+
   ]]>
   </string>
     <string name="agreement_detail">Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,</string>
-    - <!--  TODO: Remove or change this placeholder text
+    -
+    - <!--   TODO: Remove or change this placeholder text
+
   -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="payment_setting_title">This is Your Payment Setting</string>
@@ -44,14 +44,90 @@
     <string name="promotion">Promotions</string>
     <string name="add_promo_code">Add Promo/Gift Code</string>
     <string name="title">title</string>
+    <string name="enter_valid_digit_code">Please enter valid pin.</string>
+    <string name="enter_digit_code_title">Enter the 6-digit code sent to</string>
+    <string name="check_agreement">I agree the Greego agreement</string>
+    <string name="text_edit_payment_title">Edit your payment?</string>
+    <string name="exp_date">Exp.Date</string>
+    <string name="cvv">CVV</string>
+    <string name="zipcode">Zip Code</string>
+    <string name="save">Save</string>
+    <string name="enter_valid_card_no">Please enter valid card number.</string>
+    <string name="enter_exp_date">Please select expire date.</string>
+    <string name="enter_cvv_no">Please enter cvv number.</string>
+    <string name="enter_valid_cvv_no">Please enter valid cvv number.</string>
+    <string name="enter_zipcode">Please enter zip code.</string>
+    <string name="enter_valid_zipcode">Please enter valid zip code.</string>
+    <string name="hint_promo_code">Please enter a promo/Gift code</string>
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+    <string name="card_number">Card Number</string>
+    <string name="trip_history">Trip History</string>
+    <string name="trip_date_time">Feb 19, 2018, 3:40 pm</string>
+    <string name="trip_history_mi">1.41mi * 6min</string>
+    <string name="trip_history_time">6min</string>
+    <string name="trip_price">$32.20</string>
+    <string name="driver_id">ABC123</string>
+    <string name="thanks_msg_to_user">Thanks for requesting Greego driver</string>
+    <string name="start">Start</string>
+    <string name="start_time">3:43 PM</string>
+    <string name="trip_start_location">3rd Avenue, New York, NY</string>
+    <string name="end">End</string>
+    <string name="end_time">3:48 PM</string>
+    <string name="trip_end_location">2nd Avenue, New York, Ny</string>
+    <string name="greego_fair">Greego fair</string>
+    <string name="greego_fair_time">(1.41 mi, 6m 49s)</string>
+    <string name="promotion_price">$0.00</string>
+    <string name="total">Total</string>
+    <string name="get_help">Get a help from Greego</string>
+    <string name="promotion_code">1</string>
+    <string name="free_tips">Free trips</string>
+    <string name="free_driver_detail">Want more Greego for free driver?</string>
+    <string name="get_free_driver">Get a free driver worth</string>
+    <string name="invite_friends">when you refer a friend to try Greego</string>
+    <string name="invite_code">Your invite code</string>
+    <string name="code">na1004</string>
+    <string name="done">Done</string>
+    <string name="greego_help_title">greego.co/help</string>
+    <string name="how_help">HOW CAN WE</string>
+    <string name="help">HELP?</string>
+    -
+
+    <string name="lost_found">
+- <![CDATA[ Lost & Found
+  ]]>
+  </string>
+    <string name="help_report">Report an accident, safety Incident, or citation</string>
 
     <string name="update">Updates</string>
     <string name="profile">Profile</string>
     <string name="vehicle">Vehicle</string>
     <string name="payment">Payment</string>
     <string name="update_note">Before you use Greego, please complete the remain set up</string>
-    <!--<string name=""></string>-->
-    <!--<string name=""></string>-->
+<<<<<<< HEAD
+    <string name="title_activity_maps_home">Map</string>
+=======
+
+    <string name="title_activity_maps_home">Map</string>
+
+>>>>>>> 671613247b81e398b4841e62880b9013044dbdd1
+    <string name="setting">Setting</string>
+    <string name="username">Joy</string>
+    <string name="joinDate">February 2017</string>
+    <string name="join">Joined</string>
+    <string name="unverify">Unverified</string>
+    <string name="phone">+1 123 123 1231</string>
+    <string name="logout">Log out</string>
+    <string name="who">Who are you?</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="btn_update">Update</string>
+    <string name="vehicle_year">2017</string>
+    <string name="vehicle_model">Lexus Rx</string>
+    <string name="vehicle_make">350</string>
+    <string name="vehicle_color">White</string>
+
 
 
 </resources>
