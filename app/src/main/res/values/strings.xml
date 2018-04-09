@@ -27,7 +27,8 @@
     <string name="hint_lname">Last name</string>
     <string name="whats_agreement">Do you agree with Greego?</string>
     -
-    - <string name="desc_agreement">
+    -
+    <string name="desc_agreement">
 - <![CDATA[  It is the term & condition for users
 
   ]]>
@@ -91,7 +92,8 @@
     <string name="greego_help_title">greego.co/help</string>
     <string name="how_help">HOW CAN WE</string>
     <string name="help">HELP?</string>
-    - <string name="lost_found">
+    -
+    <string name="lost_found">
 - <![CDATA[ Lost & Found
   ]]>
   </string>
@@ -102,6 +104,7 @@
     <string name="vehicle">Vehicle</string>
     <string name="payment">Payment</string>
     <string name="update_note">Before you use Greego, please complete the remain set up</string>
+    <string name="title_activity_maps_home">Map</string>
 
 
 </resources>

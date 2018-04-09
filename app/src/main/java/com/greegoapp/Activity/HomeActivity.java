@@ -1,6 +1,7 @@
 package com.greegoapp.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -70,6 +71,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setHomeValues() {
         try {
+
             Fragment fragmentPro = null;
             fragmentPro = new MapHomeFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
