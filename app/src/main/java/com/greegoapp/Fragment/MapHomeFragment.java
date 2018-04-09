@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.greegoapp.R;
+import com.greegoapp.databinding.FragmentMapHomeBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +28,8 @@ public class MapHomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    
+    FragmentMapHomeBinding binding;
 
 
     public MapHomeFragment() {
@@ -56,6 +59,9 @@ public class MapHomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View view;
+
+
         return inflater.inflate(R.layout.fragment_map_home, container, false);
     }
 
