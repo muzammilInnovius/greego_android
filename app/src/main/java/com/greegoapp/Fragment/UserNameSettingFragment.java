@@ -22,6 +22,7 @@ import com.greegoapp.Model.VehicleDetailModel;
 import com.greegoapp.R;
 import com.greegoapp.databinding.FragmentUserNameSettingBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -108,6 +109,10 @@ public class UserNameSettingFragment extends Fragment implements View.OnClickLis
     private void bindViews() {
         ibback=binding.ibBack;
         recyclerView=binding.rcVwVehicle;
+        vehicleDetailModel = new VehicleDetailModel();
+        vehicleDetailList = new ArrayList<VehicleDetailModel>();
+        VehicleDetailAdapter = new VehicleDetailAdapter();
+
     }
 
     public void onButtonPressed(Uri uri) {
