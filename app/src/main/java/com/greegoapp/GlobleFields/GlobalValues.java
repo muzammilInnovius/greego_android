@@ -13,6 +13,8 @@ import java.util.Locale;
  */
 
 public class GlobalValues {
+
+    public static final String BEARER_TOKEN = "Bearer ";
     public static final int SIGN_UP_NORMAL = 1;
     public static final int SIGN_UP_WITH_FB = 2;
     public static final String IS_FROM_CHANGE_ACCOUNT = "is_from_change_account";

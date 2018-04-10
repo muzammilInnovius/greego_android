@@ -35,4 +35,10 @@
     <color name="progress_bar">#0C6293</color>
     <color name="main_mob_no_bg">#073E50</color>
     <color name="view_bg">#696969</color>
+    <color name="done_help">#3894F4</color>
+    <color name="line">#5DD8BD</color>
+
+    <color name="btnDriverIdColor">#76ABA6</color>
+    <color name="green">#386E0F</color>
+    <color name="end">#569A94</color>
 </resources>

@@ -1,0 +1,12 @@
+package com.greegoapp.SessionManager;
+
+public class AppPrefFields {
+
+    public final static String PARAM_USERID = "userId";
+    public final static String PARAM_CONTACT_NO= "contact_number";
+    public final static String PARAM_TOKEN= "token";
+    public final static String PARAM_ID= "id";
+    public final static String PARAM_NEW= "new";
+
+
+}

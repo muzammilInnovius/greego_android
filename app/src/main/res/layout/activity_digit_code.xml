@@ -379,7 +379,7 @@
             </android.support.constraint.ConstraintLayout>
 -->
             <com.chaos.view.PinView
-                android:id="@+id/txtSecurityCode"
+                android:id="@+id/pinVwDigitCode"
                 style="@style/PinWidget.PinView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
