@@ -61,18 +61,7 @@ public class TripHistoryDetailFragment extends Fragment implements View.OnClickL
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof CallFragmentInterface) {
-            callMyFragment = (CallFragmentInterface) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
-        }
 
-
-        if (context instanceof BackPressedFragment) {
-            backPressed = (BackPressedFragment) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
-        }
     }
 
     @Override

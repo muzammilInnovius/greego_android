@@ -20,20 +20,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.greegoapp.Adapter.DrawerLayoutAdapter;
-import com.greegoapp.Fragment.FreeTripsFragment;
-import com.greegoapp.Fragment.HelpFragment;
 import com.greegoapp.Fragment.MapHomeFragment;
-import com.greegoapp.Fragment.PaymentFragment;
-import com.greegoapp.Fragment.SettingFragment;
-import com.greegoapp.Fragment.TripHistoryFragment;
 import com.greegoapp.Interface.BackPressedFragment;
 import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.R;
-import com.greegoapp.Utils.HeaderBar;
-import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.databinding.ActivityHomeBinding;
 
-import java.util.HashMap;
 import java.util.Stack;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CallFragmentInterface, BackPressedFragment {
@@ -236,7 +228,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         case 1:
 //                            ivProPicHome.setVisibility(View.GONE);
-                            in = new Intent(HomeActivity.this, TripHistoryDetailActivity.class);
+                            in = new Intent(HomeActivity.this, TripHistoryActivity.class);
                             startActivity(in);
 //                            fragment = new TripHistoryFragment().newInstance("", "");
                             break;
@@ -266,13 +258,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                            break;
                     }
 
-                    if (fragment != null) {
-                        FragmentManager fragmentManager = getSupportFragmentManager();
-                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.containerBody, fragment);
-                        fragmentTransaction.commit();
-                        mContentFragment = fragment;
-                    }
+//                    if (fragment != null) {
+//                        FragmentManager fragmentManager = getSupportFragmentManager();
+//                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                        fragmentTransaction.replace(R.id.containerBody, fragment);
+//                        fragmentTransaction.commit();
+//                        mContentFragment = fragment;
+//                    }
 
                     drawer_layout.closeDrawer(drawerlist);
                     drawerLayoutAdapter.setSelectedIndex(pos);

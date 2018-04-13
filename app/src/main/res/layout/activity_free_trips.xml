@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/free_trip_bg"
-    tools:context=".Activity.FreeTripsActivity">
+    tools:context="com.greegoapp.Activity.FreeTripsActivity">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/header"
@@ -21,7 +21,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
-                android:visibility="invisible"
+                android:visibility="visible"
                 android:id="@+id/ibBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

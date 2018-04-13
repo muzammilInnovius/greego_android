@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:context="com.greegoapp.Activity.HelpActivity">
+        tools:context="com.greegoapp.Activity.TripHistoryActivity">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/header"
@@ -67,72 +67,34 @@
         </android.support.constraint.ConstraintLayout>
 
 
-        <RelativeLayout
-            android:id="@+id/rlDetail"
+        <TextView
+            android:id="@+id/tvTripHistoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/scale_125dp"
+            android:text="@string/trip_history"
+            android:textColor="@color/app_bg"
+            android:textSize="@dimen/txt_18"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+        <LinearLayout
+            android:id="@+id/llemail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/header"
-            tools:ignore="UnknownId">
+            android:layout_marginTop="@dimen/scale_35dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle">
 
-            <ImageView
-                android:id="@+id/imgVwGreegoHelp"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvTripHistory"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/scale_250dp"
-                android:src="@drawable/slider_home_bg" />
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_below="@+id/imgVwGreegoHelp"
-                android:background="@color/line" />
 
-            <TextView
-                android:id="@+id/tvHow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/view"
-                android:layout_marginTop="@dimen/scale_45dp"
-                android:paddingLeft="@dimen/scale_8dp"
-                android:text="@string/how_help"
-                android:textColor="@color/line"
-                android:textSize="@dimen/scale_30dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvHowHelp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/view"
-                android:layout_marginLeft="@dimen/scale_5dp"
-                android:layout_marginTop="@dimen/scale_45dp"
-                android:layout_toRightOf="@+id/tvHow"
-                android:text="@string/help"
-                android:textColor="@color/black"
-                android:textSize="@dimen/scale_30dp" />
-
-            <TextView
-                android:id="@+id/tvLostFound"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvHow"
-                android:layout_marginTop="@dimen/scale_60dp"
-                android:gravity="center"
-                android:text="@string/lost_found"
-                android:textColor="@color/app_bg"
-                android:textSize="@dimen/scale_15dp" />
-
-            <TextView
-                android:id="@+id/tvReport"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvLostFound"
-                android:layout_marginTop="@dimen/scale_8dp"
-                android:gravity="center"
-                android:text="@string/help_report"
-                android:textColor="@color/app_bg"
-                android:textSize="@dimen/scale_15dp" />
-
-        </RelativeLayout>
     </android.support.constraint.ConstraintLayout>
+
 </layout>

@@ -1,8 +1,10 @@
 package com.greegoapp.Activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -64,12 +66,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tvAddPaymentMethod:
-                Fragment fragment = new AddPaymentMethodFragment();
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerBody, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+              Intent in =new Intent(context, AddPaymentMethodActivity.class);
+              startActivity(in);
                 break;
             case R.id.tvAddPromoCode:
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);

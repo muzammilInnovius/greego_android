@@ -16,10 +16,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +24,6 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,7 +36,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
-import com.greegoapp.Activity.HomeActivity;
+import com.greegoapp.Activity.TripHistoryActivity;
+import com.greegoapp.Activity.TripHistoryDetailActivity;
 import com.greegoapp.Adapter.VehicleDetailAdapter;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
@@ -157,12 +154,15 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         RecyclerViewItemClickListener mListener = new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Fragment fragment = new TripHistoryDetailFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerBody, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+//                Fragment fragment = new TripHistoryDetailFragment();
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.containerBody, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
+
+                Intent in = new Intent(context, TripHistoryDetailActivity.class);
+                startActivity(in);
 
             }
         };

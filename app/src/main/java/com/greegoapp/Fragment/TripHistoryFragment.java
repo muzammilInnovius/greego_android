@@ -7,17 +7,14 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
-import com.greegoapp.Activity.HomeActivity;
+import com.greegoapp.Activity.TripHistoryActivity;
 import com.greegoapp.Adapter.TripHistoryAdapter;
 import com.greegoapp.Interface.BackPressedFragment;
 import com.greegoapp.Interface.CallFragmentInterface;
@@ -25,7 +22,6 @@ import com.greegoapp.Interface.RecyclerViewItemClickListener;
 import com.greegoapp.Model.TripHistoryModel;
 import com.greegoapp.R;
 import com.greegoapp.Utils.HeaderBar;
-import com.greegoapp.databinding.FragmentAddPaymentMethodBinding;
 import com.greegoapp.databinding.FragmentTripHistoryBinding;
 
 import java.util.ArrayList;
@@ -103,12 +99,15 @@ public class TripHistoryFragment extends Fragment implements View.OnClickListene
         RecyclerViewItemClickListener mListener = new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Fragment fragment = new TripHistoryDetailFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerBody, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+//                Fragment fragment = new TripHistoryDetailFragment();
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.containerBody, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
+
+                Intent in = new Intent(context, TripHistoryActivity.class);
+                startActivity(in);
 
             }
         };

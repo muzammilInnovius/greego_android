@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GreegoApp</string>
+    <string name="app_name">GreegoUser</string>
     <string name="app_name_title">GREEGO</string>
     <string name="welcome_app_name">Welcome GreegoApp</string>
     <string name="header_title">Title</string>

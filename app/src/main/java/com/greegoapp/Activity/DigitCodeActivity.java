@@ -124,6 +124,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
                 break;
             case R.id.tvResend:
+                cancelTimer();
                 timer();
                 callMobileNumberAPI();
                 pinVwOtpCode.setText("");
@@ -259,6 +260,12 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 pinVwOtpCode.setText("");
             }
         }.start();
+    }
+
+    //cancel timer
+    void cancelTimer() {
+        if(mCountDownTimer!=null)
+            mCountDownTimer.cancel();
     }
 
     private boolean isValid() {
