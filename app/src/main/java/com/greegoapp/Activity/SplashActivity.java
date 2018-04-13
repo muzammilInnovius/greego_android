@@ -12,6 +12,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.greegoapp.R;
+import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 
 import java.security.MessageDigest;
@@ -59,11 +60,23 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void setSplaceScreen() {
-        Intent in = new Intent(SplashActivity.this, MainActivity.class);
-        in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(in);
-        overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-        finish();
+
+        if (SessionManager.getIsUserLoggedin(getApplicationContext())) {
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        } else {
+
+            Intent in = new Intent(SplashActivity.this, MainActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(in);
+            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+            finish();
+
+        }
+
+
     }
 
     private void getIds() {

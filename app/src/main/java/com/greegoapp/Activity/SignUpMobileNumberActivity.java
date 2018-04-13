@@ -9,14 +9,28 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.gson.Gson;
+import com.greegoapp.AppController.AppController;
+import com.greegoapp.GlobleFields.GlobalValues;
+import com.greegoapp.Model.Login;
 import com.greegoapp.R;
+import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.KeyboardUtility;
+import com.greegoapp.Utils.MyProgressDialog;
+import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivitySignUpMobileNumberBinding;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 
 public class SignUpMobileNumberActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -26,6 +40,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
     ImageButton ibFinish;
     Context context;
     private View snackBarView;
+    String strMobileNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,44 +92,38 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
     }
 
     private void callMobileNumberAPI() {
-
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put(WebFields.USERID, SessionManager.getUserID(context));
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_FIRSTNAME, strFirstName);
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_LASTNAME, strLastName);
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_PROFILEPIC, strProPicBase64);
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_CONTACTNUMBER, strContactNumber);
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_NOTES, strNotesPersnlMsg);
-            //Please check bank id(Int values) as per yr requirment
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_BANKID, 0);
+//            String token = SessionManager.getToken(context);
+//            Applog.E("Token" + token);
 
+            jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, strMobileNo);
+            jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
 
-            JSONObject physicalAddress = new JSONObject();
-            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_ADDRESS, address);
-            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_CITY, city);
-            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_STATE, state);
-            physicalAddress.put(WebFields.EDIT_PROFILE.REQ_COUNTRY, GlobalValues.COUNTRY);
-            physicalAddress.put(WebFields.EDIT_PROFILE.RESP_PINCODE, zipCode);
-
-            jsonObject.put(WebFields.EDIT_PROFILE.REQ_PHYSICALADDRESS, physicalAddress);
-
-            Applog.e("request: " + jsonObject.toString());
+            Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                    WebFields.BASE_URL + WebFields.EDIT_PROFILE.MODE, jsonObject, new Response.Listener<JSONObject>() {
+                    WebFields.BASE_URL + WebFields.SIGN_IN.MODE, jsonObject, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject response) {
-                    Applog.e("success: " + response.toString());
+                    Applog.E("success: " + response.toString());
 
+                    Login loginData = new Gson().fromJson(String.valueOf(response), Login.class);
                     try {
-                        if (response.getInt("status") == 1) {
-                            MyProgressDialog.hideProgressDialog();
+                        MyProgressDialog.hideProgressDialog();
+                        if (loginData.getError_code() == 0) {
+
+                            Applog.E("Contact No" + loginData.getData().getContact_number());
+                            SessionManager.saveUserData(context, loginData);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
-                            callMyFragment.callProfileFragmentMethod();
-                            backPressed.onBackPressed(getContext());
+//                            backPressed.onBackPressed(getContext());
+
+                            Intent in = new Intent(context, DigitCodeActivity.class);
+                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
 
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -129,7 +138,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     MyProgressDialog.hideProgressDialog();
-                    Applog.e("Error: " + error.getMessage());
+                    Applog.E("Error: " + error.getMessage());
 
                     SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                 }
@@ -143,20 +152,17 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        Intent in = new Intent(context, DigitCodeActivity.class);
-//        in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(in);
-//        overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
     }
 
+
     private boolean isValid() {
-        String strMobileNo = edtTvMobileNo.getText().toString();
+        strMobileNo = "+91" + edtTvMobileNo.getText().toString();
 
         if (strMobileNo.isEmpty()) {
             edtTvMobileNo.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_mobile_no_empty));
             return false;
-        } else if (strMobileNo.length() < 8 || strMobileNo.length() > 10) {
+        } else if (strMobileNo.length() < 10) {
             edtTvMobileNo.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.mobile_no_length));
             return false;

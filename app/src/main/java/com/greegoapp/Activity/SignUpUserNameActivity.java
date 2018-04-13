@@ -17,39 +17,42 @@ import com.greegoapp.databinding.ActivitySignUpUserNameBinding;
 
 public class SignUpUserNameActivity extends AppCompatActivity implements View.OnClickListener {
     ActivitySignUpUserNameBinding binding;
-    EditText fname,lname;
-    ImageButton ibBack,ibFinish;
+    EditText edtTvFname, edtTvLname;
+    ImageButton ibBack, ibFinish;
     Context context;
-    private View snackBarView; 
-    
+    private View snackBarView;
+    String strEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up_user_name);
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_sign_up_user_name);
-        context= SignUpUserNameActivity.this;
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up_user_name);
+        strEmail = getIntent().getStringExtra("email");
+
+        context = SignUpUserNameActivity.this;
         snackBarView = findViewById(android.R.id.content);
         bindView();
         setListners();
     }
 
     private void setListners() {
-        fname.setOnClickListener(this);
-        lname.setOnClickListener(this);
+        edtTvFname.setOnClickListener(this);
+        edtTvLname.setOnClickListener(this);
         ibBack.setOnClickListener(this);
         ibFinish.setOnClickListener(this);
     }
 
     private void bindView() {
-        fname=binding.edtTvFname;
-        lname=binding.edtTvLname;
-        ibBack=binding.ibBack;
-        ibFinish=binding.ibFinish;
+        edtTvFname = binding.edtTvFname;
+        edtTvLname = binding.edtTvLname;
+        ibBack = binding.ibBack;
+        ibFinish = binding.ibFinish;
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.ibBack:
                 Intent in = new Intent(context, SignUpEmailActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -74,7 +77,13 @@ public class SignUpUserNameActivity extends AppCompatActivity implements View.On
     }
 
     private void callUnameApi() {
+        String strFName = edtTvFname.getText().toString();
+        String strLName = edtTvLname.getText().toString();
+
         Intent in = new Intent(context, SignUpAgreementActivity.class);
+        in.putExtra("email", strEmail);
+        in.putExtra("fName", strFName);
+        in.putExtra("lName", strLName);
         in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
         overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);

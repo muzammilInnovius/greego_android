@@ -21,16 +21,22 @@
                     android:id="@+id/ivProPicHome"
                     android:layout_width="@dimen/scale_40dp"
                     android:layout_height="@dimen/scale_40dp"
-                    android:layout_marginLeft="@dimen/scale_10dp"
-                    android:layout_marginTop="@dimen/scale_10dp"
-                    android:background="@mipmap/ic_place_holder"
-                    android:scaleType="fitXY"
+                    android:layout_marginLeft="@dimen/scale_1dp"
+                    android:layout_marginTop="@dimen/scale_2dp"
+                    android:background="@mipmap/ic_user_profile"
                     android:elevation="4dp"
+                    android:scaleType="fitXY"
+                    android:visibility="invisible"
                     app:border_color="@color/app_bg"
-                    app:border_width="1dp"
                     app:corner_radius="@dimen/scale_20dp"
                     app:round_background="true" />
 
+                <!--<com.greegoapp.Utils.HeaderBar-->
+                <!--android:id="@+id/headerBar"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content">-->
+
+                <!--</com.greegoapp.Utils.HeaderBar>-->
 
                 <FrameLayout
                     android:id="@+id/containerBody"
@@ -46,6 +52,7 @@
             <!--android:layout_height=""></FrameLayout>-->
             <!--android:layout_gravity="start"-->
             <RelativeLayout
+
                 android:layout_gravity="start"
                 android:id="@+id/drawerlist"
                 android:layout_width="@dimen/scale_250dp"
@@ -64,10 +71,9 @@
                         android:layout_height="@dimen/scale_80dp"
                         android:layout_marginLeft="@dimen/scale_10dp"
                         android:layout_marginTop="@dimen/scale_10dp"
-                        android:background="@mipmap/ic_place_holder"
+                        android:background="@mipmap/ic_user_profile"
                         android:scaleType="fitXY"
                         app:border_color="@color/app_bg"
-                        app:border_width="2dp"
                         app:corner_radius="@dimen/scale_40dp"
                         app:round_background="true" />
 
@@ -105,11 +111,11 @@
                 <ListView
                     android:id="@+id/menuList"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/scale_250dp"
-                    android:layout_alignParentTop="@+id/view"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/rldriverData"
                     android:layout_below="@+id/nav_header"
                     android:layout_gravity="start"
-                    android:background="#FFF8F8"
+                    android:background="@color/white"
                     android:choiceMode="singleChoice"
                     android:divider="@null"
                     android:dividerHeight="0dp"
@@ -117,61 +123,71 @@
                     android:scrollbars="vertical"
                     android:verticalSpacing="@dimen/scale_5dp" />
 
-                <View
-                    android:id="@+id/view"
+                <RelativeLayout
+                    android:id="@+id/rldriverData"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/menuList"
-                    android:layout_centerHorizontal="true"
-                    android:background="@color/app_bg" />
-
-
-                <TextView
-                    android:id="@+id/tvDriveGreego"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/view"
-                    android:layout_marginLeft="@dimen/scale_15dp"
-                    android:layout_marginTop="@dimen/scale_15dp"
-                    android:text="@string/driver_with_geego"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="@dimen/scale_5dp">
+
+                    <View
+                        android:id="@+id/view"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+
+                        android:layout_centerHorizontal="true"
+                        android:background="@color/app_bg" />
 
 
-                <View
-                    android:id="@+id/view1"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/tvDriveGreego"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginLeft="@dimen/scale_25dp"
-                    android:layout_marginRight="@dimen/scale_25dp"
-                    android:layout_marginTop="@dimen/scale_15dp"
-                    android:background="@color/app_bg" />
-
-                <TextView
-                    android:id="@+id/tvLegal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/view1"
-                    android:layout_marginLeft="@dimen/scale_15dp"
-                    android:layout_marginTop="@dimen/scale_15dp"
-                    android:text="Legal"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvDriveGreego"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/view"
+                        android:layout_marginLeft="@dimen/scale_15dp"
+                        android:layout_marginTop="@dimen/scale_15dp"
+                        android:text="@string/driver_with_geego"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
 
 
-                <TextView
-                    android:id="@+id/tvAppNo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_below="@+id/view1"
-                    android:layout_marginRight="@dimen/scale_15dp"
-                    android:layout_marginTop="@dimen/scale_15dp"
-                    android:text="v1.01.01"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                    <View
+                        android:id="@+id/view1"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvDriveGreego"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="@dimen/scale_25dp"
+                        android:layout_marginRight="@dimen/scale_25dp"
+                        android:layout_marginTop="@dimen/scale_15dp"
+                        android:background="@color/app_bg" />
+
+                    <TextView
+                        android:id="@+id/tvLegal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/view1"
+                        android:layout_marginLeft="@dimen/scale_15dp"
+                        android:layout_marginTop="@dimen/scale_15dp"
+                        android:text="Legal"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+
+                    <TextView
+                        android:id="@+id/tvAppNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view1"
+                        android:layout_marginRight="@dimen/scale_15dp"
+                        android:layout_marginTop="@dimen/scale_15dp"
+                        android:text="v1.01.01"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
             </RelativeLayout>
 
         </android.support.v4.widget.DrawerLayout>

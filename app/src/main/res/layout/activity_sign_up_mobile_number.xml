@@ -22,12 +22,10 @@
                 android:id="@+id/ibBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/scale_3dp"
                 android:layout_marginRight="@dimen/scale_5dp"
-                android:layout_marginTop="@dimen/scale_5dp"
                 android:background="@android:color/transparent"
                 android:padding="@dimen/scale_6dp"
-                android:src="@mipmap/ic_back"
+                android:src="@mipmap/ic_back_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -102,10 +100,10 @@
 
             <ImageView
                 android:id="@+id/imgVwCntyLogo"
-                android:layout_width="@dimen/scale_35dp"
-                android:layout_height="@dimen/scale_30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/ic_flag" />
+                android:src="@mipmap/american_flag_large" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -123,10 +121,11 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="@dimen/scale_10dp"
                 android:background="@null"
+                android:imeOptions="actionDone"
                 android:gravity="center_vertical"
                 android:hint="@string/mobile_number_hint"
-                android:maxLength="15"
                 android:inputType="phone"
+                android:maxLength="15"
                 android:textColor="@color/black"
                 android:textSize="@dimen/txt_14" />
 
@@ -147,13 +146,13 @@
 
         <ImageButton
             android:id="@+id/ibFinish"
-            android:layout_width="@dimen/scale_35dp"
-            android:layout_height="@dimen/scale_35dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/scale_15dp"
-            android:layout_marginTop="@dimen/scale_45dp"
-            android:background="@mipmap/ic_finish_arrow"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view" />
+            android:layout_marginBottom="@dimen/scale_20dp"
+            android:background="@mipmap/ic_next_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

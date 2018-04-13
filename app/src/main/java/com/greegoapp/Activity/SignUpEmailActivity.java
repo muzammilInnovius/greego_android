@@ -30,8 +30,8 @@ public class SignUpEmailActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         /*setContentView(R.layout.activity_sign_up_email);*/
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_sign_up_email);
-        context= SignUpEmailActivity.this;
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up_email);
+        context = SignUpEmailActivity.this;
         snackBarView = findViewById(android.R.id.content);
         bindView();
         setListners();
@@ -44,14 +44,14 @@ public class SignUpEmailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void bindView() {
-        edtTvEmail=binding.edtTvEmail;
-        ibBack=binding.ibBack;
-        ibFinish=binding.ibFinish;
+        edtTvEmail = binding.edtTvEmail;
+        ibBack = binding.ibBack;
+        ibFinish = binding.ibFinish;
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.ibBack:
                 Intent in = new Intent(context, DigitCodeActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -75,14 +75,15 @@ public class SignUpEmailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    String email;
+
     private boolean isValid() {
-        String email = edtTvEmail.getText().toString();
+        email = edtTvEmail.getText().toString();
         if (email.isEmpty()) {
             edtTvEmail.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.entered_email_no_empty));
             return false;
-        } else if(!EmailValidation.checkEmailIsCorrect(email))
-        {
+        } else if (!EmailValidation.checkEmailIsCorrect(email)) {
             edtTvEmail.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_email));
             return false;
@@ -93,6 +94,7 @@ public class SignUpEmailActivity extends AppCompatActivity implements View.OnCli
 
     private void callEmailAPI() {
         Intent in = new Intent(context, SignUpUserNameActivity.class);
+        in.putExtra("email", email);
         in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
         overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);

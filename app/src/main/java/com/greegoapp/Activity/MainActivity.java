@@ -38,14 +38,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void bindView() {
         tvMobileNo = binding.tvMobileNo;
-        llNumber=binding.llNumber;
+        llNumber = binding.llNumber;
     }
 
     @Override
     public void onClick(View view) {
+        Intent in;
+
         switch (view.getId()) {
             case R.id.llNumber:
-                Intent in = new Intent(context, SignUpMobileNumberActivity.class);
+                in = new Intent(context, SignUpMobileNumberActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(in);
+                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+                break;
+
+            case R.id.tvMobileNo:
+                in = new Intent(context, SignUpMobileNumberActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);

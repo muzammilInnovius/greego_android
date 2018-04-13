@@ -12,19 +12,19 @@
         <ImageView
             android:id="@+id/imgVwMain"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:scaleType="centerCrop"
-            android:src="@color/main_mob_no_bg" />
-
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="110dp"
-            android:text="@string/app_name_title"
-            android:textSize="@dimen/txt_60"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_greego_app" />
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="110dp"-->
+        <!--android:text="@string/app_name_title"-->
+        <!--android:textSize="@dimen/txt_60"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
 
 
         <android.support.constraint.ConstraintLayout
@@ -59,10 +59,10 @@
 
                 <ImageView
                     android:id="@+id/imgVwCntyLogo"
-                    android:layout_width="@dimen/scale_35dp"
-                    android:layout_height="@dimen/scale_30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
-                    android:src="@mipmap/ic_flag" />
+                    android:src="@mipmap/american_flag_large" />
 
 
                 <TextView
@@ -83,7 +83,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="@dimen/scale_35dp"
+                android:layout_marginTop="@dimen/scale_25dp"
                 android:background="@color/view_bg"
                 app:layout_constraintTop_toBottomOf="@+id/llNumber" />
 

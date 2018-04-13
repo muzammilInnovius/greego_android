@@ -1,6 +1,7 @@
 package com.greegoapp.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -19,18 +20,28 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.greegoapp.Adapter.DrawerLayoutAdapter;
+import com.greegoapp.Fragment.FreeTripsFragment;
+import com.greegoapp.Fragment.HelpFragment;
 import com.greegoapp.Fragment.MapHomeFragment;
+import com.greegoapp.Fragment.PaymentFragment;
+import com.greegoapp.Fragment.SettingFragment;
+import com.greegoapp.Fragment.TripHistoryFragment;
+import com.greegoapp.Interface.BackPressedFragment;
+import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.R;
+import com.greegoapp.Utils.HeaderBar;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.databinding.ActivityHomeBinding;
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.HashMap;
+import java.util.Stack;
+
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CallFragmentInterface, BackPressedFragment {
 
 
     ActivityHomeBinding binding;
     Context context;
     private View snackBarView;
-
 
     private RelativeLayout navHeader;
     private ImageView ivPro, ivProPicHome;
@@ -44,6 +55,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Fragment mContentFragment = null;
     private String[] drawerTitle = {"Payment", "Your Trips", "Free Rides", "Help", "Settings"};
     public static int index = 0;
+    private Stack<Fragment> fragmentStack;
+    FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +67,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         context = HomeActivity.this;
+        fragmentStack = new Stack<Fragment>();
+        fragmentManager = this.getSupportFragmentManager();
         snackBarView = findViewById(android.R.id.content);
 
         manager = getFragmentManager();
 
         bindView();
+//        setHeaderbar();
         setListners();
-
         setHomeValues();
         slideMenu();
         drawerlist.requestDisallowInterceptTouchEvent(true);
@@ -68,8 +83,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+//    private HeaderBar headerBar;
+//
+//    private void setHeaderbar() {
+//        try {
+//            headerBar = binding.headerBar;
+//            headerBar.ivLeft.setImageResource(R.mipmap.ic_profile);
+//            headerBar.ivLeft.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    openDrawer();
+//                }
+//            });
+//            headerBar.rrHomeBtn.setVisibility(View.GONE);
+//
+//            headerBar.ivRight.setVisibility(View.GONE);
+//            headerBar.ivRightOfLeft.setVisibility(View.GONE);
+//
+//            headerBar.tvTitle.setVisibility(View.VISIBLE);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     private void setHomeValues() {
         try {
+
             Fragment fragmentPro = null;
             fragmentPro = new MapHomeFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -90,20 +131,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void bindView() {
+
         navHeader = binding.navHeader;
         drawer_layout = binding.drawerLayout;
         ivProPicHome = binding.ivProPicHome;
+//        headerBar = binding.headerBar;
         container_body = binding.containerBody;
         drawerlist = binding.drawerlist;
         ivPro = binding.ivPro;
         tvDrawUsername = binding.tvDrawUsername;
         menuList = binding.menuList;
         tvDriveGreego = binding.tvDriveGreego;
+
+        ivProPicHome.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.ivProPicHome:
                 openDrawer();
                 break;
@@ -181,26 +226,40 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     Fragment fragment = null;
+                    Intent in;
                     switch (pos) {
                         case 0:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
-//                            fragment = new JobsListingJobSeekerFragment();
+//                            ivProPicHome.setVisibility(View.GONE);
+                            in = new Intent(HomeActivity.this, PaymentActivity.class);
+                            startActivity(in);
                             break;
 
                         case 1:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+//                            ivProPicHome.setVisibility(View.GONE);
+                            in = new Intent(HomeActivity.this, TripHistoryDetailActivity.class);
+                            startActivity(in);
+//                            fragment = new TripHistoryFragment().newInstance("", "");
                             break;
 
                         case 2:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+//                            ivProPicHome.setVisibility(View.GONE);
+                            in = new Intent(HomeActivity.this, FreeTripsActivity.class);
+                            startActivity(in);
+//                            fragment = new FreeTripsFragment().newInstance("", "");
                             break;
 
                         case 3:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+//                            ivProPicHome.setVisibility(View.GONE);
+                            in = new Intent(HomeActivity.this, HelpActivity.class);
+                            startActivity(in);
+//                            fragment = new HelpFragment().newInstance("", "");
                             break;
 
                         case 4:
-                            SnackBar.showValidationError(context, snackBarView, getString(R.string.in_progress));
+//                            ivProPicHome.setVisibility(View.GONE);
+                            in = new Intent(HomeActivity.this, SettingActivity.class);
+                            startActivity(in);
+//                            fragment = new SettingFragment().newInstance("", "");
                             break;
 
 //                        default:
@@ -230,14 +289,57 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-//    @Override
-//    public void onBackStackChanged() {
-//
-//        int count = manager.getBackStackEntryCount();
-//        for (int i = count - 1; i >= 0; i--) {
-//            FragmentManager.BackStackEntry entry = (FragmentManager.BackStackEntry) manager.getBackStackEntryAt(i);
+    @Override
+    public void onBackPressed(Context context) {
+        try {
+            onBackPressed();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager manager = getSupportFragmentManager();
+
+        if (manager.getBackStackEntryCount() > 2) {
+            // If there are back-stack entries, leave the FragmentActivity
+            // implementation take care of them.
+            manager.popBackStack();
+
+        } else {
+            finish();
+        }
+
+
+//        if (container_body.getChildCount() == 1) {
+//            super.onBackPressed();
+//            if (container_body.getChildCount() == 0) {
+//               finish();
+//                // load your first Fragment here
+//            }
+//        } else if (container_body.getChildCount() == 0) {
+//            setHomeValues();
+//            // load your first Fragment here
+//        } else {
+//            super.onBackPressed();
 //        }
-//    }
+    }
+
+
+    @Override
+    public void onFragmentCall(Context mContext, Fragment myFragment, String Tag) {
+        if (container_body.getVisibility() == View.GONE) {
+            container_body.setVisibility(View.VISIBLE);
+        }
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.containerBody, myFragment, Tag);
+        fragmentStack.push(myFragment);
+        fragmentTransaction.commit();
+    }
 
 
 }
+
+
+

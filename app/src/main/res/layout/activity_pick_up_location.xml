@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mytextview="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/scale_0.5dp"
+            android:background="@mipmap/app_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <RelativeLayout
+                android:id="@+id/search_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/bg_card"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_backTop"
+                    android:layout_width="@dimen/scale_50dp"
+                    android:layout_height="@dimen/scale_50dp"
+                    android:padding="@dimen/scale_8dp"
+                    android:src="@mipmap/ic_back_button" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/scale_8dp"
+                    android:layout_marginBottom="@dimen/scale_30dp"
+                    android:layout_below="@+id/iv_backTop"
+                    android:gravity="center"
+                    android:weightSum="1">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/iv_backTop"
+                        android:layout_weight="0.175"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:weightSum="1">
+
+                        <TextView
+                            android:id="@+id/txtStart"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:padding="@dimen/scale_8dp"
+                            android:text="Start" />
+
+                        <View
+                            android:id="@+id/viewTimeStart"
+                            android:layout_width="1dp"
+                            android:layout_height="@dimen/scale_15dp"
+                            android:layout_below="@+id/llPickupLocation"
+                            android:background="@color/black"
+                            android:paddingBottom="-18dp"
+                            android:paddingTop="-18dp" />
+
+                        <TextView
+                            android:id="@+id/txtEnd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:padding="@dimen/scale_8dp"
+                            android:text="End " />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llPickupLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.67"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <EditText
+                            android:id="@+id/edt_pickLocation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edt_boxpickup"
+                            android:hint="@string/picklocation"
+                            android:imeOptions="actionSearch"
+                            android:padding="@dimen/scale_8dp"
+                            android:singleLine="true" />
+
+                        <EditText
+                            android:id="@+id/edt_DesLocation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/scale_4dp"
+                            android:background="@drawable/edt_box"
+                            android:hint="@string/wheredogo"
+                            android:imeOptions="actionSearch"
+                            android:padding="@dimen/scale_8dp"
+                            android:singleLine="true" />
+
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.155" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/search_layout"
+                android:visibility="visible" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/powered_by_google"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:padding="@dimen/scale_8dp"
+            android:src="@drawable/powered_by_google_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

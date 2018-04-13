@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mytextview="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/payment_bg"
+        tools:context="com.greegoapp.Fragment.AddPaymentMethodFragment">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/scale_40dp"
+            android:background="@color/transparent"
+            android:clickable="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/ibBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/scale_3dp"
+                android:layout_marginRight="@dimen/scale_5dp"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:background="@android:color/transparent"
+                android:padding="@dimen/scale_6dp"
+                android:src="@mipmap/ic_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/scale_3dp"
+                android:layout_marginRight="@dimen/scale_5dp"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:background="@android:color/transparent"
+                android:padding="@dimen/scale_8dp"
+                android:src="@mipmap/ic_edit"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/txt_3"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:text="@string/header_title"
+                android:textColor="@color/black"
+                android:textSize="@dimen/txt_20"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
+        <TextView
+            android:id="@+id/tvEditPaymentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_edit_payment_title"
+            android:textColor="@color/hint_color"
+            android:textSize="@dimen/txt_18"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+        <LinearLayout
+            android:id="@+id/llAddPaymentMethod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/scale_35dp"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/scale_30dp"
+            android:weightSum="2"
+            app:layout_constraintTop_toBottomOf="@+id/tvEditPaymentTitle">
+
+            <LinearLayout
+                android:id="@+id/llCardNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/scale_20dp"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/scale_15dp"
+                android:weightSum="2">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/edtTvCardNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@mipmap/ic_flag"
+                        android:hint="@string/card_number"
+                        android:inputType="date" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+            <!-- <View
+                 android:id="@+id/view"
+                 android:layout_width="match_parent"
+                 android:layout_height="1dp"
+                 android:layout_marginLeft="@dimen/scale_5dp"
+                 android:layout_marginRight="@dimen/scale_5dp"
+                 android:layout_marginTop="@dimen/scale_2dp"
+                 android:background="@color/view_bg"
+                 app:layout_constraintLeft_toLeftOf="parent"
+                 app:layout_constraintRight_toRightOf="parent"
+                 app:layout_constraintTop_toBottomOf="@+id/llCardNumber" />-->
+            <LinearLayout
+                android:id="@+id/llCardDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/scale_20dp"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/scale_15dp"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_marginTop="@dimen/scale_8dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <EditText
+                        android:id="@+id/edtTvExpDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/exp_date"
+                        android:imeOptions="actionDone" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/edtTvCvv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/cvv"
+                            android:inputType="number"
+                            android:maxLength="3" />
+
+                    </android.support.design.widget.TextInputLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llZipCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/scale_20dp"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/scale_15dp"
+                android:weightSum="2">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/edtTvZipCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/zipcode"
+                        android:inputType="number"
+                        android:maxLength="6" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llSubmitPaymentMethod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/scale_20dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/btnSavePaymentMethod"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/app_bg"
+                    android:text="@string/save"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/scale_15dp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</layout>
