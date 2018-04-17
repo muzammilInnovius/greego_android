@@ -56,12 +56,33 @@ public class SessionManager {
 
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(AppPrefFields.PARAM_CONTACT_NO, vo.getData().getContact_number());
+            editor.putInt(AppPrefFields.PARAM_OTP, vo.getData().getOtp());
+            editor.putString(AppPrefFields.PARAM_TOKEN, vo.getData().getToken());
 
             editor.apply();
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
         }
+    }
+
+    public static void setIsUserLoggedin(Context context, boolean val) {
+        try {
+            SharedPreferences preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(AppPrefFields.SHARED_ISLOGGEDIN, val);
+            editor.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean getIsUserLoggedin(Context context) {
+        SharedPreferences preferences = context
+                .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        boolean val = preferences.getBoolean(AppPrefFields.SHARED_ISLOGGEDIN, false);
+        return val;
     }
 
     public static String getMobileNo(Context context) {
@@ -76,17 +97,39 @@ public class SessionManager {
         return mobileNo;
     }
 
-    public static void saveUserData(Context context, VerifyOtp vo) {
+    public static void saveUserData(Context context, Login vo) {
         try {
             SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(AppPrefFields.PARAM_CONTACT_NO, vo.getData().getContact_number());
-            editor.putInt(AppPrefFields.PARAM_ID, vo.getData().getId());
-            editor.putInt(AppPrefFields.PARAM_NEW, vo.getData().getNewX());
+            editor.putInt(AppPrefFields.PARAM_OTP, vo.getData().getOtp());
             editor.putString(AppPrefFields.PARAM_TOKEN, vo.getData().getToken());
 
+            editor.apply();
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
 
+//    public static void clearRememberMeSession(Context context) {
+//        try {
+//            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_REMEMBER_ME, Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editor = preferences.edit();
+//            editor.clear();
+//            editor.apply();
+//        } catch (Exception e) {
+//            // TODO: handle exception
+//            e.printStackTrace();
+//        }
+//    }
+
+    public static void clearAppSession(Context context) {
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
             editor.apply();
         } catch (Exception e) {
             // TODO: handle exception
@@ -110,6 +153,18 @@ public class SessionManager {
             // TODO: handle exception
             e.printStackTrace();
         }
+    }
+
+    public static int getOTP(Context context) {
+        int otp = 0;
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            otp = preferences.getInt(AppPrefFields.PARAM_OTP, 0);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return otp;
     }
 
     public static String getToken(Context context) {
@@ -181,7 +236,6 @@ public class SessionManager {
         }
 
     }
-
 
     public static void setLocationService(final Activity activity) {
         // TODO Auto-generated method stub

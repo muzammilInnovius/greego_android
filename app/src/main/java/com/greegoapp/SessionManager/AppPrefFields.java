@@ -7,6 +7,8 @@ public class AppPrefFields {
     public final static String PARAM_TOKEN= "token";
     public final static String PARAM_ID= "id";
     public final static String PARAM_NEW= "new";
+    public final static String PARAM_OTP= "otp";
 
+    public final static String SHARED_ISLOGGEDIN = "logIn";
 
 }

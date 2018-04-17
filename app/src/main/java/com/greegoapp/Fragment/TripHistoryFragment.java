@@ -7,22 +7,21 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
-import com.greegoapp.Activity.HomeActivity;
+import com.greegoapp.Activity.TripHistoryActivity;
 import com.greegoapp.Adapter.TripHistoryAdapter;
+import com.greegoapp.Interface.BackPressedFragment;
+import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
 import com.greegoapp.Model.TripHistoryModel;
 import com.greegoapp.R;
-import com.greegoapp.databinding.FragmentAddPaymentMethodBinding;
+import com.greegoapp.Utils.HeaderBar;
 import com.greegoapp.databinding.FragmentTripHistoryBinding;
 
 import java.util.ArrayList;
@@ -45,11 +44,16 @@ public class TripHistoryFragment extends Fragment implements View.OnClickListene
     TripHistoryAdapter tripHistoryAdapter;
     TripHistoryModel tripHistoryModel;
     RecyclerViewItemClickListener mListener;
+    private BackPressedFragment backPressed;
+    CallFragmentInterface callMyFragment;
 
-
-
-    public TripHistoryFragment() {
-        // Required empty public constructor
+    public static TripHistoryFragment newInstance(String param1, String param2) {
+        TripHistoryFragment fragment = new TripHistoryFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
     }
 
 
@@ -68,28 +72,49 @@ public class TripHistoryFragment extends Fragment implements View.OnClickListene
         setListner();
 
 
-
         return view;
 
+    }
+    private HeaderBar headerBar;
+
+    private void setHeaderbar() {
+        try {
+//            headerBar = (HeaderBar) findViewById(R.id.headerBar);
+            headerBar.ivLeft.setImageResource(R.mipmap.ic_back_button);
+            headerBar.ivLeft.setOnClickListener(this);
+
+            headerBar.rrHomeBtn.setVisibility(View.GONE);
+
+            headerBar.ivRight.setVisibility(View.GONE);
+            headerBar.ivRightOfLeft.setVisibility(View.GONE);
+
+            headerBar.tvTitle.setVisibility(View.VISIBLE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setRecyclerView() {
         RecyclerViewItemClickListener mListener = new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Fragment fragment = new TripHistoryDetailFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerBody, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+//                Fragment fragment = new TripHistoryDetailFragment();
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.containerBody, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
+
+                Intent in = new Intent(context, TripHistoryActivity.class);
+                startActivity(in);
 
             }
         };
         recyclerView.setHasFixedSize(true);
         tripHistoryModel.setDate("45");
         tripHistoryList.add(tripHistoryModel);
-        recyclerView.setAdapter(new TripHistoryAdapter(tripHistoryList, context,mListener));
+        recyclerView.setAdapter(new TripHistoryAdapter(tripHistoryList, context, mListener));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
     }
@@ -101,8 +126,8 @@ public class TripHistoryFragment extends Fragment implements View.OnClickListene
     }
 
     private void bindViews() {
-        recyclerView=binding.rcVwTripHistory;
-        ibback=binding.ibBack;
+        recyclerView = binding.rcVwTripHistory;
+        ibback = binding.ibBack;
 
         tripHistoryModel = new TripHistoryModel();
         tripHistoryList = new ArrayList<TripHistoryModel>();
@@ -118,29 +143,39 @@ public class TripHistoryFragment extends Fragment implements View.OnClickListene
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-    }
+        if (context instanceof CallFragmentInterface) {
+            callMyFragment = (CallFragmentInterface) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
+        }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
+        if (context instanceof BackPressedFragment) {
+            backPressed = (BackPressedFragment) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
+        }
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId())
-        {
+        switch (view.getId()) {
             case R.id.ibBack:
-                Intent i=new Intent(getActivity(), HomeActivity.class);
-                startActivity(i);
+                backPressed.onBackPressed(getActivity());
                 break;
 
         }
     }
-
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callMyFragment = null;
+        backPressed = null;
+    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name

@@ -8,8 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/free_trip_bg"
-        android:paddingBottom="@dimen/scale_45dp"
-        tools:context=".Fragment.FreeTripsFragment">
+       tools:context=".Fragment.FreeTripsFragment">
 
 
 
@@ -24,6 +23,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
+                android:visibility="invisible"
                 android:id="@+id/ibBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -18,7 +18,6 @@ import com.greegoapp.Fragment.AddPaymentMethodFragment;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
 import com.greegoapp.Model.TripHistoryModel;
 import com.greegoapp.R;
-import com.greegoapp.databinding.FragmentTripHistoryBinding;
 import com.greegoapp.databinding.RowTripHistoryBinding;
 
 import java.util.ArrayList;

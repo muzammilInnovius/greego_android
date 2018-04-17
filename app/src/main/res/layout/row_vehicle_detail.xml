@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mytextview="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        tools:context="com.greegoapp.Fragment.UserProfileFragment"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/scale_10dp"
+            android:paddingBottom="@dimen/scale_10dp"
+            >
+
+                <TextView
+                    android:id="@+id/tvYear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:layout_marginLeft="@dimen/scale_5dp"
+                    android:textSize="@dimen/scale_15dp"
+                    android:layout_toRightOf="@+id/ivProPicTripHistory"
+                    android:text="@string/vehicle_year"
+                    tools:ignore="NotSibling" />
+                <TextView
+                    android:id="@+id/tvModel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/scale_15dp"
+                    android:layout_marginLeft="@dimen/scale_5dp"
+                    android:layout_toRightOf="@+id/tvYear"
+                    android:text="@string/vehicle_model"/>
+
+                <TextView
+                    android:id="@+id/tvMake"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/scale_5dp"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/scale_15dp"
+                    android:layout_toRightOf="@+id/tvModel"
+                    android:textColor="@color/black"
+                    android:text="@string/vehicle_make"/>
+            <TextView
+                android:id="@+id/tvColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_5dp"
+                android:layout_weight="1"
+                android:textSize="@dimen/scale_15dp"
+                android:layout_toRightOf="@+id/tvMake"
+                android:textColor="@color/black"
+                android:text="@string/vehicle_color"/>
+
+            <ImageView
+                android:id="@+id/imgVwnext"
+                android:layout_width="@dimen/scale_20dp"
+                android:layout_height="@dimen/scale_20dp"
+                android:layout_marginLeft="@dimen/scale_20dp"
+                android:layout_marginRight="@dimen/scale_10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                mytextview:srcCompat="@mipmap/ic_remove"
+                />
+            </RelativeLayout>
+
+
+
+
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

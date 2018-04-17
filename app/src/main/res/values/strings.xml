@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GreegoApp</string>
+    <string name="app_name">Greego</string>
     <string name="app_name_title">GREEGO</string>
     <string name="welcome_app_name">Welcome GreegoApp</string>
     <string name="header_title">Title</string>
@@ -30,14 +30,8 @@
     <string name="hint_fname">First name</string>
     <string name="hint_lname">Last name</string>
     <string name="whats_agreement">Do you agree with Greego?</string>
-    -
-    <string name="desc_agreement">
-- <![CDATA[ It is the term & condition for users
-  ]]>
-  </string>
+    <string name="desc_agreement">It is the term &amp; condition for users</string>
     <string name="agreement_detail">Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,</string>
-    - <!--  TODO: Remove or change this placeholder text
-  -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="payment_setting_title">This is Your Payment Setting</string>
     <string name="payment_method">Payment Method</string>
@@ -61,12 +55,12 @@
     <string name="cvv">CVV</string>
     <string name="zipcode">Zip Code</string>
     <string name="save">Save</string>
-    <string name="enter_valid_card_no">Please enter valid card number.</string>
+    <string name="enter_valid_card_no">Card number should be minimum 12 characters long.</string>
     <string name="enter_exp_date">Please select expire date.</string>
     <string name="enter_cvv_no">Please enter cvv number.</string>
-    <string name="enter_valid_cvv_no">Please enter valid cvv number.</string>
+    <string name="enter_valid_cvv_no">Cvv number should be minimum 3 characters long.</string>
     <string name="enter_zipcode">Please enter zip code.</string>
-    <string name="enter_valid_zipcode">Please enter valid zip code.</string>
+    <string name="enter_valid_zipcode">Zip code should be minimum 6 characters long.</string>
     <string name="hint_promo_code">Please enter a promo/Gift code</string>
     <string name="cancel">Cancel</string>
     <string name="add">Add</string>
@@ -100,12 +94,8 @@
     <string name="greego_help_title">greego.co/help</string>
     <string name="how_help">HOW CAN WE</string>
     <string name="help">HELP?</string>
-    -
 
-    <string name="lost_found">
-- <![CDATA[ Lost & Found
-  ]]>
-  </string>
+    <string name="lost_found">Lost &amp; Found</string>
     <string name="help_report">Report an accident, safety Incident, or citation</string>
 
     <string name="title_activity_maps_home">Map</string>
@@ -129,5 +119,31 @@
 
     <string name="something_went_wrong">Something went wrong</string>
 
+    <!--Mujju-->
+    <string name="otp_resend_wng">Please enter correct otp.</string>
+    <string name="otp_resend_empty">Please resend otp.</string>
+    <string name="tv_vehical">What\'s your vehicle?</string>
+    <string name="tv_vehical_ttl_dtl">Please select the option for your vehicle information.</string>
 
+    <string name="vehicle_make_empty">Please choose vehicle make.</string>
+    <string name="vehicle_model_empty">Please choose vehicle model.</string>
+    <string name="vehicle_year_empty">Please choose vehicle year.</string>
+    <string name="vehicle_color_empty">Please choose vehicle color.</string>
+    <string name="vehicle_car_empty">Please choose vehicle car type.</string>
+
+    <string-array name="typeOfModel">
+        <item>Type of Car</item>
+        <item>Sedan</item>
+        <item>Suv</item>
+        <item>Van</item>
+    </string-array>
+
+
+    // pragnessh
+    <string name="wheredogo">Where do you want to go?</string>
+    <string name="picklocation">Pick-up location</string>
+    <string name="new_payment">What\'s your new payment?</string>
+
+    <string name="start1"><font fgcolor='#519021'>S</font>tart</string>
+    <string name="end1"><font fgcolor='#569A94'>E</font>nd</string>
 </resources>

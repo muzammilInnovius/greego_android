@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.greegoapp.Activity.HomeActivity;
+import com.greegoapp.Interface.BackPressedFragment;
+import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.R;
 import com.greegoapp.databinding.FragmentFreeTripsBinding;
 
@@ -26,14 +28,12 @@ public class FreeTripsFragment extends Fragment implements View.OnClickListener 
     private String mParam1;
     private String mParam2;
     Context context;
-    ImageButton ibback;
+    ImageButton ibBack;
     private OnFragmentInteractionListener mListener;
+    CallFragmentInterface callMyFragment;
+    private BackPressedFragment backPressed;
 
-    public FreeTripsFragment() {
-        // Required empty public constructor
-    }
-
-   public static FreeTripsFragment newInstance(String param1, String param2) {
+    public static FreeTripsFragment newInstance(String param1, String param2) {
         FreeTripsFragment fragment = new FreeTripsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -68,11 +68,11 @@ public class FreeTripsFragment extends Fragment implements View.OnClickListener 
     }
 
     private void setListner() {
-        ibback.setOnClickListener(this);
+        ibBack.setOnClickListener(this);
     }
 
     private void bindViews() {
-        ibback=binding.ibBack;
+        ibBack = binding.ibBack;
 
     }
 
@@ -86,21 +86,31 @@ public class FreeTripsFragment extends Fragment implements View.OnClickListener 
     public void onAttach(Context context) {
         super.onAttach(context);
 
+        if (context instanceof CallFragmentInterface) {
+            callMyFragment = (CallFragmentInterface) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
+        }
+
+        if (context instanceof BackPressedFragment) {
+            backPressed = (BackPressedFragment) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        callMyFragment = null;
+        backPressed = null;
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId())
-        {
+        switch (view.getId()) {
             case R.id.ibBack:
-                Intent i=new Intent(getActivity(), HomeActivity.class);
-                startActivity(i);
+                backPressed.onBackPressed(getActivity());
                 break;
         }
     }

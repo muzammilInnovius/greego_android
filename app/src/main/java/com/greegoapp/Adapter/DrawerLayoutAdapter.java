@@ -62,8 +62,8 @@ public class DrawerLayoutAdapter extends BaseAdapter {
             try {
                 drawerView = inflater.inflate(R.layout.listview_with_text_image, parent, false);
 
-                TextView txtMenuTitle = (TextView) drawerView.findViewById(R.id.listtextView);
-                ImageView imgVwLog = (ImageView) drawerView.findViewById(R.id.imgVwLog);
+                TextView txtMenuTitle = drawerView.findViewById(R.id.listtextView);
+                ImageView imgVwLog = drawerView.findViewById(R.id.imgVwLog);
 
                 txtMenuTitle.setText(menuTitle[position]);
 

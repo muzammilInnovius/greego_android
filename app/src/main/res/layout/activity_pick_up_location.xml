@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <fragment
+            android:id="@+id/mgooleMap"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_maker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_black_pin"
+                />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSetLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set"
+            android:textColor="@color/black"
+            android:textSize="@dimen/txt_15"
+            android:visibility="gone"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/scale_50dp"
+            />
+
+
+
+
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/scale_0.5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <RelativeLayout
+                android:id="@+id/search_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/bg_card">
+
+                <ImageView
+                    android:id="@+id/iv_backTop"
+                    android:layout_width="@dimen/scale_50dp"
+                    android:layout_height="@dimen/scale_40dp"
+                    android:padding="@dimen/scale_8dp"
+                    android:src="@mipmap/ic_back_button" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/iv_backTop"
+                    android:layout_marginBottom="@dimen/scale_5dp"
+                    android:weightSum="1">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/iv_backTop"
+                        android:layout_weight="0.2"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:weightSum="1">
+
+                        <TextView
+                            android:id="@+id/txtStart"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="@dimen/scale_8dp"
+                            android:text="@string/start1" />
+
+                        <View
+                            android:id="@+id/viewTimeStart"
+                            android:layout_width="1dp"
+                            android:layout_height="@dimen/scale_15dp"
+                            android:layout_below="@+id/llPickupLocation"
+                            android:background="@color/black"
+                            android:paddingBottom="-18dp"
+                            android:paddingTop="-18dp" />
+
+                        <TextView
+                            android:id="@+id/txtEnd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="@dimen/scale_8dp"
+                            android:text="@string/end1" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llPickupLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.7"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+
+                        <RelativeLayout
+                            android:id="@+id/rlPick"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/scale_50dp"
+                            android:descendantFocusability="beforeDescendants"
+                            android:focusableInTouchMode="true"
+                            android:background="@drawable/edt_boxpickup">
+
+                            <EditText
+                                android:id="@+id/edt_pickLocation"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:hint="@string/picklocation"
+                                android:singleLine="true"
+                                android:padding="@dimen/scale_4dp"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:layout_toLeftOf="@+id/clear"
+                                android:imeOptions="actionSearch"
+                                android:background="@null"
+                                android:layout_marginLeft="@dimen/scale_8dp"/>
+
+                            <ImageView
+                                android:id="@+id/clear"
+                                android:layout_width="@dimen/scale_30dp"
+                                android:layout_height="@dimen/scale_30dp"
+                                android:src="@mipmap/clear"
+                                android:layout_alignParentRight="true"
+                                android:layout_gravity="right|center_vertical"
+                                android:visibility="gone"
+                                android:padding="@dimen/scale_8dp"
+                                android:layout_marginRight="@dimen/scale_8dp"
+                                android:layout_centerVertical="true"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/scale_50dp"
+                            android:layout_marginTop="@dimen/scale_4dp"
+                            android:descendantFocusability="beforeDescendants"
+                            android:focusableInTouchMode="true"
+                            android:background="@drawable/edt_boxpickup">
+
+                            <EditText
+                                android:id="@+id/edt_DesLocation"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:hint="@string/wheredogo"
+                                android:singleLine="true"
+                                android:padding="@dimen/scale_4dp"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:layout_toLeftOf="@+id/declear"
+                                android:imeOptions="actionDone"
+                                android:background="@null"
+                                android:layout_marginLeft="@dimen/scale_8dp"/>
+
+                            <ImageView
+                                android:id="@+id/declear"
+                                android:layout_width="@dimen/scale_30dp"
+                                android:layout_height="@dimen/scale_30dp"
+                                android:src="@mipmap/clear"
+                                android:layout_alignParentRight="true"
+                                android:layout_gravity="right|center_vertical"
+                                android:visibility="gone"
+                                android:padding="@dimen/scale_8dp"
+                                android:layout_marginRight="@dimen/scale_8dp"
+                                android:layout_centerVertical="true"/>
+
+                        </RelativeLayout>
+
+
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.1" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+
+
+            <LinearLayout
+                android:id="@+id/ll_LocationView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@mipmap/app_bg"
+                android:orientation="vertical"
+                android:layout_below="@+id/search_layout"
+                >
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/list_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/search_layout"
+                    android:visibility="visible" />
+
+
+                <RelativeLayout
+                    android:id="@+id/rlSetLocationMap"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scale_50dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/image"
+                        android:layout_width="@dimen/scale_30dp"
+                        android:layout_height="@dimen/scale_30dp"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_map" />
+
+                    <TextView
+                        android:id="@+id/address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/scale_8dp"
+                        android:layout_marginRight="@dimen/scale_4dp"
+                        android:layout_toRightOf="@+id/image"
+                        android:lineSpacingExtra="@dimen/scale_8dp"
+                        android:singleLine="true"
+                        android:textColor="#000000"
+                        android:text="Set Location on the map"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/txt_14" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="#B6BDBF" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rlCurrentLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scale_50dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/image1"
+                        android:layout_width="@dimen/scale_30dp"
+                        android:layout_height="@dimen/scale_30dp"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_map" />
+
+                    <TextView
+                        android:id="@+id/address1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/scale_8dp"
+                        android:layout_marginRight="@dimen/scale_4dp"
+                        android:layout_toRightOf="@+id/image1"
+                        android:lineSpacingExtra="@dimen/scale_8dp"
+                        android:singleLine="true"
+                        android:textColor="#000000"
+                        android:text="Set Current Location"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/txt_14" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="#B6BDBF" />
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+
+
+        </RelativeLayout>
+
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

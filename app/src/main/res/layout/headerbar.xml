@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/transparent">
+
+    <com.greegoapp.Utils.RoundedImageView
+        android:id="@+id/ivProPicHome"
+        android:layout_width="@dimen/scale_40dp"
+        android:layout_height="@dimen/scale_40dp"
+        android:layout_marginLeft="@dimen/scale_10dp"
+        android:background="@mipmap/ic_user_profile"
+        android:elevation="4dp"
+        android:scaleType="fitXY"
+        android:visibility="visible"
+        app:border_color="@color/app_bg"
+        app:corner_radius="@dimen/scale_20dp"
+        app:round_background="true" />
+
+    <com.greegoapp.Utils.RoundedImageView
+        android:id="@+id/ivLeft"
+        android:layout_width="@dimen/scale_50dp"
+        android:layout_height="@dimen/scale_40dp"
+        android:layout_alignParentLeft="true"
+        android:padding="@dimen/scale_5dp"
+        android:src="@mipmap/ic_back_button"
+        android:visibility="invisible" />
+
+
+    <ImageView
+        android:id="@+id/ivRight"
+        android:layout_width="@dimen/scale_50dp"
+        android:layout_height="@dimen/scale_50dp"
+        android:layout_alignParentRight="true"
+        android:padding="@dimen/scale_10dp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/ivRightOfLeft"
+        android:layout_width="@dimen/scale_50dp"
+        android:layout_height="@dimen/scale_50dp"
+        android:layout_centerInParent="true"
+        android:layout_toLeftOf="@id/ivRight"
+        android:padding="@dimen/scale_10dp"
+        android:paddingLeft="@dimen/scale_15dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="@dimen/scale_5dp"
+        android:text="dsds"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/txt_18"
+        android:visibility="gone" />
+
+
+</RelativeLayout>

@@ -8,12 +8,15 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -23,6 +26,9 @@ import com.chaos.view.PinView;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
+import com.greegoapp.Model.GetUserData;
+import com.greegoapp.Model.Login;
+import com.greegoapp.Model.UserData;
 import com.greegoapp.Model.VerifyOtp;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
@@ -33,9 +39,16 @@ import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivityDigitCodeBinding;
+import com.stfalcon.smsverifycatcher.OnSmsCatchListener;
+import com.stfalcon.smsverifycatcher.SmsVerifyCatcher;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DigitCodeActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -48,9 +61,11 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
     Context context;
     private View snackBarView;
     String strOtpCode;
-    TextView txtTimer;
+    TextView txtTimer, tvCntWthDriver;
     CountDownTimer mCountDownTimer;
     Dialog dialogotp;
+    int sendOtp;
+    SmsVerifyCatcher smsVerifyCatcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +76,27 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
         bindView();
         setListners();
+        timer();
+        tvCntWthDriver.setText(SessionManager.getMobileNo(context));
+
+        sendOtp = SessionManager.getOTP(context);
+
+        smsVerifyCatcher = new SmsVerifyCatcher(this, new OnSmsCatchListener<String>() {
+            @Override
+            public void onSmsCatch(String message) {
+                String code = parseCode(message);//Parse verification code
+                pinVwOtpCode.setText(code);//set code in edit text
+
+                if (ConnectivityDetector
+                        .isConnectingToInternet(context)) {
+
+                    callDigitCodeAPI();
+
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+            }
+        });
     }
 
     private void setListners() {
@@ -75,6 +111,8 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         pinVwOtpCode = binding.pinVwDigitCode;
         tvResend = binding.tvResend;
         ibFinish = binding.ibFinish;
+        tvCntWthDriver = binding.tvCntWthDriver;
+        txtTimer = binding.txtTimer;
        /* edtTvDigit1 = binding.edtTvDigit1;
         edtTvDigit2 = binding.edtTvDigit2;
         edtTvDigit3 = binding.edtTvDigit3;
@@ -93,10 +131,14 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 iback.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(iback);
                 overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
+                finish();
                 break;
             case R.id.tvResend:
+                cancelTimer();
                 timer();
+                callMobileNumberAPI();
                 pinVwOtpCode.setText("");
+                KeyboardUtility.showKeyboard(context,pinVwOtpCode);
                 break;
             /*    edtTvDigit1.setText("");
                 edtTvDigit2.setText("");
@@ -125,88 +167,44 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
     }
 
 
-    public void timer() {
-        mCountDownTimer = new CountDownTimer(30000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
-                int seconds = (int) (millisUntilFinished / 1000) % 60;
-
-                txtTimer.setText(String.format("%02d", minutes) + " : " + String.format("%02d", seconds));
-
-            }
-
-            @Override
-            public void onFinish() {
-                txtTimer.setText("00" + " : " + "00");
-                tvResend.setEnabled(true);
-                tvResend.setTextColor(Color.BLUE);
-                pinVwOtpCode.setText("");
-//                isCounterRunning = false;
-                dialogotp.setCanceledOnTouchOutside(true);
-                dialogotp.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                    @Override
-                    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                        return false;
-                    }
-                });
-                dialogotp.dismiss();
-                pinVwOtpCode.setText("");
-            }
-        }.start();
-    }
-
-    private boolean isValid() {
-        strOtpCode = pinVwOtpCode.getText().toString();
-        if (strOtpCode.length() < 6) {
-            pinVwOtpCode.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_digit_code));
-            return false;
-        }
-        return true;
-    }
-
-    private void callDigitCodeAPI() {
-
+    private void callMobileNumberAPI() {
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put(WebFields.VERIFY_OTP.PARAM_CONTACT_NO, SessionManager.getMobileNo(context));
-            jsonObject.put(WebFields.VERIFY_OTP.PARAM_OTP, strOtpCode);
+//            String token = SessionManager.getToken(context);
+//            Applog.E("Token" + token);
 
-            Applog.E("request DigitCode=> " + jsonObject.toString());
+            jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, SessionManager.getMobileNo(context));
+            jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
+
+            Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                    WebFields.BASE_URL + WebFields.VERIFY_OTP.MODE, jsonObject, new Response.Listener<JSONObject>() {
+                    WebFields.BASE_URL + WebFields.SIGN_IN.MODE, jsonObject, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
 
-                    VerifyOtp otpData = new Gson().fromJson(String.valueOf(response), VerifyOtp.class);
+                    Login loginData = new Gson().fromJson(String.valueOf(response), Login.class);
                     try {
                         MyProgressDialog.hideProgressDialog();
-//
-                        if (otpData.getError_code() == 0) {
+                        if (loginData.getError_code() == 0) {
 
-                            Applog.E("Contact No" + otpData);
-                            SessionManager.saveUserData(context, otpData);
+                            Applog.E("Contact No" + loginData.getData().getContact_number());
+                            SessionManager.saveUserData(context, loginData);
+
+                            sendOtp = SessionManager.getOTP(context);
+                            Applog.E("Resend Otp ==> " + sendOtp);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
-//
-                            if (otpData.getData().getNewX() == 0) {
-                                Intent in = new Intent(context, HomeActivity.class);
-                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-                            }else {
-                                Intent in = new Intent(context, SignUpEmailActivity.class);
-                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-                            }
+//                            backPressed.onBackPressed(getContext());
 
 
-//
+//                            Intent in = new Intent(context, DigitCodeActivity.class);
+//                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(in);
+//                            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+
                         } else {
                             MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));
@@ -234,6 +232,273 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void timer() {
+        txtTimer.setText("");
+
+        mCountDownTimer = new CountDownTimer(60000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+
+                txtTimer.setText(String.format("%02d", minutes) + " : " + String.format("%02d", seconds));
+
+            }
+
+            @Override
+            public void onFinish() {
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_empty));
+                String mobileNo = SessionManager.getMobileNo(context);
+
+                sendOtp = 0;
+
+                txtTimer.setText("00" + " : " + "00");
+                tvResend.setEnabled(true);
+                tvResend.setTextColor(Color.BLUE);
+                pinVwOtpCode.setText("");
+//                isCounterRunning = false;
+//                dialogotp.setCanceledOnTouchOutside(true);
+//                dialogotp.setOnKeyListener(new DialogInterface.OnKeyListener() {
+//                    @Override
+//                    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+//                        return false;
+//                    }
+//                });
+//                dialogotp.dismiss();
+                pinVwOtpCode.setText("");
+            }
+        }.start();
+    }
+
+    //cancel timer
+    void cancelTimer() {
+        if (mCountDownTimer != null)
+            mCountDownTimer.cancel();
+    }
+
+    private boolean isValid() {
+        strOtpCode = pinVwOtpCode.getText().toString();
+        if (strOtpCode.length() < 6) {
+            pinVwOtpCode.requestFocus();
+            SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_digit_code));
+            return false;
+        }
+        return true;
+    }
+
+    private void callDigitCodeAPI() {
+
+        String mobileNo = SessionManager.getMobileNo(context);
+        strOtpCode = pinVwOtpCode.getText().toString();
+
+        if (sendOtp != 0) {
+//            sendOtp = SessionManager.getOTP(context);
+            String newOtp = "" + sendOtp;
+            if (strOtpCode.matches(newOtp)) {
+                callUserMeApi();
+
+
+            } else {
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
+//            sendOtp = resendOtp;
+            }
+
+
+//        if (sendOtp != null) {
+//        Applog.E("sendOtp==>" +sendOtp);
+//            if (strOtpCode.matches(sendOtp)) {
+//                Intent in = new Intent(context, SignUpEmailActivity.class);
+//                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(in);
+//                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+////            }
+//        } else {
+//            SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_empty));
+//        }
+
+//        try {
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put(WebFields.VERIFY_OTP.PARAM_CONTACT_NO, SessionManager.getMobileNo(context));
+//            jsonObject.put(WebFields.VERIFY_OTP.PARAM_OTP, strOtpCode);
+//
+//            Applog.E("request DigitCode=> " + jsonObject.toString());
+//            MyProgressDialog.showProgressDialog(context);
+//
+//            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+//                    WebFields.BASE_URL + WebFields.VERIFY_OTP.MODE, jsonObject, new Response.Listener<JSONObject>() {
+//
+//                @Override
+//                public void onResponse(JSONObject response) {
+//                    Applog.E("success: " + response.toString());
+//
+//                    VerifyOtp otpData = new Gson().fromJson(String.valueOf(response), VerifyOtp.class);
+//                    try {
+//                        MyProgressDialog.hideProgressDialog();
+////
+//                        if (otpData.getError_code() == 0) {
+//
+//                            Applog.E("Contact No" + otpData);
+////                            SessionManager.saveUserData(context, otpData);
+////                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
+////
+//                            if (otpData.getData().getNewX() == 1) {
+//                                Intent in = new Intent(context, HomeActivity.class);
+//                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                startActivity(in);
+//                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+//                            } else {
+//                                Intent in = new Intent(context, SignUpEmailActivity.class);
+//                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                startActivity(in);
+//                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+//                            }
+//
+//
+////
+//                        } else {
+//                            MyProgressDialog.hideProgressDialog();
+//                            SnackBar.showError(context, snackBarView, response.getString("message"));
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }, new Response.ErrorListener() {
+//
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    MyProgressDialog.hideProgressDialog();
+//                    Applog.E("Error: " + error.getMessage());
+//
+//                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+//                }
+//            });
+//            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+//                    GlobalValues.TIME_OUT,
+//                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//
+//            AppController.getInstance().addToRequestQueue(jsonObjReq);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        } else {
+            SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
+//            sendOtp = resendOtp;
+        }
+    }
+
+    private void callUserMeApi() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+                    GetUserData userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+//
+                        if (userDetails.getError_code() == 0) {
+
+                            Applog.E("UserDetails==>Dg==>" + userDetails);
+//                            SessionManager.saveUserData(context, userDetails);
+//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
+//
+                            //getIs_agreed = 0 new user
+                            if (userDetails.getData().getIs_agreed().matches("0")) {
+                                Intent in = new Intent(context, SignUpEmailActivity.class);
+                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(in);
+                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+                            } else {
+                                SessionManager.setIsUserLoggedin(context, true);
+                                Intent in = new Intent(context, HomeActivity.class);
+                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(in);
+                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+                            }
+
+//
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        smsVerifyCatcher.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        smsVerifyCatcher.onStop();
+    }
+
+    /**
+     * need for Android 6 real time permissions
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        smsVerifyCatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private String parseCode(String message) {
+        Pattern p = Pattern.compile("\\b\\d{6}\\b");
+        Matcher m = p.matcher(message);
+        String code = "";
+        while (m.find()) {
+            code = m.group(0);
+        }
+        return code;
+    }
+
 }

@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.greegoapp.Interface.BackPressedFragment;
+import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.R;
 import com.greegoapp.databinding.FragmentHelpBinding;
 
@@ -23,12 +25,10 @@ public class HelpFragment extends Fragment {
     private String mParam2;
     Context context;
     ImageButton done;
-
+    CallFragmentInterface callMyFragment;
     private OnFragmentInteractionListener mListener;
 
-    public HelpFragment() {
-    }
-
+    private BackPressedFragment backPressed;
    public static HelpFragment newInstance(String param1, String param2) {
         HelpFragment fragment = new HelpFragment();
         Bundle args = new Bundle();
@@ -80,12 +80,25 @@ public class HelpFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        if (context instanceof CallFragmentInterface) {
+            callMyFragment = (CallFragmentInterface) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
+        }
+
+        if (context instanceof BackPressedFragment) {
+            backPressed = (BackPressedFragment) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        callMyFragment = null;
+        backPressed = null;
     }
 
     public interface OnFragmentInteractionListener {

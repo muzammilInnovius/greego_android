@@ -8,85 +8,80 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        tools:context="com.greegoapp.Fragment.TripHistoryFragment"
-        >
+        tools:context="com.greegoapp.Fragment.TripHistoryFragment">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/scale_10dp"
-        android:paddingBottom="@dimen/scale_10dp"
-       >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/scale_10dp"
+            android:paddingTop="@dimen/scale_10dp">
 
             <com.greegoapp.Utils.RoundedImageView
                 android:id="@+id/ivProPicTripHistory"
                 android:layout_width="@dimen/scale_50dp"
                 android:layout_height="@dimen/scale_50dp"
-                android:background="@mipmap/ic_place_holder"
-                android:scaleType="fitXY"
-                android:layout_marginLeft="@dimen/scale_10dp"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/scale_10dp"
+                android:background="@mipmap/ic_place_holder"
                 android:elevation="4dp"
+                android:scaleType="fitXY"
                 app:border_color="@color/app_bg"
                 app:corner_radius="@dimen/scale_25dp"
                 app:round_background="true" />
 
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ivProPicTripHistory"
+                android:paddingLeft="@dimen/scale_5dp">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/scale_5dp"
-            android:layout_toRightOf="@+id/ivProPicTripHistory"
-            >
-            <TextView
+                <TextView
                     android:id="@+id/tvTripDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                     android:textSize="@dimen/scale_15dp"
-                    android:layout_toRightOf="@+id/ivProPicTripHistory"
                     android:text="@string/trip_date_time"
-                tools:ignore="NotSibling" />
-              <TextView
-                  android:id="@+id/tvTripTime"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_16"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTripTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvTripDate"
                     android:layout_marginRight="@dimen/scale_6dp"
                     android:layout_weight="1"
-                  android:textSize="@dimen/scale_15dp"
-                  android:layout_below="@+id/tvTripDate"
-                    android:text="@string/trip_history_mi"/>
+                    android:text="@string/trip_history_mi"
+                    android:textSize="@dimen/txt_14" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/scale_15dp"
-                    android:layout_weight="1"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/scale_15dp"
                     android:layout_below="@+id/tvTripDate"
+                    android:layout_marginLeft="@dimen/scale_15dp"
                     android:layout_toRightOf="@+id/tvTripTime"
+                    android:layout_weight="1"
+                    android:text="@string/trip_price"
                     android:textColor="@color/black"
-                    android:text="@string/trip_price"/>
+                    android:textSize="@dimen/txt_14"
+                    android:textStyle="bold" />
 
 
-        </RelativeLayout>
+            </RelativeLayout>
 
             <ImageView
                 android:id="@+id/imgVwnext"
                 android:layout_width="@dimen/scale_20dp"
                 android:layout_height="@dimen/scale_20dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/scale_20dp"
                 android:layout_marginRight="@dimen/scale_10dp"
-                android:layout_centerVertical="true"
-               android:layout_alignParentRight="true"
-                mytextview:srcCompat="@mipmap/ic_finish_arrow"
-                />
+                mytextview:srcCompat="@mipmap/ic_finish_arrow" />
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-       
+
     </android.support.constraint.ConstraintLayout>
 </layout>

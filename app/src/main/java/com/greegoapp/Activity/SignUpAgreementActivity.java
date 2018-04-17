@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -23,6 +24,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
+import com.greegoapp.Model.GetUserData;
 import com.greegoapp.Model.UserData;
 import com.greegoapp.Model.VerifyOtp;
 import com.greegoapp.R;
@@ -37,6 +39,9 @@ import com.greegoapp.databinding.ActivitySignUpAgreementBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpAgreementActivity extends AppCompatActivity implements View.OnClickListener {
     ActivitySignUpAgreementBinding binding;
@@ -98,18 +103,19 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
+                KeyboardUtility.hideKeyboard(context, view);
                 Intent in = new Intent(context, SignUpUserNameActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
-
+                finish();
                 break;
             case R.id.ibFinish:
                 KeyboardUtility.hideKeyboard(context, view);
                 if (isValid()) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
-
+                        isChecked = true;
                         callAcceptAgreementAPI();
 
                     } else {
@@ -124,17 +130,17 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
         try {
             JSONObject jsonObject = new JSONObject();
 
-            jsonObject.put(WebFields.SIGN_UP.PARAM_ACCEPT, "application/json");
-            Applog.E("Token===>" + SessionManager.getToken(context));
-            jsonObject.put(WebFields.SIGN_UP.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
-
             jsonObject.put(WebFields.SIGN_UP.PARAM_FIRST_NAME, strFName);
             jsonObject.put(WebFields.SIGN_UP.PARAM_LAST_NAME, strLName);
             jsonObject.put(WebFields.SIGN_UP.PARAM_EMAIL, strEmail);
             jsonObject.put(WebFields.SIGN_UP.PARAM_CITY, "");
             jsonObject.put(WebFields.SIGN_UP.PARAM_PRO_PIC, "");
-            jsonObject.put(WebFields.SIGN_UP.PARAM_IS_AGGREED, isChecked);
 
+            if (isChecked) {
+                jsonObject.put(WebFields.SIGN_UP.PARAM_IS_AGGREED, 1);
+            } else {
+                jsonObject.put(WebFields.SIGN_UP.PARAM_IS_AGGREED, 0);
+            }
 
             Applog.E("request DigitCode=> " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
@@ -146,22 +152,90 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
 
-                    UserData userDetails= new Gson().fromJson(String.valueOf(response), UserData.class);
+                    UserData userDetails = new Gson().fromJson(String.valueOf(response), UserData.class);
                     try {
                         MyProgressDialog.hideProgressDialog();
 //
                         if (userDetails.getError_code() == 0) {
 
                             Applog.E("UserDetails" + userDetails);
+                            callUserMeApi();
+                            SessionManager.setIsUserLoggedin(context, true);
+//                            Intent in = new Intent(context, HomeActivity.class);
+//                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(in);
+//                            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+//                            finish();
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void callUserMeApi() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+                    GetUserData userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+//
+                        if (userDetails.getError_code() == 0) {
+
+                            Applog.E("UserUpdate==>Dg==>" + userDetails);
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //
-
+                            //getIs_agreed = 0 new user
                             Intent in = new Intent(context, HomeActivity.class);
                             in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(in);
-                            overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
-
+                            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
 //
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -180,7 +254,17 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
 
                     SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                 }
-            });
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
             jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
                     GlobalValues.TIME_OUT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
@@ -193,10 +277,11 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
 
     }
 
+
     public boolean isValid() {
         //   boolean cbchecked=false;
         if (!cbChecked.isChecked()) {
-            isChecked = true;
+            isChecked = false;
             cbChecked.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.no_checked_agreement));
             return false;
