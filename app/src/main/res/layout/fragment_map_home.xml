@@ -333,6 +333,7 @@
                 android:weightSum="1">
 
                 <ImageView
+                    android:id="@+id/imgSetting"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -342,6 +343,7 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/tvEditVehicle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -356,6 +358,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/llSetVehicle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/scale_5dp"
@@ -366,6 +369,7 @@
                 android:weightSum="1">
 
                 <ImageView
+                    android:id="@+id/imgVwVehicle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"

@@ -34,12 +34,12 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -170,7 +170,10 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     Double dist;
     int mapZoomLevel;
     ArrayList<GetUserData> userDetails = new ArrayList<>();
-    LinearLayout llEditVehicle;
+
+    //Vehicle 17_4_2018
+    LinearLayout llEditVehicle, llSetVehicle;
+    ImageView imgSetting, imgVwVehicle;
 
     public static MapHomeFragment newInstance(ArrayList<GetUserData> userData, String param2) {
         MapHomeFragment fragment = new MapHomeFragment();
@@ -391,15 +394,14 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
                 createRoute();
             }
-        }
-        else if (requestCode == ADD_EDIT_VEHICAL_REQUEST) {
+        } else if (requestCode == ADD_EDIT_VEHICAL_REQUEST) {
             if (data != null) {
                 String manufac = data.getStringExtra("manufacture");
                 String model = data.getStringExtra("model");
                 String year = data.getStringExtra("year");
                 String color = data.getStringExtra("color");
 
-                tvVehicalData.setText(manufac+" "+model+" "+year+" "+color);
+                tvVehicalData.setText(manufac + " " + model + " " + year + " " + color);
                 Applog.E("manufac=>" + manufac + "model=>" + model + "year=>" + year + "color=>" + color);
             }
         }
@@ -432,7 +434,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
             case R.id.llEditVehicle:
                 in = new Intent(context, AddEditVehicleActivity.class);
-                startActivityForResult(in,ADD_EDIT_VEHICAL_REQUEST);
+                startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
                 break;
 
             case R.id.rlVwUpdateMain:
@@ -457,7 +459,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 break;
             case R.id.txtVwVehicleName:
                 in = new Intent(context, AddEditVehicleActivity.class);
-                startActivityForResult(in,ADD_EDIT_VEHICAL_REQUEST);
+                startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
 //                        fragment = AddEditVehicleFragment.newInstance("", "");
 //                fragment = new V();
                 break;
@@ -476,7 +478,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 break;
             case R.id.rlVehicleNo:
                 in = new Intent(context, AddEditVehicleActivity.class);
-                startActivityForResult(in,ADD_EDIT_VEHICAL_REQUEST);
+                startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
 //                        fragment = AddEditVehicleFragment.newInstance("", "");
 //                fragment = new V();
                 break;
@@ -995,19 +997,19 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
                 mGoogleMap.addPolyline(polyLineOptions);
 
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(pickupPoint);
                 builder.include(dropPoint);
 
-                LatLngBounds bounds=builder.build();
+                LatLngBounds bounds = builder.build();
 
-                int width =getResources().getDisplayMetrics().widthPixels;
-                int padding= (int) (width*0.2);
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int padding = (int) (width * 0.2);
 
-                CameraUpdate cameraUpdate=CameraUpdateFactory.newLatLngBounds(bounds,padding);
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 mGoogleMap.animateCamera(cameraUpdate);
 
-              dist=getDistance(pickupPoint.latitude,pickupPoint.longitude,dropPoint.latitude,dropPoint.longitude);
+                dist = getDistance(pickupPoint.latitude, pickupPoint.longitude, dropPoint.latitude, dropPoint.longitude);
 
                 if (dist > 2 && dist <= 5) {
                     mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(13.0f));
@@ -1045,7 +1047,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 }
 
 
-
                 marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(pickupPoint)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_ellipse2))
@@ -1057,8 +1058,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_ellipse2))
                         .title("Drop Location")
                         .snippet("Home"));
-
-
 
 
             } else {

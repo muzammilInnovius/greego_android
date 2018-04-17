@@ -97,7 +97,7 @@
                 android:paddingLeft="@dimen/scale_15dp"
                 android:weightSum="2">
 
-              <!--  <android.support.design.widget.TextInputLayout
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -107,17 +107,17 @@
                         android:layout_height="wrap_content"
                         android:drawableLeft="@mipmap/ic_flag"
                         android:hint="@string/card_number"
-                        android:maxLength="16" />
+                        android:maxLength="19" />
 
-                </android.support.design.widget.TextInputLayout>-->
+                </android.support.design.widget.TextInputLayout>
 
-                <EditText
+               <!-- <EditText
                     android:id="@+id/edtTvCardNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@mipmap/ic_flag"
                     android:hint="@string/card_number"
-                    android:maxLength="16" />
+                    android:maxLength="16" />-->
 
             </LinearLayout>
             <!-- <View
@@ -160,8 +160,9 @@
                             android:id="@+id/edtTvExpDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="12-11-2018"
+                            android:hint="MM/YY"
                             android:imeOptions="actionDone"
+                            android:maxLength="5"
                             android:textSize="@dimen/txt_14" />
 
 
