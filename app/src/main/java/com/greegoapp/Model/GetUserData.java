@@ -18,7 +18,9 @@ public class GetUserData implements Parcelable{
     private int error_code;
     private String message;
 
-    protected GetUserData(Parcel in) {
+    public GetUserData(){}
+
+    public GetUserData(Parcel in) {
         error_code = in.readInt();
         message = in.readString();
     }

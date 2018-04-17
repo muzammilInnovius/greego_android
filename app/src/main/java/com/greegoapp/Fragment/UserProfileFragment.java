@@ -402,7 +402,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");
@@ -478,7 +478,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");

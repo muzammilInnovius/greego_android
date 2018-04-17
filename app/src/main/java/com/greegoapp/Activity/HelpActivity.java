@@ -5,14 +5,16 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.greegoapp.R;
 import com.greegoapp.databinding.ActivityHelpBinding;
 
-public class HelpActivity extends AppCompatActivity {
+public class HelpActivity extends AppCompatActivity implements View.OnClickListener {
     ActivityHelpBinding binding;
     Context context;
     private View snackBarView;
+    ImageButton ibBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +31,21 @@ public class HelpActivity extends AppCompatActivity {
     }
 
     private void setListner() {
+        ibBack.setOnClickListener(this);
     }
 
     private void bindViews() {
+        ibBack = binding.ibBack;
 
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ibBack:
+                finish();
+                break;
+        }
     }
 }

@@ -113,7 +113,29 @@ public class SessionManager {
         }
     }
 
+//    public static void clearRememberMeSession(Context context) {
+//        try {
+//            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_REMEMBER_ME, Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editor = preferences.edit();
+//            editor.clear();
+//            editor.apply();
+//        } catch (Exception e) {
+//            // TODO: handle exception
+//            e.printStackTrace();
+//        }
+//    }
 
+    public static void clearAppSession(Context context) {
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
+            editor.apply();
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
 
     public static void saveUserDetails(Context context, UserData vo) {
         try {

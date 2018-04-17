@@ -1,24 +1,39 @@
 package com.greegoapp.Activity;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.greegoapp.Fragment.MapHomeFragment.MY_PERMISSIONS_REQUEST_ACCOUNTS;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -26,19 +41,119 @@ public class SplashActivity extends AppCompatActivity {
     public static boolean isRemember = false;
     public static final String PACKAGE = "com.greegoapp";
 
-//    ProgressBar customProgressBar;
+    //    ProgressBar customProgressBar;
     int progressStatusCounter = 0;
     Handler progressHandler = new Handler();
-
+    Context context;
+    String TAG = SplashActivity.class.getSimpleName();
+    public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splace_screen);
-
+        context = SplashActivity.this;
         getIds();
-        startTimer();
+
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            if (Build.VERSION.SDK_INT < 23) {
+                //Do not need to check the permission
+
+                /*  Initialize Map  */
+                // create GoogleApiClient
+//                createGoogleApi();
+                startTimer();
+
+            } else {
+                if (checkAndRequestPermissions()) {
+                    //If you have already permitted the permission
+                    startTimer();
+                    //        initialize GoogleMaps
+                    // create GoogleApiClient
+//                    createGoogleApi();
+
+                }
+            }
+//            CheckGpsStatus();
+        } else {
+            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
+    private boolean checkAndRequestPermissions() {
+        int AccessFineLocation = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        int AccessCorasLocation = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (AccessFineLocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        if (AccessCorasLocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult()");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCOUNTS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted
+                    // Permission was granted.
+                    if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        startTimer();
+//                        if (mGoogleApiClient == null) {
+//                            setUpGoogleApiClient();
+//                        }
+//                        mGoogleMap.setMyLocationEnabled(true);
+                    }
+
+                } else {
+                    // Permission denied
+                    permissionsDenied();
+                }
+                break;
+            }
+        }
+    }
+
+    // App cannot work without the permissions
+    private void permissionsDenied() {
+        Log.w(TAG, "permissionsDenied()");
+        // TODO close app and warn user
+    }
+
+
+
+    private boolean checkPermission() {
+        Log.d(TAG, "checkPermission()");
+        // Ask for permission if it wasn't granted yet
+        return (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void askPermission() {
+        Log.d(TAG, "askPermission()");
+        ActivityCompat.requestPermissions(
+                SplashActivity.this,
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                MY_PERMISSIONS_REQUEST_ACCOUNTS
+        );
+    }
     private void startTimer() {
         try {
             Timer timer = new Timer();

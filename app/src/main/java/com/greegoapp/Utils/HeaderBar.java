@@ -36,11 +36,11 @@ public class HeaderBar extends RelativeLayout {
     private void init() {
         try {
             View view = LayoutInflater.from(context).inflate(R.layout.headerbar, this, true);
-            tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+            tvTitle = view.findViewById(R.id.tvTitle);
 
-            ivLeft = (ImageView) findViewById(R.id.ivLeft);
-            ivProPicHome= (ImageView) findViewById(R.id.ivProPicHome);
-            ivRight = (ImageView) findViewById(R.id.ivRight);
+            ivLeft = findViewById(R.id.ivLeft);
+            ivProPicHome= findViewById(R.id.ivProPicHome);
+            ivRight = findViewById(R.id.ivRight);
 
 
         } catch (Exception e) {

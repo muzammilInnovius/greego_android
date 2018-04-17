@@ -103,11 +103,12 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
+                KeyboardUtility.hideKeyboard(context, view);
                 Intent in = new Intent(context, SignUpUserNameActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
-
+                finish();
                 break;
             case R.id.ibFinish:
                 KeyboardUtility.hideKeyboard(context, view);
@@ -158,12 +159,13 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
                         if (userDetails.getError_code() == 0) {
 
                             Applog.E("UserDetails" + userDetails);
-//                            callUserMeApi();
-                            SessionManager.setIsUserLoggedin(context,true);
-                            Intent in = new Intent(context, HomeActivity.class);
-                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(in);
-                            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+                            callUserMeApi();
+                            SessionManager.setIsUserLoggedin(context, true);
+//                            Intent in = new Intent(context, HomeActivity.class);
+//                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(in);
+//                            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+//                            finish();
                         } else {
                             MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));
@@ -183,7 +185,7 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");
@@ -254,7 +256,7 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");

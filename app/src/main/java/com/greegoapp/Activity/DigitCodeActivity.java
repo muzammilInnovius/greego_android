@@ -86,6 +86,15 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
             public void onSmsCatch(String message) {
                 String code = parseCode(message);//Parse verification code
                 pinVwOtpCode.setText(code);//set code in edit text
+
+                if (ConnectivityDetector
+                        .isConnectingToInternet(context)) {
+
+                    callDigitCodeAPI();
+
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
             }
         });
     }
@@ -122,12 +131,14 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 iback.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(iback);
                 overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
+                finish();
                 break;
             case R.id.tvResend:
                 cancelTimer();
                 timer();
                 callMobileNumberAPI();
                 pinVwOtpCode.setText("");
+                KeyboardUtility.showKeyboard(context,pinVwOtpCode);
                 break;
             /*    edtTvDigit1.setText("");
                 edtTvDigit2.setText("");
@@ -155,7 +166,6 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    Login loginData;
 
     private void callMobileNumberAPI() {
         try {
@@ -264,7 +274,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
     //cancel timer
     void cancelTimer() {
-        if(mCountDownTimer!=null)
+        if (mCountDownTimer != null)
             mCountDownTimer.cancel();
     }
 
@@ -411,7 +421,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                                 startActivity(in);
                                 overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
                             } else {
-                                SessionManager.setIsUserLoggedin(context,true);
+                                SessionManager.setIsUserLoggedin(context, true);
                                 Intent in = new Intent(context, HomeActivity.class);
                                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(in);
@@ -438,7 +448,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");

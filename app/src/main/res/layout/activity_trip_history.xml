@@ -7,7 +7,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@drawable/trip_history_bg"
         tools:context="com.greegoapp.Activity.TripHistoryActivity">
 
         <android.support.constraint.ConstraintLayout

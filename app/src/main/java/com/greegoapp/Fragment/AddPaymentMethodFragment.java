@@ -265,7 +265,7 @@ public class AddPaymentMethodFragment extends Fragment implements View.OnClickLi
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");
@@ -403,7 +403,7 @@ public class AddPaymentMethodFragment extends Fragment implements View.OnClickLi
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");

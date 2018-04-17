@@ -54,11 +54,12 @@ public class SignUpUserNameActivity extends AppCompatActivity implements View.On
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
+                KeyboardUtility.hideKeyboard(context, view);
                 Intent in = new Intent(context, SignUpEmailActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
-
+                finish();
                 break;
             case R.id.ibFinish:
                 KeyboardUtility.hideKeyboard(context, view);
@@ -87,7 +88,7 @@ public class SignUpUserNameActivity extends AppCompatActivity implements View.On
         in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
         overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
-
+        finish();
     }
 
     private boolean isValid() {

@@ -53,10 +53,12 @@ public class SignUpEmailActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
-                Intent in = new Intent(context, DigitCodeActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(in);
-                overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
+                KeyboardUtility.hideKeyboard(context, view);
+                finish();
+//                Intent in = new Intent(context, DigitCodeActivity.class);
+//                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(in);
+//                overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
 
                 break;
             case R.id.ibFinish:
@@ -98,5 +100,6 @@ public class SignUpEmailActivity extends AppCompatActivity implements View.OnCli
         in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
         overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+        finish();
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/predictedRow"
+    android:id="@+id/row"
     android:layout_width="match_parent"
     android:layout_height="@dimen/scale_50dp"
     android:layout_centerVertical="true"
@@ -23,9 +23,8 @@
         android:layout_marginLeft="@dimen/scale_8dp"
         android:layout_marginRight="@dimen/scale_4dp"
         android:layout_toRightOf="@+id/image"
-        android:lineSpacingExtra="@dimen/scale_8dp"
-        android:singleLine="true"
         android:textColor="#000"
+        android:maxLines="2"
         android:textSize="@dimen/txt_14" />
 
     <View
@@ -34,3 +33,4 @@
         android:layout_alignParentBottom="true"
         android:background="#B6BDBF" />
 </RelativeLayout>
+

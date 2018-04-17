@@ -10,29 +10,20 @@ import java.util.regex.Pattern;
 public class EmailValidation {
     private static final String VALID_EMAIL = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-    ;
 
     public static boolean checkEmailIsCorrect(String strEmail) {
 //		try {
         boolean isvalid;
         Pattern pattern = Pattern.compile(VALID_EMAIL);
         Matcher matcher = pattern.matcher(strEmail);
-        if (matcher.matches()) {
-            isvalid = true;
-        } else {
-            isvalid = false;
-        }
+        isvalid = matcher.matches();
         return isvalid;
     }
 
     public static boolean isValidUrl(String txtWebsite) {
         Pattern regex = Pattern.compile("^[a-zA-Z0-9\\-\\.]+\\.(com|org|net|mil|edu|COM|ORG|NET|MIL|EDU)$");
         Matcher matcher = regex.matcher(txtWebsite);
-        if (matcher.matches()) {
-            return true;
-        } else {
-            return false;
-        }
+        return matcher.matches();
     }
     public static boolean isValidPassword(final String password) {
 

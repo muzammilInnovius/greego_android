@@ -154,7 +154,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/scale_35dp"
                         android:layout_marginTop="@dimen/scale_4dp"
-                        android:text="@string/whats_name" />
+                        android:text="@string/whats_agreement" />
                 </RelativeLayout>
             </LinearLayout>
 

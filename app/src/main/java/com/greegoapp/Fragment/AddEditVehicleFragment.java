@@ -1,6 +1,7 @@
 package com.greegoapp.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -85,6 +87,9 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
     ImageButton ibBack;
     private BackPressedFragment backPressed;
     CallFragmentInterface callMyFragment;
+    ImageView imgVwAutomaticSelect, imgVwManualSelect;
+    String strYear,strColor;
+
     public AddEditVehicleFragment() {
         // Required empty public constructor
     }
@@ -160,13 +165,7 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
                             ManufacturesBeanArrayAdapter = new ArrayAdapter<GetManufactures.DataBean>(context, android.R.layout.simple_spinner_dropdown_item, alManufactur) {
                                 @Override
                                 public boolean isEnabled(int position) {
-                                    if (position == 0) {
-                                        // Disable the first item from Spinner
-                                        // First item will be use for hint
-                                        return false;
-                                    } else {
-                                        return true;
-                                    }
+                                    return position != 0;
                                 }
 
                                 @Override
@@ -245,6 +244,8 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
     }
 
     private void bindViews() {
+        imgVwAutomaticSelect = binding.automaticSelect;
+        imgVwManualSelect = binding.manualSelect;
         ibBack = binding.ibBack;
         edtTvCarType = binding.edtTvCarType;
         edtTvMake = binding.edtTvMake;
@@ -261,6 +262,13 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
         tvAutoMatic = binding.tvAutoMatic;
         tvManual = binding.tvManual;
         btnSaveVehicle = binding.btnSaveVehicle;
+
+        imgVwAutomaticSelect.setVisibility(View.VISIBLE);
+        imgVwManualSelect.setVisibility(View.GONE);
+        transmissionType = 0;
+        autoType = true;
+        tvAutoMatic.setTextColor(getResources().getColor(R.color.app_bg));
+        tvManual.setTextColor(getResources().getColor(R.color.hint_color));
     }
 
     int transmissionType;
@@ -326,22 +334,35 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
 
             case R.id.tvAutoMatic:
                 if (autoType) {
+                    imgVwAutomaticSelect.setVisibility(View.GONE);
+                    imgVwManualSelect.setVisibility(View.GONE);
                     tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
+                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
                     autoType = false;
                 } else {
+                    imgVwAutomaticSelect.setVisibility(View.VISIBLE);
+                    imgVwManualSelect.setVisibility(View.GONE);
                     transmissionType = 0;
                     autoType = true;
                     tvAutoMatic.setTextColor(getResources().getColor(R.color.app_bg));
+                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
+
                 }
                 break;
             case R.id.tvManual:
-                if (manualType) {
+                if (autoType) {
+                    imgVwAutomaticSelect.setVisibility(View.GONE);
+                    imgVwManualSelect.setVisibility(View.GONE);
                     tvManual.setTextColor(getResources().getColor(R.color.hint_color));
-                    manualType = false;
+                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
+                    autoType = false;
                 } else {
-                    manualType = true;
+                    imgVwAutomaticSelect.setVisibility(View.GONE);
+                    imgVwManualSelect.setVisibility(View.VISIBLE);
+                    autoType = false;
                     transmissionType = 1;
                     tvManual.setTextColor(getResources().getColor(R.color.app_bg));
+                    tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
                 }
                 break;
 
@@ -369,12 +390,13 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
         backPressed = null;
     }
 
+
     private boolean isValid() {
         String make = edtTvMake.getText().toString().trim();
         String model = edtTvModel.getText().toString().trim();
-        String year = edtTvYear.getText().toString().trim();
+         strYear = edtTvYear.getText().toString().trim();
         String type = edtTvCarType.getText().toString().trim();
-        String color = edtTvColor.getText().toString().trim();
+         strColor = edtTvColor.getText().toString().trim();
 
         if (make.isEmpty()) {
             edtTvMake.requestFocus();
@@ -384,11 +406,11 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
             edtTvModel.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_model_empty));
             return false;
-        } else if (year.isEmpty()) {
+        } else if (strYear.isEmpty()) {
             edtTvYear.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_year_empty));
             return false;
-        } else if (color.isEmpty()) {
+        } else if (strColor.isEmpty()) {
             edtTvColor.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_color_empty));
             return false;
@@ -420,16 +442,22 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
                     Applog.E("Save vehicle success: " + response.toString());
 
                     SnackBar.showSuccess(context, snackBarView, "Vehicle Add successfully.");
-//                    GetVehicle vehicleData = new Gson().fromJson(String.valueOf(response), GetVehicle.class);
-                    //                hidepDialog();
-//                    if (vehicleData.getError_code() == 0) {
-//
-//
-//                    } else
-//
-//                    {
-//                        SnackBar.showError(context, snackBarView, vehicleData.getMessage());
-//                    }
+                    GetVehicle vehicleData = new Gson().fromJson(String.valueOf(response), GetVehicle.class);
+                    if (vehicleData.getError_code() == 0) {
+
+                                Intent data = new Intent();
+                                data.putExtra("manufacture",strManufactur);
+                                data.putExtra("model", strVehicle);
+                                data.putExtra("year", strYear);
+                                data.putExtra("color", strColor);
+                                getActivity().setResult(MapHomeFragment.ADD_EDIT_VEHICAL_REQUEST, data);
+                        getActivity().finish();
+
+                    } else
+
+                    {
+                        SnackBar.showError(context, snackBarView, vehicleData.getMessage());
+                    }
                 }
             }, new Response.ErrorListener() {
 
@@ -441,7 +469,7 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");
@@ -472,13 +500,7 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
         carTypeArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, carType) {
             @Override
             public boolean isEnabled(int position) {
-                if (position == 0) {
-                    // Disable the first item from Spinner
-                    // First item will be use for hint
-                    return false;
-                } else {
-                    return true;
-                }
+                return position != 0;
             }
 
             @Override
@@ -561,13 +583,7 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
                         vehicalModelListArrayAdapter = new ArrayAdapter<GetVehicle.DataBean>(context, android.R.layout.simple_spinner_dropdown_item, alVehical) {
                             @Override
                             public boolean isEnabled(int position) {
-                                if (position == 0) {
-                                    // Disable the first item from Spinner
-                                    // First item will be use for hint
-                                    return false;
-                                } else {
-                                    return true;
-                                }
+                                return position != 0;
                             }
 
                             @Override
@@ -695,7 +711,6 @@ public class AddEditVehicleFragment extends Fragment implements View.OnClickList
             throw new RuntimeException(context.toString() + " must implement CallFragmentInterface");
         }
     }
-
 
 
     public interface OnFragmentInteractionListener {

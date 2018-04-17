@@ -1,15 +1,27 @@
 package com.greegoapp.Activity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -18,19 +30,52 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.gson.Gson;
 import com.greegoapp.Adapter.DrawerLayoutAdapter;
+import com.greegoapp.AppController.AppController;
 import com.greegoapp.Fragment.MapHomeFragment;
+import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.BackPressedFragment;
 import com.greegoapp.Interface.CallFragmentInterface;
+import com.greegoapp.Model.GetUserData;
 import com.greegoapp.R;
+import com.greegoapp.SessionManager.SessionManager;
+import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.MyProgressDialog;
+import com.greegoapp.Utils.SnackBar;
+import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivityHomeBinding;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CallFragmentInterface, BackPressedFragment {
 
-
+    String MAIN_TAG = HomeActivity.class.getSimpleName();
     ActivityHomeBinding binding;
     Context context;
     private View snackBarView;
@@ -50,7 +95,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Stack<Fragment> fragmentStack;
     FragmentManager fragmentManager;
 
+    //Pregnesh
+    public static final int MY_PERMISSION_REQUEST = 1;
+    LocationManager locationManager;
+    public boolean isGPSEnable = false;
+    public static final int REQUEST_CHECK_SETTINGS = 0x1;
+    public static boolean location_Success = false;
+
+    GetUserData.DataBean userDetails;
+    ArrayList<GetUserData> alUserList;
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         drawerLayoutAdapter = new DrawerLayoutAdapter(HomeActivity.this, drawerTitle);
@@ -68,7 +124,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         bindView();
 //        setHeaderbar();
         setListners();
-        setHomeValues();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callUserMeApi();
+//            CheckGpsStatus();
+        } else {
+            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+        }
+
+
         slideMenu();
         drawerlist.requestDisallowInterceptTouchEvent(true);
         navHeader.requestDisallowInterceptTouchEvent(true);
@@ -100,21 +163,37 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //        }
 //    }
 
-    private void setHomeValues() {
-        try {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
+        super.onSaveInstanceState(outState);
+    }
 
-            Fragment fragmentPro = null;
-            fragmentPro = new MapHomeFragment();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            fragmentTransaction.replace(R.id.containerBody, fragmentPro);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-            mContentFragment = fragmentPro;
-            drawer_layout.closeDrawer(drawerlist);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void setHomeValues() {
+
+        if (ConnectivityDetector.isConnectingToInternet(this)) {
+            if (isGPSEnable()) {
+                try {
+
+                    Fragment fragmentPro = null;
+                    fragmentPro = new MapHomeFragment().newInstance(alUserList, "");
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                    fragmentTransaction.replace(R.id.containerBody, fragmentPro);
+                    fragmentTransaction.addToBackStack(null);
+//                    fragmentTransaction.commit();
+                    fragmentTransaction.commitAllowingStateLoss();
+                    mContentFragment = fragmentPro;
+                    drawer_layout.closeDrawer(drawerlist);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                displayLocationSettingsRequest();
+            }
+        } else {
+            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -142,8 +221,49 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ivProPicHome:
-                openDrawer();
+                if (userDetails != null) {
+
+                    for (GetUserData userData : alUserList) {
+                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles()
+                                != null && userData.getData().getCards() != null) {
+                            openDrawer();
+                        }else {
+                            showCheckUserUpdateData("Please complete your updates before proceeding.");
+                        }
+                    }
+                }
+
                 break;
+        }
+    }
+    private void showCheckUserUpdateData(String msg) {
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    .setTitle("Greego").setMessage(msg);
+
+
+            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    if (ConnectivityDetector
+                            .isConnectingToInternet(context)) {
+
+                        dialog.dismiss();
+
+                    } else {
+                        SnackBar.showInternetError(context, snackBarView);
+                    }
+                }
+            });
+
+            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -275,11 +395,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-
-    }
-
 
     @Override
     public void onBackPressed(Context context) {
@@ -330,6 +445,204 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         fragmentTransaction.commit();
     }
 
+
+// pragnesh
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                setHomeValues();
+                break;
+            case Activity.RESULT_CANCELED:
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //  Premission Granted Successfully.
+                    setHomeValues();
+                } else {
+                    //  Did not Granted Permission.
+                }
+                break;
+        }
+    }
+
+    public boolean isGPSEnable() {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        isGPSEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return isGPSEnable;
+    }
+
+
+    public boolean displayLocationSettingsRequest() {
+
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API).build();
+        googleApiClient.connect();
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(10000 / 2);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi
+                .checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                switch (status.getStatusCode()) {
+
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        Log.i(MAIN_TAG, "All location settings are satisfied.");
+                        location_Success = true;
+                        break;
+
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        Log.i(MAIN_TAG, "Location settings are not satisfied. " +
+                                "Show the user a Dialog to upgrade location settings ");
+                        location_Success = false;
+                        try {
+                            // Show the Dialog by calling startResolutionForResult(), and check the result
+                            // in onActivityResult().
+                            status.startResolutionForResult(HomeActivity.this, REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            Log.i(MAIN_TAG, "PendingIntent unable to execute request.");
+                        }
+                        break;
+
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        Log.i(MAIN_TAG, "Location settings are inadequate, " +
+                                "and cannot be fixed here. Dialog not created.");
+                        location_Success = false;
+                        break;
+                }
+            }
+        });
+        return location_Success;
+    }
+
+
+    public boolean checkSelfPermission() {
+        int AccessCorasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        int AccessFineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        List<String> permissionNeeded = new ArrayList<>();
+
+        if (AccessFineLocation != PackageManager.PERMISSION_GRANTED) {
+            permissionNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        if (AccessCorasLocation != PackageManager.PERMISSION_GRANTED) {
+            permissionNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+
+
+        if (!permissionNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    permissionNeeded.toArray(new String[permissionNeeded.size()]), MY_PERMISSION_REQUEST);
+            return false;
+        }
+        return true;
+    }
+
+    private void callUserMeApi() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+
+                    userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.DataBean.class);
+                    GetUserData userDetail = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+                        alUserList = new ArrayList<>();
+
+                        if (userDetail.getError_code() == 0) {
+
+
+                            alUserList.add(userDetail);
+
+                            Applog.E("UserUpdate==>Dg==>" + userDetail);
+
+                            String userName = userDetail.getData().getName();
+                            tvDrawUsername.setText(userName);
+
+                            if (Build.VERSION.SDK_INT < 23) {
+                                setHomeValues();
+                            } else {
+                                if (checkSelfPermission()) {
+                                    setHomeValues();
+                                }
+                            }
+
+//                            SessionManager.saveUserData(context, userDetails);
+//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
+//
+                            //getIs_agreed = 0 new user
+
+//
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
 

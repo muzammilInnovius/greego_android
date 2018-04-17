@@ -1,48 +1,73 @@
 package com.greegoapp.Activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.greegoapp.Adapter.PlaceAutocompleteAdapter;
+import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.R;
+import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.databinding.ActivityPickUpLocationBinding;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
-public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface
-        ,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, View.OnClickListener {
+public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface ,View.OnClickListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,LocationListener, OnMapReadyCallback {
 
+    private static final String TAG = PickUpLocationActivity.class.getName();
     ActivityPickUpLocationBinding binding;
     Context context;
     private View snackBarView;
 
 
-    //
-    final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
     Context mContext;
-    GoogleApiClient mGoogleApiClient;
+
 
     private RecyclerView mRecyclerView;
     LinearLayoutManager llm;
@@ -50,13 +75,40 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
 
     private static final LatLngBounds BOUNDS_INDIA = new LatLngBounds(
-            new LatLng(23.63936, 68.14712), new LatLng(28.20453, 97.34466));
-    EditText mEdtPickUpLocation;
-    ImageView  mivBack;
+            new LatLng(-33.880490, 151.184363), new LatLng(-33.858754, 151.229596));
+
+    EditText mEdtPickUpLocation, mEdtDetstinationLocation;
+    ImageView mivBack, ivPickClear, ivDesClear;
+    static int edtType;
+
+    RelativeLayout rlSetLocationMap, rlSetCurrentLocation,rlEditextPickup;
+    LinearLayout llLocationView;
 
 
+    //
+    String  ssLocation,ddLocation,address;
+
+    LatLng mDestinationLatLong,mSoucreLatLong;
 
 
+    /*  Google Map  */
+    private GoogleMap mGoogleMap;
+    View mapView;
+    MapFragment mFragment;
+    GoogleApiClient mGoogleApiClient;
+
+    public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
+    private LocationRequest locationRequest;
+    // Defined in mili seconds.
+    // This number in extremely low, and should be used only for debug
+
+    private final int UPDATE_INTERVAL = 1000;
+    private final int FASTEST_INTERVAL = 900;
+
+    private LatLng mLatLng;
+    private Location lastLocation;
+    Button btnSetLocation;
+    public static boolean mapViewVisible=false;
 
 
 
@@ -64,18 +116,109 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding= DataBindingUtil.setContentView(this, R.layout.activity_pick_up_location);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_pick_up_location);
 
         context = PickUpLocationActivity.this;
         snackBarView = findViewById(android.R.id.content);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, 0 /* clientId */, this)
-                .addApi(Places.GEO_DATA_API)
-                .build();
 
+        initilizeMap();
+        setUpGoogleApiClient();
         bindView();
         setListners();
+
+        mEdtPickUpLocation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count > 0) {
+                    edtType = 0;
+//
+                    ivPickClear.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    if (mAdapter != null) {
+                        mRecyclerView.setAdapter(mAdapter);
+                    }
+                } else {
+                    ivPickClear.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.GONE);
+//                    if (mSavedAdapter != null && mSavedAddressList.size() > 0) {
+//                        mRecyclerView.setAdapter(mSavedAdapter);
+//                    }
+                }
+                if (!s.toString().equals("") && mGoogleApiClient.isConnected()) {
+                    mAdapter.getFilter().filter(s.toString());
+                } else if (!mGoogleApiClient.isConnected()) {
+//                    Toast.makeText(getApplicationContext(), Constants.API_NOT_CONNECTED, Toast.LENGTH_SHORT).show();
+                    Log.e("", "NOT CONNECTED");
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+
+        mEdtDetstinationLocation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count > 0) {
+                    edtType = 1;
+//                    llLocationView.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    ivDesClear.setVisibility(View.VISIBLE);
+                    if (mAdapter != null) {
+                        mRecyclerView.setAdapter(mAdapter);
+                    }
+                } else {
+                    ivDesClear.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.GONE);
+//                    if (mSavedAdapter != null && mSavedAddressList.size() > 0) {
+//                        mRecyclerView.setAdapter(mSavedAdapter);
+//                    }
+                }
+                if (!s.toString().equals("") && mGoogleApiClient.isConnected()) {
+                    mAdapter.getFilter().filter(s.toString());
+                } else if (!mGoogleApiClient.isConnected()) {
+                    Log.e("", "NOT CONNECTED");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        mEdtPickUpLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View arg0, boolean hasfocus) {
+                if (hasfocus) {
+                    edtType=0;
+                    Log.e("TAG", "e1 focused");
+//                    llLocationView.setVisibility(View.VISIBLE);
+                } else {
+                    Log.e("TAG", "e1 not focused");
+                }
+            }
+        });
+        mEdtDetstinationLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View arg0, boolean hasfocus) {
+                if (hasfocus) {
+                    edtType=1;
+//                    llLocationView.setVisibility(View.VISIBLE);
+                    Log.e("TAG", "e1 focused");
+                } else {
+                    Log.e("TAG", "e1 not focused");
+                }
+            }
+        });
+
 
 
 
@@ -85,17 +228,36 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     }
 
     private void bindView() {
-        mEdtPickUpLocation = (EditText) findViewById(R.id.edt_pickLocation);
-        mRecyclerView = (RecyclerView) findViewById(R.id.list_search);
+        mEdtPickUpLocation = binding.edtPickLocation;
+        mEdtDetstinationLocation = binding.edtDesLocation;
+        mRecyclerView = binding.listSearch;
+        mivBack = binding.ivBackTop;
+        ivPickClear = binding.clear;
+        ivDesClear = binding.declear;
+        edtType=0;
+
+        rlSetLocationMap = binding.rlSetLocationMap;
+        llLocationView = binding.llLocationView;
+        rlSetCurrentLocation = binding.rlCurrentLocation;
+        btnSetLocation = binding.btnSetLocation;
+        rlEditextPickup=binding.rlPick;
+
+
         mRecyclerView.setHasFixedSize(true);
         llm = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(llm);
 
 
-
-
-        mivBack = (ImageView) findViewById(R.id.iv_backTop);
         mivBack.setOnClickListener(this);
+        ivPickClear.setOnClickListener(this);
+        ivDesClear.setOnClickListener(this);
+        rlSetLocationMap.setOnClickListener(this);
+        llLocationView.setOnClickListener(this);
+        rlSetCurrentLocation.setOnClickListener(this);
+        btnSetLocation.setOnClickListener(this);
+
+        mEdtPickUpLocation.setOnClickListener(this);
+        mEdtDetstinationLocation.setOnClickListener(this);
 
 
         mAdapter = new PlaceAutocompleteAdapter(this, R.layout.layout_view_placesearch,
@@ -103,110 +265,92 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         mRecyclerView.setAdapter(mAdapter);
 
 
-        mEdtPickUpLocation.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count > 0) {
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                    if (mAdapter != null) {
-                        mRecyclerView.setAdapter(mAdapter);
-                    }
-                } else {
-                    mRecyclerView.setVisibility(View.GONE);
-                    /*if (mSavedAdapter != null && mSavedAddressList.size() > 0) {
-                        mRecyclerView.setAdapter(mSavedAdapter);
-                    }*/
-                }
-                if (!s.toString().equals("") && mGoogleApiClient.isConnected()) {
-                    mAdapter.getFilter().filter(s.toString());
-                } else if (!mGoogleApiClient.isConnected()) {
-//                    Toast.makeText(getApplicationContext(), Constants.API_NOT_CONNECTED, Toast.LENGTH_SHORT).show();
-                    Log.e("", "NOT CONNECTED");
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
 
 
-    }
-    @Override
-    public void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
     }
 
 
 
     @Override
     public void onClick(View view) {
-        switch (view.getId())
-        {
+        switch (view.getId()) {
             case R.id.iv_backTop:
                 finish();
                 break;
-        }
-    }
+            case R.id.clear:
+                mEdtPickUpLocation.setText("");
+                if (mAdapter != null) {
+                    mAdapter.clearList();
+                }
+                llLocationView.setVisibility(View.VISIBLE);
+                btnSetLocation.setVisibility(View.GONE);
+                break;
+            case R.id.declear:
+                mEdtDetstinationLocation.setText("");
+                if (mAdapter != null) {
+                    mAdapter.clearList();
+                }
+                llLocationView.setVisibility(View.VISIBLE);
+                btnSetLocation.setVisibility(View.GONE);
+                break;
 
+            case R.id.ll_LocationView:
+                break;
+            case R.id.rlSetLocationMap:
+                KeyboardUtility.hideKeyboard(context,view);
+                btnSetLocation.setVisibility(View.VISIBLE);
+                llLocationView.setVisibility(View.GONE);
+                mapViewVisible=true;
 
-
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-
-            case PLACE_AUTOCOMPLETE_REQUEST_CODE:
-                if (resultCode == RESULT_OK) {
-                    Bundle selectAddress = data.getExtras();
-                    String lat = selectAddress.getString("lat");
-                    String lon = selectAddress.getString("lng");
-                    String address = selectAddress.getString("address");
-                    String addressFor = selectAddress.getString("addressFor");
-
-                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-//                    Status status = PlaceAutocomplete.getStatus(getActivity(), data);
-//                    Log.i(TAG, status.getStatusMessage());
-                } else if (resultCode == RESULT_CANCELED) {
-
+                break;
+            case R.id.rlCurrentLocation:
+                if(edtType ==0)
+                {
+                    mSoucreLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+                    ssLocation=address;
+                    mEdtPickUpLocation.setText(ssLocation);
+                }
+                else
+                {
+                    mDestinationLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+                    ddLocation=address;
+                    mEdtDetstinationLocation.setText(ddLocation);
                 }
                 break;
+            case R.id.edt_pickLocation:
+                edtType=0;
+                break;
+            case R.id.edt_DesLocation:
+                edtType=1;
+                break;
+
+            case R.id.btnSetLocation:
+                String sou = mEdtPickUpLocation.getText().toString();
+                String des = mEdtDetstinationLocation.getText().toString();
+                if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
+                    Intent data = new Intent();
+                    data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
+                    data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
+                    data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
+                    data.putExtra("destinationLng",String.valueOf(mDestinationLatLong.longitude));
+                    setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
+                    finish();
+                }
+                else
+                {
+                    llLocationView.setVisibility(View.VISIBLE);
+                }
+
+                break;
+
         }
     }
 
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
 
 
     @Override
     public void onPlaceClick(ArrayList<PlaceAutocompleteAdapter.PlaceAutocomplete> mResultList, int position) {
-        if(mResultList!=null){
+        if (mResultList != null) {
             try {
                 final String placeId = String.valueOf(mResultList.get(position).placeId);
                 final String placeName = String.valueOf(mResultList.get(position).description);
@@ -219,26 +363,389 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
                     @Override
                     public void onResult(PlaceBuffer places) {
-                        if(places.getCount()==1){
+                        if (places.getCount() == 1) {
                             //Do the things here on Click.....
-                            Intent data = new Intent();
-                            data.putExtra("lat",String.valueOf(places.get(0).getLatLng().latitude));
-                            data.putExtra("lng", String.valueOf(places.get(0).getLatLng().longitude));
-                            data.putExtra("address",placeName);
-                            setResult(PickUpLocationActivity.RESULT_OK, data);
-                            mEdtPickUpLocation.setText(placeName);
-//                            finish();
-                        }else {
-                            Toast.makeText(getApplicationContext(),"something went wrong", Toast.LENGTH_SHORT).show();
+                            if (edtType == 0) {
+                                mEdtPickUpLocation.setText(placeName);
+                                mEdtPickUpLocation.clearFocus();
+                                mEdtDetstinationLocation.requestFocus();
+                                mSoucreLatLong=new LatLng(places.get(0).getLatLng().latitude,places.get(0).getLatLng().longitude);
+                                if (mAdapter != null) {
+                                    mAdapter.clearList();
+                                }
+
+                            } else {
+                                mEdtDetstinationLocation.setText(placeName);
+                                mEdtDetstinationLocation.clearFocus();
+                                mDestinationLatLong=new LatLng(places.get(0).getLatLng().latitude,places.get(0).getLatLng().longitude);
+                                if (mAdapter != null) {
+                                    mAdapter.clearList();
+                                }
+                            }
+
+                            String des = mEdtDetstinationLocation.getText().toString();
+                            if (des != null && !des.equals("null") && !des.equals("")) {
+                                Intent data = new Intent();
+                                data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
+                                data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
+                                data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
+                                data.putExtra("destinationLng",String.valueOf(mDestinationLatLong.longitude));
+                                setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
+                                finish();
+                            }
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-            }
-            catch (Exception e){
+            } catch (Exception e) {
 
             }
         }
     }
 
+
+    // Initialize GoogleMaps
+    public void initilizeMap() {
+        mFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mgooleMap);
+        mapView = mFragment.getView();
+        mFragment.getMapAsync(this);
+    }
+
+
+    // Callback called when Map is ready
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady()");
+        mGoogleMap = googleMap;
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        if (Build.VERSION.SDK_INT < 23) {
+            mGoogleMap.setMyLocationEnabled(true);
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+// position on right bottom
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
+            rlp.addRule(RelativeLayout.ALIGN_END, 0);
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            rlp.setMargins(0, 0, 30, 40);
+        } else {
+            if (checkAndRequestPermissions()) {
+                mGoogleMap.setMyLocationEnabled(true);
+                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+// position on right bottom
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
+                rlp.addRule(RelativeLayout.ALIGN_END, 0);
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                rlp.setMargins(0, 0, 30, 40);
+            }
+        }
+
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+        mGoogleMap.getUiSettings().setCompassEnabled(false);
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mGoogleMap.getUiSettings().setRotateGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setScrollGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
+        mGoogleMap.setTrafficEnabled(false);
+
+
+
+
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                mLatLng = cameraPosition.target;
+                if(mapViewVisible==true)
+                {
+                    try {
+                        KeyboardUtility.hideKeyboard(context,mapView);
+                        if(edtType == 0)
+                        {
+                            mEdtPickUpLocation.setText("Loading....");
+                            ssLocation=getAddress(mLatLng.latitude, mLatLng.longitude);
+                            mSoucreLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
+                            mEdtPickUpLocation.setText(ssLocation);
+                            mEdtPickUpLocation.clearFocus();
+                            ivPickClear.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            mEdtDetstinationLocation.setText("Loading....");
+                            ddLocation = getAddress(mLatLng.latitude, mLatLng.longitude);
+                            mDestinationLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
+                            mEdtDetstinationLocation.setText(ddLocation);
+                            mEdtDetstinationLocation.clearFocus();
+                            ivDesClear.setVisibility(View.VISIBLE);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+    }
+
+    private synchronized void setUpGoogleApiClient() {
+        Log.d(TAG, "createGoogleApi()");
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .enableAutoManage(this, 0 /* clientId */, this)
+                    .addApi(Places.GEO_DATA_API)
+                    .addApi(LocationServices.API)
+                    .build();
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+        setUpGoogleApiClient();
+        mGoogleApiClient.connect();
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Disconnect GoogleApiClient when stopping Activity
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+
+    }
+
+
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
+                + connectionResult.getErrorCode());
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        getLastKnownLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+    // Get last known location
+    private void getLastKnownLocation() {
+        Log.d(TAG, "getLastKnownLocation()");
+        if (checkPermission()) {
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (lastLocation != null) {
+                Log.i(TAG, "LasKnown location. " +
+                        "Long: " + lastLocation.getLongitude() +
+                        " | Lat: " + lastLocation.getLatitude());
+                writeLastLocation();
+                startLocationUpdates();
+
+            } else {
+                Log.w(TAG, "No location retrieved yet");
+                startLocationUpdates();
+            }
+        } else askPermission();
+
+    }
+
+    private void writeLastLocation() {
+        writeActualLocation(lastLocation);
+        mEdtPickUpLocation.setText("Loading....");
+        String add=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
+        mSoucreLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+        mEdtPickUpLocation.setText(add);
+        ivPickClear.setVisibility(View.VISIBLE);
+        mEdtPickUpLocation.clearFocus();
+        mEdtPickUpLocation.setSelected(false);
+        mEdtPickUpLocation.setFocusable(false);
+        mEdtPickUpLocation.setFocusableInTouchMode(true);
+        address=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
+       /* mEdtDetstinationLocation.requestFocus();
+        if (mAdapter != null) {
+            mAdapter.clearList();
+        }
+*/
+    }
+    private void writeActualLocation(Location location) {
+        CameraPosition cameraPosition = new CameraPosition.Builder().
+                target(new LatLng(location.getLatitude(), location.getLongitude())).bearing(360).
+                zoom(15f).tilt(40).build();
+        mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+    // Start location Updates
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        Log.i(TAG, "startLocationUpdates()");
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(UPDATE_INTERVAL)
+                .setFastestInterval(FASTEST_INTERVAL);
+        if (checkAndRequestPermissions())
+        {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
+        }
+
+    }
+
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged [" + location + "]");
+        lastLocation = location;
+    }
+
+    public String getAddress(double latitude, double longitude) {
+        StringBuilder result = new StringBuilder();
+
+        System.out.println("get address");
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses.size() > 0) {
+
+            HashMap itemAddress;
+            ArrayList itemList = new ArrayList<HashMap<String, String>>();
+            Log.d("Addresses", "" + "Start to print the ArrayList");
+            for (int i = 0; i < addresses.size(); i++) {
+                itemAddress = new HashMap<String, String>();
+                Address address = addresses.get(i);
+                String addressline = "Addresses from getAddressLine(): ";
+                for (int n = 0; n <= address.getMaxAddressLineIndex(); n++) {
+                    addressline += " index n: " + n + ": " + address.getAddressLine(n) + ", ";
+                }
+                Log.d(TAG,"Addresses: "+addressline);
+                Log.d(TAG,"Addresses getAdminArea()"+ address.getAdminArea());
+                Log.d(TAG,"Addresses getCountryCode()"+ address.getCountryCode());
+                Log.d(TAG,"Addresses getCountryName()" + address.getCountryName());
+                Log.d(TAG,"Addresses getFeatureName()"+ address.getFeatureName());
+                Log.d(TAG,"Addresses getLocality()" + address.getLocality());
+                Log.d(TAG,"Addresses getPostalCode()" + address.getPostalCode());
+                Log.d(TAG, "" + address.getPremises());
+                Log.d(TAG,"Addresses getSubAdminArea()"+ address.getSubAdminArea());
+                Log.d(TAG, "" + address.getSubLocality());
+                Log.d(TAG, "" + address.getSubThoroughfare());
+                Log.d(TAG,"Addresses getThoroughfare()"+ address.getThoroughfare());
+            }
+
+
+
+
+            System.out.println("size====" + addresses.size());
+            Address address = addresses.get(0);
+
+
+            for (int i = 0; i <= addresses.get(0).getMaxAddressLineIndex(); i++) {
+                if (i == addresses.get(0).getMaxAddressLineIndex()) {
+                    result.append(addresses.get(0).getAddressLine(i));
+                } else {
+                    result.append(addresses.get(0).getAddressLine(i) + ",");
+                }
+            }
+
+
+            System.out.println("ad==" + address);
+            System.out.println("result---" + result.toString());
+
+//                autoComplete_location.setText(result.toString()); // Here is you AutoCompleteTextView where you want to set your string address (You can remove it if you not need it)
+        }
+
+        return result.toString();
+    }
+    private boolean checkAndRequestPermissions() {
+        int AccessFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        int AccessCorasLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (AccessFineLocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        if (AccessCorasLocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
+            return false;
+        }
+        return true;
+    }
+    private boolean checkPermission() {
+        Log.d(TAG, "checkPermission()");
+        // Ask for permission if it wasn't granted yet
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void askPermission() {
+        Log.d(TAG, "askPermission()");
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                MY_PERMISSIONS_REQUEST_ACCOUNTS
+        );
+    }
+    // App cannot work without the permissions
+    private void permissionsDenied() {
+        Log.w(TAG, "permissionsDenied()");
+        // TODO close app and warn user
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult()");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCOUNTS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted
+                    // Permission was granted.
+                    if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+                        if (mGoogleApiClient == null) {
+                            setUpGoogleApiClient();
+                        }
+                        mGoogleMap.setMyLocationEnabled(true);
+                    }
+
+                } else {
+                    // Permission denied
+                    permissionsDenied();
+                }
+                break;
+            }
+        }
+    }
 
 }

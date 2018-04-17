@@ -3,8 +3,11 @@ package com.greegoapp.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -43,6 +46,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.Intent;
+
 public class AddPaymentMethodActivity extends AppCompatActivity implements View.OnClickListener {
 
     ActivityAddPaymentMethodBinding binding;
@@ -50,8 +55,9 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     Context context;
     DatePicker datePicker;
 
+    TextInputEditText edtTvCardNumber,edtTvExpDate;
 
-    EditText edtTvExpDate, edtTvCvv, edtTvZipCode, edtTvCardNumber;
+    EditText edtTvCvv, edtTvZipCode;
     Button save;
     int mYear, mMonth, mDay;
     ImageButton ibback;
@@ -72,6 +78,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 
         bindViews();
         setListner();
+
         callUserMeApi();
 
     }
@@ -80,8 +87,45 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     private void setListner() {
         ibBack.setOnClickListener(this);
         btnSavePaymentMethod.setOnClickListener(this);
-        edtTvExpDate.setOnClickListener(this);
+        edtTvCvv.setOnClickListener(this);
+        edtTvCardNumber.addTextChangedListener(new CreditCardNumberFormattingTextWatcher());
+        edtTvExpDate.addTextChangedListener(mDateEntryWatcher);
     }
+    private TextWatcher mDateEntryWatcher = new TextWatcher() {
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String working = s.toString();
+            boolean isValid = true;
+            if (working.length()==2 && before ==0) {
+                if (Integer.parseInt(working) < 1 || Integer.parseInt(working)>12) {
+                    isValid = false;
+                } else {
+                    working+="/";
+                    edtTvExpDate.setText(working);
+                    edtTvExpDate.setSelection(working.length());
+                }
+            }
+            else if (working.length()==5 && before ==0) {
+                String enteredYear = working.substring(3);
+                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+                if (Integer.parseInt(enteredYear) < currentYear) {
+                    isValid = false;
+                }
+            } else if (working.length()!=7) {
+                isValid = false;
+            }
+
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {}
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+    };
 
     private void bindViews() {
         edtTvCardNumber = binding.edtTvCardNumber;
@@ -90,14 +134,85 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         edtTvZipCode = binding.edtTvZipCode;
         btnSavePaymentMethod = binding.btnSavePaymentMethod;
         tvEditPaymentTitle = binding.tvEditPaymentTitle;
-        ibBack =  binding.ibBack;
+        ibBack = binding.ibBack;
     }
+
+
+    public static class CreditCardNumberFormattingTextWatcher implements TextWatcher {
+
+        private boolean lock;
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (lock || s.length() > 16) {
+                return;
+            }
+            lock = true;
+            for (int i = 4; i < s.length(); i += 5) {
+                if (s.toString().charAt(i) != ' ') {
+                    s.insert(i, " ");
+                }
+            }
+            lock = false;
+        }
+    }
+
+    private TextWatcher mCardNumberWatcher = new TextWatcher() {
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String working = s.toString();
+            boolean isValid = true;
+            if (working.length()==2 && before ==0) {
+                if (Integer.parseInt(working) < 1 || Integer.parseInt(working)>12) {
+                    isValid = false;
+                } else {
+                    working+="/";
+                    edtTvCvv.setText(working);
+                    edtTvCvv.setSelection(working.length());
+                }
+            }
+            else if (working.length()==5 && before ==0) {
+                String enteredYear = working.substring(3);
+                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+                if (Integer.parseInt(enteredYear) < currentYear) {
+                    isValid = false;
+                }
+            } else if (working.length()!=7) {
+                isValid = false;
+            }
+
+            if (!isValid) {
+                edtTvCvv.setError("Enter a valid date: MM/YY");
+            } else {
+                edtTvCvv.setError(null);
+            }
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {}
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+    };
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
-                finish();
+                Intent  in = new Intent(AddPaymentMethodActivity.this, HomeActivity.class);
+               startActivity(in);
+//                finish();
 //                Fragment fragment = new PaymentFragment();
 //                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -118,9 +233,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                     }
                 }
                 break;
-            case R.id.edtTvExpDate:
-                getDate();
-                break;
+
 
         }
     }
@@ -188,6 +301,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                             SessionManager.setIsUserLoggedin(context, true);
                             Applog.E("UserDetails" + cardDetails);
 //                            callUserMeApi();
+                            finish();
                             SnackBar.showSuccess(context, snackBarView, "Add card successfully.");
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -210,7 +324,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");
@@ -263,7 +377,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             edtTvZipCode.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_zipcode));
             return false;
-        } else if (zipcode.length() < 6 || zipcode.length() > 6) {
+        } else if (zipcode.length() < 6) {
             edtTvZipCode.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_zipcode));
             return false;
@@ -324,7 +438,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 //                            edtTvProfileLname.setText(userDetails.getData().getLastname());
 //                            strEmail = userDetails.getData().getEmail();
 //                            SessionManager.saveUserData(context, userDetails);
-                            SnackBar.showSuccess(context, snackBarView, "Profile Update successfully.");
+//                            SnackBar.showSuccess(context, snackBarView, "Profile Update successfully.");
 //
                             //getIs_agreed = 0 new user
 
@@ -348,7 +462,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
 
                     params.put(WebFields.PARAM_ACCEPT, "application/json");

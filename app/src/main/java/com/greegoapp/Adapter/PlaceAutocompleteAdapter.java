@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocompleteAdapter.PlaceViewHolder> implements Filterable{
 
     public interface PlaceAutoCompleteInterface{
-        public void onPlaceClick(ArrayList<PlaceAutocomplete> mResultList, int position);
+        void onPlaceClick(ArrayList<PlaceAutocomplete> mResultList, int position);
     }
 
     Context mContext;
@@ -202,8 +202,8 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
 
         public PlaceViewHolder(View itemView) {
             super(itemView);
-            mParentLayout = (RelativeLayout)itemView.findViewById(R.id.predictedRow);
-            mAddress = (TextView)itemView.findViewById(R.id.address);
+            mParentLayout = itemView.findViewById(R.id.row);
+            mAddress = itemView.findViewById(R.id.address);
         }
 
     }
