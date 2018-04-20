@@ -14,6 +14,7 @@ public class WebFields {
         public static final String MODE = "login";
         public static final String PARAM_CONTACT_NO = "contact_number";
         public static final String PARAM_IS_PHONE_NO = "is_iphone";
+        public static final String PARAM_DEVICE_ID = "device_id";
     }
 
 
@@ -69,4 +70,23 @@ public class WebFields {
         public static final String PARAM_TRANSMISSION_TYPE = "transmission_type";
 
     }
+
+    public static final class SELECT_VEHICLE {
+        public static final String MODE = "user/select/vehicle";
+        public static final String PARAM_VEHICLE_ID = "vehicle_id";
+    }
+
+    public static final class TRIP {
+        public static final String MODE = "user/get/rates";
+        public static final String PARAM_STATE = "state";
+    }
+
+    public static final class USER_NEAR_DRIVER_LIST {
+        public static final String MODE = "user/get/drivers";
+
+        public static final String PARAM_USER_LAT= "lat";
+        public static final String PARAM_USER_LONG= "lng";
+    }
+
+
 }

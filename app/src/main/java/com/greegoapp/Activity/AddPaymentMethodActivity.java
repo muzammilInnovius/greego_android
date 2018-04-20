@@ -24,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
+import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.CardData;
 import com.greegoapp.Model.GetUserData;
@@ -47,6 +48,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Intent;
+
+import static com.greegoapp.Activity.HomeActivity.HOME_SLIDER_PROFILE_UPDATE;
+import static com.greegoapp.Activity.PaymentActivity.ADD_CARD_PAYMENT_METHOD;
+import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_ADD_PAYMENT;
 
 public class AddPaymentMethodActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -158,53 +163,13 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             lock = true;
             for (int i = 4; i < s.length(); i += 5) {
                 if (s.toString().charAt(i) != ' ') {
-                    s.insert(i, " ");
+                    s.insert(i, "/");
                 }
             }
             lock = false;
         }
     }
 
-    private TextWatcher mCardNumberWatcher = new TextWatcher() {
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            String working = s.toString();
-            boolean isValid = true;
-            if (working.length()==2 && before ==0) {
-                if (Integer.parseInt(working) < 1 || Integer.parseInt(working)>12) {
-                    isValid = false;
-                } else {
-                    working+="/";
-                    edtTvCvv.setText(working);
-                    edtTvCvv.setSelection(working.length());
-                }
-            }
-            else if (working.length()==5 && before ==0) {
-                String enteredYear = working.substring(3);
-                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-                if (Integer.parseInt(enteredYear) < currentYear) {
-                    isValid = false;
-                }
-            } else if (working.length()!=7) {
-                isValid = false;
-            }
-
-            if (!isValid) {
-                edtTvCvv.setError("Enter a valid date: MM/YY");
-            } else {
-                edtTvCvv.setError(null);
-            }
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {}
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-    };
 
     @Override
     public void onClick(View view) {
@@ -300,8 +265,24 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                         if (cardDetails.getError_code() == 0) {
                             SessionManager.setIsUserLoggedin(context, true);
                             Applog.E("UserDetails" + cardDetails);
+                            String card_number =cardDetails.getData().getCard_number();
+
+                            SessionManager.saveCardDetails(context,cardDetails);
+
+                            if (REQUEST_ADD_PAYMENT ==110){
+                                Intent data = new Intent();
+                                setResult(REQUEST_ADD_PAYMENT, data);
+                            }else if (ADD_CARD_PAYMENT_METHOD == 1001){
+                                Intent data = new Intent();
+                                data.putExtra("cardNumber",card_number);
+                                setResult(ADD_CARD_PAYMENT_METHOD, data);
+                            }
+
+
 //                            callUserMeApi();
                             finish();
+
+
                             SnackBar.showSuccess(context, snackBarView, "Add card successfully.");
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -357,7 +338,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         String cvvno = edtTvCvv.getText().toString();
         String zipcode = edtTvZipCode.getText().toString();
 
-        if (cardno.length() < 12) {
+        if (cardno.length() < 19) {
             edtTvCardNumber.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_card_no));
             return false;
@@ -377,7 +358,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             edtTvZipCode.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_zipcode));
             return false;
-        } else if (zipcode.length() < 6) {
+        } else if (zipcode.length() < 5) {
             edtTvZipCode.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_zipcode));
             return false;
@@ -430,7 +411,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                                     Applog.E("Card No===> " + cardNo);
                                     edtTvCardNumber.setText(cardNo);
                                     edtTvExpDate.setText(cardsBean.getExp_month_year());
-                                    edtTvCvv.setText(cardsBean.getCvv_number());
                                     edtTvZipCode.setText(cardsBean.getZipcode());
                                 }
                             }

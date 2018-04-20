@@ -77,7 +77,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     Context context;
     ImageButton ibback;
     RecyclerView recyclerView;
-    ArrayList<VehicleDetailModel> alVehicleDetail;
+    ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail;
     VehicleDetailAdapter adapter;
     VehicleDetailModel vehicleDetailModel;
     RecyclerViewItemClickListener mListener;

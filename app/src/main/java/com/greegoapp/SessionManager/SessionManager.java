@@ -2,11 +2,9 @@ package com.greegoapp.SessionManager;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -20,13 +18,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.greegoapp.Model.CardData;
 import com.greegoapp.Model.Login;
 import com.greegoapp.Model.UserData;
-import com.greegoapp.Model.VerifyOtp;
+import com.greegoapp.Model.VehicleUpdate;
 import com.greegoapp.Utils.AppConstants;
 import com.greegoapp.Utils.Applog;
-
-import java.util.Calendar;
 
 public class SessionManager {
     public static ProgressDialog progressDialog;
@@ -36,12 +33,15 @@ public class SessionManager {
     static PendingIntent pendingIntent;
 
 
-    public static void saveUserDetails(Context context, Login vo) {
+    public static void saveVehical(Context context, VehicleUpdate vo) {
         try {
             SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = preferences.edit();
-//            editor.putLong(AppPrefFields.PARAM_USERID, vo.().getUserId());
+            editor.putString(AppPrefFields.PARAM_VEHICLE_MANUFACTURE, vo.getManufacture());
+            editor.putString(AppPrefFields.PARAM_VEHICLE_MODEL, vo.getModel());
+            editor.putString(AppPrefFields.PARAM_VEHICLE_COLOR, vo.getColor());
+            editor.putInt(AppPrefFields.PARAM_VEHICLE_YEAR, vo.getYear());
 
             editor.apply();
         } catch (Exception e) {
@@ -49,6 +49,23 @@ public class SessionManager {
             e.printStackTrace();
         }
     }
+
+    public static VehicleUpdate getUpdatedVehical(Context context) {
+        VehicleUpdate vehicleDtl = new VehicleUpdate();
+        try {
+            SharedPreferences pref = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            vehicleDtl.setManufacture(pref.getString(AppPrefFields.PARAM_VEHICLE_MANUFACTURE, ""));
+            vehicleDtl.setModel(pref.getString(AppPrefFields.PARAM_VEHICLE_MODEL, ""));
+            vehicleDtl.setYear(pref.getInt(AppPrefFields.PARAM_VEHICLE_YEAR, 0));
+            vehicleDtl.setColor(pref.getString(AppPrefFields.PARAM_VEHICLE_COLOR, ""));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vehicleDtl;
+    }
+
 
     public static void saveMobileNo(Context context, Login vo) {
         try {
@@ -154,6 +171,38 @@ public class SessionManager {
             e.printStackTrace();
         }
     }
+
+    public static void saveCardDetails(Context context, CardData vo) {
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(AppPrefFields.PARAM_CARD_NUMBER, vo.getData().getCard_number());
+            editor.putInt(AppPrefFields.PARAM_ID, vo.getData().getId());
+            editor.putInt(AppPrefFields.PARAM_USER_ID, vo.getData().getUser_id());
+            editor.putString(AppPrefFields.PARAM_CARD_EXP_MONTH_YR, vo.getData().getExp_month_year());
+            editor.putString(AppPrefFields.PARAM_CARD_ZIPCODE_OTP, vo.getData().getZipcode());
+//
+
+            editor.apply();
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    public static String getCardNo(Context context) {
+        String cardNo = "";
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            cardNo  = preferences.getString(AppPrefFields.PARAM_CARD_NUMBER, "");
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return cardNo ;
+    }
+
 
     public static int getOTP(Context context) {
         int otp = 0;

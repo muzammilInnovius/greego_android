@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -25,13 +24,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
-import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.BackPressedFragment;
 import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.Model.GetManufactures;
 import com.greegoapp.Model.GetVehicle;
 import com.greegoapp.Model.UpdateVehicle;
+import com.greegoapp.Model.VehicleUpdate;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -49,6 +48,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.greegoapp.Activity.UserProfileActivity.SELECT_CHOISE_VEHICLE;
+import static com.greegoapp.Fragment.MapHomeFragment.ADD_EDIT_VEHICAL_REQUEST;
+import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_ADD_VEHICLE;
+
 public class AddEditVehicleActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText edtTvMake, edtTvModel, edtTvYear, edtTvColor, edtTvCarType;
     private Spinner spinnerMake, spinnerModel, spinnerYear, spinnerColor, spinnerCarType;
@@ -57,7 +60,6 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
     ActivityAddEditVehicleBinding binding;
     private View snackBarView;
     Context context;
-
 
     private ArrayAdapter<GetManufactures.DataBean> ManufacturesBeanArrayAdapter;
     private ArrayAdapter<GetVehicle.DataBean> vehicalModelListArrayAdapter;
@@ -121,7 +123,6 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
 
                             GetManufactures.DataBean makeData = new GetManufactures.DataBean();
                             makeData.setId(0);
-                            makeData.setName("CHOOSE VEHICLE MAKE");
                             alManufactur.add(0, makeData);
 
 
@@ -279,12 +280,23 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                 break;
 
             case R.id.ibBack:
+                if (REQUEST_ADD_VEHICLE == 111) {
+                    Intent data = new Intent();
+                    setResult(REQUEST_ADD_VEHICLE, data);
+                } else if (ADD_EDIT_VEHICAL_REQUEST == 2000) {
+                    Intent data = new Intent();
+                    setResult(ADD_EDIT_VEHICAL_REQUEST, data);
+                } else if (SELECT_CHOISE_VEHICLE == 1100) {
+                    Intent data = new Intent();
+                    setResult(SELECT_CHOISE_VEHICLE, data);
+                }
                 finish();
                 break;
             case R.id.edtTvYear:
                 break;
 
             case R.id.edtTvColor:
+                KeyboardUtility.hideKeyboard(context, view);
                 break;
 
             case R.id.edtTvCarType:
@@ -315,9 +327,9 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
             case R.id.tvManual:
                 if (autoType) {
                     imgVwAutomaticSelect.setVisibility(View.GONE);
-                    imgVwManualSelect.setVisibility(View.GONE);
-                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
-                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
+                    imgVwManualSelect.setVisibility(View.VISIBLE);
+                    tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
+                    tvManual.setTextColor(getResources().getColor(R.color.app_bg));
                     autoType = false;
                 } else {
                     imgVwAutomaticSelect.setVisibility(View.GONE);
@@ -378,6 +390,8 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
         return true;
     }
 
+    VehicleUpdate vehicleUpdate = new VehicleUpdate();
+
     private void callSaveVehicleAPI() {
         try {
             String year = edtTvYear.getText().toString().trim();
@@ -401,12 +415,40 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     UpdateVehicle vehicleData = new Gson().fromJson(String.valueOf(response), UpdateVehicle.class);
                     if (vehicleData.getError_code() == 0) {
 
-                        Intent data = new Intent();
-                        data.putExtra("manufacture", strManufactur);
-                        data.putExtra("model", strVehicle);
-                        data.putExtra("year", strYear);
-                        data.putExtra("color", strColor);
-                        setResult(MapHomeFragment.ADD_EDIT_VEHICAL_REQUEST, data);
+
+                        if (REQUEST_ADD_VEHICLE == 111) {
+                            Intent data = new Intent();
+                            data.putExtra("manufacture", strManufactur);
+                            data.putExtra("model", strVehicle);
+                            data.putExtra("year", strYear);
+                            data.putExtra("color", strColor);
+
+                            vehicleUpdate.setManufacture(strManufactur);
+                            vehicleUpdate.setModel(strVehicle);
+                            vehicleUpdate.setYear(Integer.parseInt(strYear));
+                            vehicleUpdate.setColor(strColor);
+                            SessionManager.saveVehical(context,vehicleUpdate);
+
+                            setResult(REQUEST_ADD_VEHICLE, data);
+                        } else if (ADD_EDIT_VEHICAL_REQUEST == 2000) {
+                            Intent data = new Intent();
+                            data.putExtra("manufacture", strManufactur);
+                            data.putExtra("model", strVehicle);
+                            data.putExtra("year", strYear);
+                            data.putExtra("color", strColor);
+
+                            vehicleUpdate.setManufacture(strManufactur);
+                            vehicleUpdate.setModel(strVehicle);
+                            vehicleUpdate.setYear(Integer.parseInt(strYear));
+                            vehicleUpdate.setColor(strColor);
+                            SessionManager.saveVehical(context,vehicleUpdate);
+                            setResult(ADD_EDIT_VEHICAL_REQUEST, data);
+                        } else if (SELECT_CHOISE_VEHICLE == 1100) {
+                            Intent data = new Intent();
+                            setResult(SELECT_CHOISE_VEHICLE, data);
+                        }
+
+
                         finish();
 
                     } else
@@ -532,7 +574,6 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
 
                         GetVehicle.DataBean questionDatum1 = new GetVehicle.DataBean();
                         questionDatum1.setId(0);
-                        questionDatum1.setModel("CHOOSE VEHICLE MODEL");
                         alVehical.add(0, questionDatum1);
 
 

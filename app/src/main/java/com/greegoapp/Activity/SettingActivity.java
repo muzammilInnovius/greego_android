@@ -5,18 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -24,13 +20,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
-import com.greegoapp.Fragment.UserProfileFragment;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.GetUserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -50,8 +46,10 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     ImageButton ibback;
     RelativeLayout rl_name, rl_phone, rl_email, rl_btnlogout;
     View snackBarView;
-    TextView tvUserName, tvUserEmail;
+    TextView tvUserName, tvUserEmail, tvUserPhone;
     GetUserData userDetails;
+
+    public static final int SETTING_PROFILE_UPDATE = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,17 +87,21 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         rl_btnlogout = binding.rlLogout;
         tvUserName = binding.tvUserName;
         tvUserEmail = binding.tvUserEmail;
+        tvUserPhone = binding.tvUserPhone;
     }
+
+    Intent in;
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
+                KeyboardUtility.hideKeyboard(context,view);
                 finish();
                 break;
             case R.id.rlName:
-                Intent in = new Intent(SettingActivity.this, UserProfileActivity.class);
-                startActivity(in);
+                in = new Intent(SettingActivity.this, UserProfileActivity.class);
+                startActivityForResult(in, SETTING_PROFILE_UPDATE);
 //                Fragment fragment = new UserProfileFragment();
 //                FragmentManager fragmentManager = getSupportFragmentManager();
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -115,6 +117,21 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
         }
     }
+
+    String userName;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case SETTING_PROFILE_UPDATE:
+                userName = data.getStringExtra("name");
+                tvUserName.setText(userName);
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
     private void showCallbacksLogout(String strLogOut) {
         try {
@@ -176,8 +193,10 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
                             String userName = userDetails.getData().getName();
                             String emailId = userDetails.getData().getEmail();
+                            String mobileNO = userDetails.getData().getContact_number();
                             tvUserName.setText(userName);
                             tvUserEmail.setText(emailId);
+                            tvUserPhone.setText(mobileNO);
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //

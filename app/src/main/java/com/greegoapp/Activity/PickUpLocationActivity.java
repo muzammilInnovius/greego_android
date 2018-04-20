@@ -109,6 +109,8 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     private Location lastLocation;
     Button btnSetLocation;
     public static boolean mapViewVisible=false;
+    public static boolean passValue=false;
+
 
 
 
@@ -127,6 +129,25 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         bindView();
         setListners();
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            passValue=true;
+            String plat = extras.getString("pickupPointLatitud");
+            String plong = extras.getString("pickupPointLongitude");
+            String dlat = extras.getString("dropPointLatitude");
+            String dlong = extras.getString("dropPointLongitude");
+            mSoucreLatLong=new LatLng(Double.parseDouble(plat),Double.parseDouble(plong));
+            mDestinationLatLong=new LatLng(Double.parseDouble(dlat),Double.parseDouble(dlong));
+            ssLocation=getAddress(mSoucreLatLong.latitude,mSoucreLatLong.longitude);
+            ddLocation=getAddress(mDestinationLatLong.latitude,mDestinationLatLong.longitude);
+            mEdtPickUpLocation.setText(ssLocation);
+            mEdtDetstinationLocation.setText(ddLocation);
+        }else {
+            passValue=false;
+        }
+
+
+
         mEdtPickUpLocation.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -135,7 +156,6 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count > 0) {
                     edtType = 0;
-//
                     ivPickClear.setVisibility(View.VISIBLE);
                     mRecyclerView.setVisibility(View.VISIBLE);
                     if (mAdapter != null) {
@@ -144,14 +164,10 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 } else {
                     ivPickClear.setVisibility(View.GONE);
                     mRecyclerView.setVisibility(View.GONE);
-//                    if (mSavedAdapter != null && mSavedAddressList.size() > 0) {
-//                        mRecyclerView.setAdapter(mSavedAdapter);
-//                    }
                 }
                 if (!s.toString().equals("") && mGoogleApiClient.isConnected()) {
                     mAdapter.getFilter().filter(s.toString());
                 } else if (!mGoogleApiClient.isConnected()) {
-//                    Toast.makeText(getApplicationContext(), Constants.API_NOT_CONNECTED, Toast.LENGTH_SHORT).show();
                     Log.e("", "NOT CONNECTED");
                 }
             }
@@ -199,8 +215,14 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             public void onFocusChange(View arg0, boolean hasfocus) {
                 if (hasfocus) {
                     edtType=0;
+                    passValue=false;
                     Log.e("TAG", "e1 focused");
-//                    llLocationView.setVisibility(View.VISIBLE);
+                    llLocationView.setVisibility(View.VISIBLE);
+                    ivPickClear.setVisibility(View.VISIBLE);
+                    if(mAdapter!=null)
+                    {
+                        mAdapter.clearList();
+                    }
                 } else {
                     Log.e("TAG", "e1 not focused");
                 }
@@ -211,7 +233,13 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             public void onFocusChange(View arg0, boolean hasfocus) {
                 if (hasfocus) {
                     edtType=1;
-//                    llLocationView.setVisibility(View.VISIBLE);
+                    passValue=false;
+                    llLocationView.setVisibility(View.VISIBLE);
+                    ivDesClear.setVisibility(View.VISIBLE);
+                    if(mAdapter!=null)
+                    {
+                        mAdapter.clearList();
+                    }
                     Log.e("TAG", "e1 focused");
                 } else {
                     Log.e("TAG", "e1 not focused");
@@ -465,6 +493,8 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
 
 
+
+
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -475,20 +505,28 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                         KeyboardUtility.hideKeyboard(context,mapView);
                         if(edtType == 0)
                         {
-                            mEdtPickUpLocation.setText("Loading....");
-                            ssLocation=getAddress(mLatLng.latitude, mLatLng.longitude);
-                            mSoucreLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
-                            mEdtPickUpLocation.setText(ssLocation);
-                            mEdtPickUpLocation.clearFocus();
-                            ivPickClear.setVisibility(View.VISIBLE);
+                            if(passValue==false)
+                            {
+                                mEdtPickUpLocation.setText("Loading....");
+                                ssLocation=getAddress(mLatLng.latitude, mLatLng.longitude);
+                                mSoucreLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
+                                mEdtPickUpLocation.setText(ssLocation);
+                                mEdtPickUpLocation.clearFocus();
+                                ivPickClear.setVisibility(View.VISIBLE);
+                            }
                         }
                         else {
-                            mEdtDetstinationLocation.setText("Loading....");
-                            ddLocation = getAddress(mLatLng.latitude, mLatLng.longitude);
-                            mDestinationLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
-                            mEdtDetstinationLocation.setText(ddLocation);
-                            mEdtDetstinationLocation.clearFocus();
-                            ivDesClear.setVisibility(View.VISIBLE);
+
+                            if(passValue==false)
+                            {
+                                mEdtDetstinationLocation.setText("Loading....");
+                                ddLocation = getAddress(mLatLng.latitude, mLatLng.longitude);
+                                mDestinationLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
+                                mEdtDetstinationLocation.setText(ddLocation);
+                                mEdtDetstinationLocation.clearFocus();
+                                ivDesClear.setVisibility(View.VISIBLE);
+                            }
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -571,21 +609,29 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
     private void writeLastLocation() {
         writeActualLocation(lastLocation);
-        mEdtPickUpLocation.setText("Loading....");
-        String add=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
-        mSoucreLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
-        mEdtPickUpLocation.setText(add);
-        ivPickClear.setVisibility(View.VISIBLE);
-        mEdtPickUpLocation.clearFocus();
-        mEdtPickUpLocation.setSelected(false);
-        mEdtPickUpLocation.setFocusable(false);
-        mEdtPickUpLocation.setFocusableInTouchMode(true);
-        address=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
-       /* mEdtDetstinationLocation.requestFocus();
-        if (mAdapter != null) {
-            mAdapter.clearList();
+
+        if(passValue==false)
+        {
+            mEdtPickUpLocation.setText("Loading....");
+            String add=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
+            mSoucreLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+            mEdtPickUpLocation.setText(add);
+            ivPickClear.setVisibility(View.VISIBLE);
+            mEdtPickUpLocation.clearFocus();
+            mEdtPickUpLocation.setSelected(false);
+            mEdtPickUpLocation.setFocusable(false);
+            mEdtPickUpLocation.setFocusableInTouchMode(true);
+            mEdtDetstinationLocation.clearFocus();
+            mEdtDetstinationLocation.setSelected(false);
+            mEdtDetstinationLocation.setFocusable(false);
+            mEdtDetstinationLocation.setFocusableInTouchMode(true);
+            address=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
+            mEdtDetstinationLocation.requestFocus();
+            if (mAdapter != null) {
+                mAdapter.clearList();
+            }
         }
-*/
+
     }
     private void writeActualLocation(Location location) {
         CameraPosition cameraPosition = new CameraPosition.Builder().

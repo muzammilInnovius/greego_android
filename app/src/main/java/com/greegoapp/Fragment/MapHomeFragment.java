@@ -27,6 +27,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +35,14 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -62,6 +65,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
 import com.greegoapp.Activity.AddEditVehicleActivity;
 import com.greegoapp.Activity.AddPaymentMethodActivity;
 import com.greegoapp.Activity.PickUpLocationActivity;
@@ -70,7 +74,9 @@ import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.BackPressedFragment;
 import com.greegoapp.Interface.CallFragmentInterface;
+import com.greegoapp.Model.GetTripRate;
 import com.greegoapp.Model.GetUserData;
+import com.greegoapp.Model.UserNearDriverList;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -83,9 +89,12 @@ import com.greegoapp.polilineAnimator.MapAnimator;
 import com.greegoapp.polilineAnimator.MapHttpConnection;
 import com.greegoapp.polilineAnimator.PathJSONParser;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +112,7 @@ import java.util.Map;
 
 
 public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener, GoogleMap.OnMarkerClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -131,7 +140,8 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     private final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
     private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
 
-
+    public final static int REQUEST_ADD_PAYMENT = 110;
+    public final static int REQUEST_ADD_VEHICLE = 111;
     private LocationRequest locationRequest;
     // Defined in mili seconds.
     // This number in extremely low, and should be used only for debug
@@ -155,7 +165,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     RelativeLayout rlProfile, rlVehicleNo, rlPaymentNo;
     CallFragmentInterface callMyFragment;
     BackPressedFragment backPressed;
-    TextView tvVehicalData;
+
     // pragnesh
     private List<LatLng> routeList;
     private static final long MOVE_ANIMATION_DURATION = 1000;
@@ -165,15 +175,33 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     private int mIndexCurrentPoint = 0;
     private LatLng pickupPoint, dropPoint;
     public static final int PICK_CONTACT_REQUEST = 1;  // The request code
-    public static final int ADD_EDIT_VEHICAL_REQUEST = 2;  // The request code
+    public static final int ADD_EDIT_VEHICAL_REQUEST = 2000;  // The request code
 
     Double dist;
     int mapZoomLevel;
     ArrayList<GetUserData> userDetails = new ArrayList<>();
 
     //Vehicle 17_4_2018
-    LinearLayout llEditVehicle, llSetVehicle;
+    LinearLayout llEditVehicle, llSetVehicle, llVehical;
     ImageView imgSetting, imgVwVehicle;
+    TextView tvVehicalData, tvEditVehicle;
+    String strManufacur, strModel, strColor;
+    int strYear;
+    boolean isEditVehical = false;
+
+    public static final int MAP_HOME_PROFILE_UPDATE = 1002;
+
+    LinearLayout llEditVechicleDesign, llCostDesign;
+    TextView txtEstMentCost;
+    EditText edtCardNo;
+    public String cardNo, statCode;
+    float base_fee, time_fee, mile_fee, trip_price, over_mile_fee, price;
+    String duration, duration1;
+
+
+    //Mujju 19_4_18
+//    ArrayList<UserNearDriverList> alUserNearDriver;
+    ArrayList<UserNearDriverList.DataBean> alUserNearDriverDtls;
 
     public static MapHomeFragment newInstance(ArrayList<GetUserData> userData, String param2) {
         MapHomeFragment fragment = new MapHomeFragment();
@@ -208,7 +236,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         setListners();
         setFirstTimeRegister();
 
-
         if (ConnectivityDetector.isConnectingToInternet(context)) {
             if (Build.VERSION.SDK_INT < 23) {
                 //Do not need to check the permission
@@ -240,6 +267,121 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         return view;
     }
 
+    private void callNearDriverAPI(String currentLat, String currentLong) {
+        try {
+            Applog.E("Get Current Lot" + currentLat);
+            Applog.E("Get Current Long" + currentLong);
+
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put(WebFields.USER_NEAR_DRIVER_LIST.PARAM_USER_LAT, currentLat);
+            jsonObject.put(WebFields.USER_NEAR_DRIVER_LIST.PARAM_USER_LONG, currentLong);
+
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.USER_NEAR_DRIVER_LIST.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+
+                    UserNearDriverList nearDriver = new Gson().fromJson(String.valueOf(response), UserNearDriverList.class);
+                    UserNearDriverList.DataBean nrDriverData = new Gson().fromJson(String.valueOf(response), UserNearDriverList.DataBean.class);
+
+                    alUserNearDriverDtls = new ArrayList<UserNearDriverList.DataBean>();
+
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+                        if (nearDriver.getError_code() == 0) {
+
+                            if (nearDriver.getData().size() != 0) {
+                                alUserNearDriverDtls.addAll(nearDriver.getData());
+//                            alUserNearDriverDtls.add(nrDriverData);
+                                Applog.E("near array size after==>" + alUserNearDriverDtls.size());
+
+
+                                setNearDriver();
+                            }
+
+
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setNearDriver() {
+
+        if (alUserNearDriverDtls.size() != 0) {
+
+
+                for (int j = 0; j < alUserNearDriverDtls.size(); j++) {
+
+//            for (UserNearDriverList.DataBean nrDriver : alUserNearDriverDtls)
+
+
+                    for (int i = 0; i < alUserNearDriverDtls.size(); i++) {
+
+//                                    createMarker(nearDriverAll.getLat(), nearDriverAll.getLng(), nearDriverAll.getDistance());
+                        Applog.E("Double lat == > " + alUserNearDriverDtls.get(i).getLat());
+                        double drvLat = Double.parseDouble(alUserNearDriverDtls.get(i).getLat());
+                        double drvLong = Double.parseDouble(alUserNearDriverDtls.get(i).getLng());
+
+                        createMarker(drvLat, drvLong, "Driver", "Show");
+
+                    }
+
+                }
+        }
+    }
+
+    protected Marker createMarker(double latitude, double longitude, String title, String snippet) {
+
+        return mGoogleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .anchor(0.5f, 0.5f)
+                .title(title)
+                .snippet(snippet).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_driver)));
+    }
+
+
     private void setFirstTimeRegister() {
         rlUpdateData.setVisibility(View.GONE);
 
@@ -257,52 +399,53 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 }
 
 
-                if (userData.getData().getCards() == null) {
-                    rlVwUpdateMain.setVisibility(View.VISIBLE);
-                    rlUpdateData.setVisibility(View.GONE);
-                    txtVwVehicleName.setTextColor(getResources().getColor(R.color.hint_color));
-                } else {
-                    txtVwVehicleName.setTextColor(getResources().getColor(R.color.app_bg));
-                }
-
-                if (userData.getData().getVehicles() == null) {
-
+                if (userData.getData().getCards().size() == 0) {
                     rlVwUpdateMain.setVisibility(View.VISIBLE);
                     rlUpdateData.setVisibility(View.GONE);
                     txtVwpayment.setTextColor(getResources().getColor(R.color.hint_color));
                 } else {
                     txtVwpayment.setTextColor(getResources().getColor(R.color.app_bg));
+                }
+
+                if (userData.getData().getVehicles().size() == 0) {
+
+                    rlVwUpdateMain.setVisibility(View.VISIBLE);
+                    rlUpdateData.setVisibility(View.GONE);
+                    txtVwVehicleName.setTextColor(getResources().getColor(R.color.hint_color));
+                } else {
+                    txtVwVehicleName.setTextColor(getResources().getColor(R.color.app_bg));
 
                 }
 
 
-                if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles() != null && userData.getData().getCards() != null) {
+                if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
 
                     rlVwUpdateMain.setVisibility(View.GONE);
                     rlUpdateData.setVisibility(View.GONE);
                     txtAddress.setVisibility(View.VISIBLE);
+                    llVehical.setVisibility(View.VISIBLE);
                 } else {
 
                     //Any two array null set 2
-                    if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles() == null && userData.getData().getCards() == null) {
+                    if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() == 0) {
                         txtVwCount.setText("2");
-                    } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles() != null && userData.getData().getCards() == null) {
+                    } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() == 0) {
                         txtVwCount.setText("2");
-                    } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles() == null && userData.getData().getCards() != null) {
+                    } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                         txtVwCount.setText("2");
                     }
 
                     //Any one array null set 1
-                    else if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles() != null && userData.getData().getCards() == null) {
+                    else if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() == 0) {
                         txtVwCount.setText("1");
-                    } else if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles() == null && userData.getData().getCards() != null) {
+                    } else if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                         txtVwCount.setText("1");
-                    } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles() != null && userData.getData().getCards() != null) {
+                    } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
                         txtVwCount.setText("1");
                     }
 
                     rlVwUpdateMain.setVisibility(View.VISIBLE);
-                    rlUpdateData.setVisibility(View.VISIBLE);
+                    rlUpdateData.setVisibility(View.GONE);
                 }
             }
         }
@@ -322,12 +465,24 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         rlPaymentNo.setOnClickListener(this);
         btnDone.setOnClickListener(this);
         llEditVehicle.setOnClickListener(this);
+        llSetVehicle.setOnClickListener(this);
     }
 
 
     private void bindViews() {
-        tvVehicalData = binding.tvVehicalData;
+        txtEstMentCost = binding.txtEstCost;
+        edtCardNo = binding.edtCardDetail;
         llEditVehicle = binding.llEditVehicle;
+        llCostDesign = binding.llCost;
+
+        llVehical = binding.llVehical;
+        llSetVehicle = binding.llSetVehicle;
+        llEditVehicle = binding.llEditVehicle;
+        imgSetting = binding.imgSetting;
+        imgVwVehicle = binding.imgVwVehicle;
+        tvEditVehicle = binding.tvEditVehicle;
+        tvVehicalData = binding.tvVehicalData;
+
         btnDone = binding.done;
         txtAddress = binding.txtAddress;
         mFragment = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mgooleMap);
@@ -344,7 +499,34 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         rlProfile = binding.rlProfile;
         rlVehicleNo = binding.rlVehicleNo;
         rlPaymentNo = binding.rlPaymentNo;
+        rlUpdateData.setVisibility(View.GONE);
         rlVwUpdateMain.setVisibility(View.GONE);
+
+        strManufacur = SessionManager.getUpdatedVehical(context).getManufacture();
+        strModel = SessionManager.getUpdatedVehical(context).getModel();
+        strYear = SessionManager.getUpdatedVehical(context).getYear();
+        strColor = SessionManager.getUpdatedVehical(context).getColor();
+
+        if (strManufacur.matches("Edit your vehicle")) {
+            tvVehicalData.setText("Edit your vehicle");
+            imgVwVehicle.setImageResource(R.mipmap.setup);
+
+            tvEditVehicle.setText("");
+            isEditVehical = false;
+        } else {
+            isEditVehical = true;
+            tvVehicalData.setText("Edit your vehicle");
+            imgVwVehicle.setImageResource(R.mipmap.setup);
+
+            if (strYear == 0) {
+                tvEditVehicle.setText("");
+            } else {
+                tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
+                imgSetting.setImageResource(R.mipmap.ellipse_1);
+            }
+
+
+        }
     }
 
 
@@ -377,35 +559,60 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
             // Make sure the request was successful
             if (data != null) {
                 mGoogleMap.clear();
+
+
                 String sLat = data.getStringExtra("sourceLat");
                 String sLng = data.getStringExtra("sourceLng");
                 String dLat = data.getStringExtra("destinationLat");
                 String dLng = data.getStringExtra("destinationLng");
                 pickupPoint = new LatLng(Double.parseDouble(sLat), Double.parseDouble(sLng));
                 dropPoint = new LatLng(Double.parseDouble(dLat), Double.parseDouble(dLng));
-                // The Intent's data Uri identifies which contact was selected.
 
-                // Do something with the contact here (bigger example below)
+                llVehical.setVisibility(View.GONE);
+                txtAddress.setVisibility(View.GONE);
+                llCostDesign.setVisibility(View.VISIBLE);
 
-                Applog.d("MapHomeFragment", "sourceLatitude" + sLat);
-                Applog.d("MapHomeFragment", "sourceLogitude" + sLng);
-                Applog.d("MapHomeFragment", "destinationLat" + dLat);
-                Applog.d("MapHomeFragment", "destinationLng" + dLng);
-
-                createRoute();
+                createRoute(pickupPoint, dropPoint);
             }
         } else if (requestCode == ADD_EDIT_VEHICAL_REQUEST) {
             if (data != null) {
-                String manufac = data.getStringExtra("manufacture");
-                String model = data.getStringExtra("model");
-                String year = data.getStringExtra("year");
-                String color = data.getStringExtra("color");
 
-                tvVehicalData.setText(manufac + " " + model + " " + year + " " + color);
-                Applog.E("manufac=>" + manufac + "model=>" + model + "year=>" + year + "color=>" + color);
+                strManufacur = SessionManager.getUpdatedVehical(context).getManufacture();
+                strModel = SessionManager.getUpdatedVehical(context).getModel();
+                strYear = SessionManager.getUpdatedVehical(context).getYear();
+                strColor = SessionManager.getUpdatedVehical(context).getColor();
+
+                String manu = data.getStringExtra("manufacture");
+                String model = data.getStringExtra("model");
+                String yr = data.getStringExtra("year");
+                String clo = data.getStringExtra("color");
+
+                if (strManufacur.matches("Edit your vehicle") && strYear == 0) {
+                    tvVehicalData.setText("Edit your vehicle");
+                    imgVwVehicle.setImageResource(R.mipmap.setup);
+
+//                    tvEditVehicle.setText("");
+                    isEditVehical = false;
+                } else {
+                    isEditVehical = true;
+                    tvVehicalData.setText("Edit your vehicle");
+                    imgVwVehicle.setImageResource(R.mipmap.setup);
+
+//                    tvEditVehicle.setText(manu + " " + model + " " + yr + " " + clo);
+                    tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
+                    imgSetting.setImageResource(R.mipmap.ellipse_1);
+                }
+
             }
+        } else if (requestCode == REQUEST_ADD_VEHICLE) {
+            callUserMeApi();
+        } else if (requestCode == MAP_HOME_PROFILE_UPDATE) {
+            callUserMeApi();
+        } else if (requestCode == REQUEST_ADD_PAYMENT) {
+            callUserMeApi();
         }
     }
+
 
     @Override
     public void onClick(View view) {
@@ -416,25 +623,41 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
             case R.id.txtAddress:
 
                 if (userDetails != null) {
-
                     for (GetUserData userData : userDetails) {
-                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles()
-                                != null && userData.getData().getCards() != null) {
+
+                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
+                                != 0 && userData.getData().getCards().size() != 0) {
+
                             Intent mIntent = new Intent(context, PickUpLocationActivity.class);
-                            mIntent.putExtra("Currentlocation", location);
-                            mIntent.putExtra("latitude", sourceLatitude);
-                            mIntent.putExtra("langitutde", sourceLongitude);
+//                            mIntent.putExtra("Currentlocation", location);
+//                            mIntent.putExtra("latitude", sourceLatitude);
+//                            mIntent.putExtra("langitutde", sourceLongitugde);
                             startActivityForResult(mIntent, PICK_CONTACT_REQUEST);
+
                         } else {
                             showCheckUserUpdateData("Please complete your updates before proceeding.");
                         }
                     }
                 }
+
+                break;
+
+            case R.id.llSetVehicle:
+                if (isEditVehical) {
+                    in = new Intent(context, AddEditVehicleActivity.class);
+                    startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
+                } else {
+
+                }
                 break;
 
             case R.id.llEditVehicle:
-                in = new Intent(context, AddEditVehicleActivity.class);
-                startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
+                if (isEditVehical) {
+                    in = new Intent(context, AddEditVehicleActivity.class);
+                    startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
+                } else {
+
+                }
                 break;
 
             case R.id.rlVwUpdateMain:
@@ -453,39 +676,39 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 break;
             case R.id.txtVwProfile:
                 in = new Intent(context, UserProfileActivity.class);
-                startActivity(in);
+                startActivityForResult(in, MAP_HOME_PROFILE_UPDATE);
 
 //                fragment = UserProfileFragment.newInstance("", "");
                 break;
             case R.id.txtVwVehicleName:
                 in = new Intent(context, AddEditVehicleActivity.class);
-                startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
+                startActivityForResult(in, REQUEST_ADD_VEHICLE);
 //                        fragment = AddEditVehicleFragment.newInstance("", "");
 //                fragment = new V();
                 break;
             case R.id.txtVwpayment:
 //                fragment = AddPaymentMethodFragment.newInstance("", "");
                 in = new Intent(context, AddPaymentMethodActivity.class);
-                startActivity(in);
+                startActivityForResult(in, REQUEST_ADD_PAYMENT);
 
                 break;
 
             case R.id.rlProfile:
                 in = new Intent(context, UserProfileActivity.class);
-                startActivity(in);
+                startActivityForResult(in, MAP_HOME_PROFILE_UPDATE);
 
 //                fragment = UserProfileFragment.newInstance("", "");
                 break;
             case R.id.rlVehicleNo:
                 in = new Intent(context, AddEditVehicleActivity.class);
-                startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
+                startActivityForResult(in, REQUEST_ADD_VEHICLE);
 //                        fragment = AddEditVehicleFragment.newInstance("", "");
 //                fragment = new V();
                 break;
             case R.id.rlPaymentNo:
 //                        fragment = AddPaymentMethodFragment.newInstance("", "");
                 in = new Intent(context, AddPaymentMethodActivity.class);
-                startActivity(in);
+                startActivityForResult(in, REQUEST_ADD_PAYMENT);
                 break;
         }
 
@@ -505,7 +728,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                     .setTitle("Greego").setMessage(msg);
 
 
-            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
@@ -518,16 +741,29 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 }
             });
 
-            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
+//            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    dialog.dismiss();
+//                }
+//            });
             AlertDialog dialog = builder.create();
             dialog.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Intent mIntent = new Intent(context, PickUpLocationActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("pickupPointLatitud", String.valueOf(pickupPoint.latitude));
+        bundle.putString("pickupPointLongitude", String.valueOf(pickupPoint.longitude));
+        bundle.putString("dropPointLatitude", String.valueOf(dropPoint.latitude));
+        bundle.putString("dropPointLongitude", String.valueOf(dropPoint.longitude));
+        mIntent.putExtras(bundle);
+        startActivityForResult(mIntent, PICK_CONTACT_REQUEST);
+        return false;
     }
 
 
@@ -579,8 +815,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         Log.d(TAG, "onMapReady()");
         mGoogleMap = googleMap;
 
-
-
       /*  googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
                         this, R.raw.map_style));*/
@@ -631,6 +865,8 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
         //or mGoogleMap.getUiSettings().setAllGesturesEnabled(true);
 
+        mGoogleMap.setOnMarkerClickListener(this);
+
         mGoogleMap.setTrafficEnabled(false);
 //        mGoogleMap.setInfoWindowAdapter(new InfoWindowCustom(getActivity()));
 
@@ -646,8 +882,11 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                     Log.e("Longitude", latLng.longitude + "");
                     sourceLatitude = latLng.latitude + "";
                     sourceLongitude = latLng.longitude + "";
-                    location = getAddress(latLng.latitude, latLng.longitude);
-                    txtAddress.setText(location);
+//                    location = getAddress(latLng.latitude, latLng.longitude);
+//                    txtAddress.setText(location);
+
+                    //After get current location get near by driver
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -717,6 +956,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged [" + location + "]");
         lastLocation = location;
+
 
 //        writeActualLocation(location);
 
@@ -804,12 +1044,93 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 writeLastLocation();
                 startLocationUpdates();
 
+
+                double lat = lastLocation.getLatitude();
+                double lng = lastLocation.getLongitude();
+
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    String currentLat = String.valueOf(lat);
+                    String currentLong = String.valueOf(lng);
+
+                    statCode = getstatCode(Double.parseDouble(currentLat), Double.parseDouble(currentLong));
+
+                    callNearDriverAPI(currentLat, currentLong);
+                    callTripRateAPI(statCode);
+                } else {
+                    Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+                }
+
             } else {
                 Log.w(TAG, "No location retrieved yet");
                 startLocationUpdates();
             }
         } else askPermission();
 
+    }
+
+    private void callTripRateAPI(String statCode) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put(WebFields.TRIP.PARAM_STATE, statCode);
+
+            Applog.E("request Trip Price => " + jsonObject.toString());
+//            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.TRIP.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+                    GetTripRate tripRateData = new Gson().fromJson(String.valueOf(response), GetTripRate.class);
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+                        if (tripRateData.getError_code() == 0) {
+
+                            base_fee = Float.parseFloat(tripRateData.getData().getBase_fee());
+                            time_fee = Float.parseFloat(tripRateData.getData().getTime_fee());
+                            mile_fee = Float.parseFloat(tripRateData.getData().getMile_fee());
+                            over_mile_fee = Float.parseFloat(tripRateData.getData().getOvermile_fee());
+                            //   CalculateMile(str,elapsedTime);
+
+
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -869,7 +1190,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-    private void createRoute() {
+    private void createRoute(LatLng pickupPoint, LatLng dropPoint) {
         String url = getMapsApiDirectionsUrl(pickupPoint, dropPoint);
         ReadTask downloadTask = new ReadTask();
         // Start downloading json data from Google Directions API
@@ -958,7 +1279,9 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 jObject = new JSONObject(jsonData[0]);
                 PathJSONParser parser = new PathJSONParser();
                 routes = parser.parse(jObject);
-
+                duration = parser.getDuration(jObject);
+                String[] separated = duration.split(" ");
+                duration1 = separated[0]; // this will contain "Fruit"
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -972,7 +1295,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
             PolylineOptions polyLineOptions = null;
 
 
-            // traversing through routes
             if (routes.size() > 0) {
                 for (int i = 0; i < routes.size(); i++) {
                     routeList = new ArrayList<LatLng>();
@@ -1010,6 +1332,8 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 mGoogleMap.animateCamera(cameraUpdate);
 
                 dist = getDistance(pickupPoint.latitude, pickupPoint.longitude, dropPoint.latitude, dropPoint.longitude);
+                price = CalculateMile(String.valueOf(dist), duration1);
+
 
                 if (dist > 2 && dist <= 5) {
                     mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(13.0f));
@@ -1045,21 +1369,40 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                     mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(14.0f));
                     mapZoomLevel = 14;
                 }
+                DecimalFormat df = new DecimalFormat();
+                df.setMaximumFractionDigits(2);
+                txtEstMentCost.setText("US$" + df.format(price));
+
+                if (userDetails != null) {
+                    for (GetUserData userData : userDetails) {
+                        if (userData.getData().getCards().get(0).getCard_number() != null) {
+                            byte[] data = Base64.decode(userData.getData().getCards().get(0).getCard_number(), Base64.DEFAULT);
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                                cardNo = new String(data, StandardCharsets.UTF_8);
+
+//                                edtCardNo.setSelected(false);
+//                                edtCardNo.setFocusable(false);
+//                                edtCardNo.setFocusableInTouchMode(false);
+//                                String cn=cardNo.substring(11,15);
+                                edtCardNo.setText(cardNo);
+
+                            }
+                        }
+                    }
+                }
 
 
                 marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(pickupPoint)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_ellipse2))
                         .title("Current Location")
-                        .snippet("Driver"));
+                        .snippet("Home"));
 
                 mGoogleMap.addMarker(new MarkerOptions()
                         .position(dropPoint)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_ellipse2))
                         .title("Drop Location")
-                        .snippet("Home"));
-
-
+                        .snippet("Driver"));
             } else {
                 Log.e("TAG", "No route found");
             }
@@ -1264,54 +1607,33 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
 
-//                    userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
-//                    try {
-//                        MyProgressDialog.hideProgressDialog();
-////
-//                        if (userDetails.getError_code() == 0) {
+
+//                   GetUserData.DataBean userDtl = new Gson().fromJson(String.valueOf(response), GetUserData.DataBean.class);
+                    GetUserData userDetail = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+                        userDetails = new ArrayList<>();
+
+                        if (userDetail.getError_code() == 0) {
+
+
+                            userDetails.add(userDetail);
+
+                            setFirstTimeRegister();
+
+//                            SessionManager.saveUserData(context, userDetails);
+//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //
-//                            Applog.E("UserUpdate==>Dg==>" + userDetails);
-//                            if (userDetails.getData().getProfile_pic() == null) {
-//                                rlVwUpdateMain.setVisibility(View.VISIBLE);
-//                                rlUpdateData.setVisibility(View.VISIBLE);
-//                                txtVwProfile.setTextColor(getResources().getColor(R.color.hint_color));
-////                                txtVwCount.setText("2");
-//                            } else {
-//                                txtVwProfile.setTextColor(getResources().getColor(R.color.app_bg));
-//                            }
+                            //getIs_agreed = 0 new user
+
 //
-//                            if (userDetails.getData().getCards() == null) {
-//                                rlVwUpdateMain.setVisibility(View.VISIBLE);
-//                                rlUpdateData.setVisibility(View.VISIBLE);
-//                                txtVwVehicleName.setTextColor(getResources().getColor(R.color.hint_color));
-//                            }else {
-//                                txtVwVehicleName.setTextColor(getResources().getColor(R.color.app_bg));
-//                            }
-//
-//                             if (userDetails.getData().getVehicles() == null) {
-//                                rlVwUpdateMain.setVisibility(View.VISIBLE);
-//                                rlUpdateData.setVisibility(View.VISIBLE);
-//                                txtVwpayment.setTextColor(getResources().getColor(R.color.hint_color));
-//                            } else {
-//                                 txtVwpayment.setTextColor(getResources().getColor(R.color.app_bg));
-//                                rlVwUpdateMain.setVisibility(View.GONE);
-//                                rlUpdateData.setVisibility(View.GONE);
-//
-//                            }
-//
-////                            SessionManager.saveUserData(context, userDetails);
-////                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
-////
-//                            //getIs_agreed = 0 new user
-//
-////
-//                        } else {
-//                            MyProgressDialog.hideProgressDialog();
-//                            SnackBar.showError(context, snackBarView, response.getString("message"));
-//                        }
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }, new Response.ErrorListener() {
 
@@ -1345,4 +1667,52 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         }
 
     }
+
+    public String getstatCode(double latitude, double longitude) {
+        StringBuilder result = new StringBuilder();
+
+        System.out.println("get address");
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses.size() > 0) {
+            System.out.println("size====" + addresses.size());
+            Address address = addresses.get(0);
+
+            statCode = address.getAdminArea();
+
+            for (int i = 0; i <= addresses.get(0).getMaxAddressLineIndex(); i++) {
+                if (i == addresses.get(0).getMaxAddressLineIndex()) {
+                    result.append(addresses.get(0).getAddressLine(i));
+                } else {
+                    result.append(addresses.get(0).getAddressLine(i) + ",");
+                }
+            }
+
+            System.out.println("ad==" + address);
+            System.out.println("result---" + result.toString());
+
+//                autoComplete_location.setText(result.toString()); // Here is you AutoCompleteTextView where you want to set your string address (You can remove it if you not need it)
+        }
+
+        return result.toString();
+    }
+
+
+
+    private float CalculateMile(String strDistance, String strTime) {
+        float dis = Float.parseFloat(strDistance);
+        float time = Float.parseFloat(strTime);
+        if (dis <= 10) {
+            trip_price = base_fee + (time * time_fee) + (dis * mile_fee);
+        } else {
+            trip_price = base_fee + (time * time_fee) + (10 * mile_fee) + ((dis - 10) * over_mile_fee);
+        }
+        return trip_price;
+    }
+
 }

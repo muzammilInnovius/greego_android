@@ -1,6 +1,8 @@
 package com.greegoapp.AppController;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -12,7 +14,11 @@ import com.android.volley.toolbox.Volley;
  */
 
 public class AppController extends Application {
-
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
     public static final String TAG = AppController.class.getSimpleName();
 
     private RequestQueue mRequestQueue;

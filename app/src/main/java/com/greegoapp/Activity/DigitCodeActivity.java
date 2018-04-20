@@ -34,6 +34,7 @@ import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.DeviceId;
 import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
@@ -66,6 +67,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
     Dialog dialogotp;
     int sendOtp;
     SmsVerifyCatcher smsVerifyCatcher;
+    public static String deviceId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +150,12 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 edtTvDigit6.setText("");*/
 
             case R.id.ibFinish:
-                KeyboardUtility.hideKeyboard(context, view);
+//                KeyboardUtility.hideKeyboard(context, view);
+//                Intent in = new Intent(context, HomeActivity.class);
+//                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(in);
+//                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+
                 if (isValid()) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
@@ -169,12 +176,16 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
     private void callMobileNumberAPI() {
         try {
+            deviceId = DeviceId.getDeviceId(this);
+            Applog.E("DeviceId==>" + deviceId);
+
             JSONObject jsonObject = new JSONObject();
 //            String token = SessionManager.getToken(context);
 //            Applog.E("Token" + token);
 
             jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, SessionManager.getMobileNo(context));
             jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
+            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, deviceId);
 
             Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
@@ -293,17 +304,20 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         String mobileNo = SessionManager.getMobileNo(context);
         strOtpCode = pinVwOtpCode.getText().toString();
 
-        if (sendOtp != 0) {
-//            sendOtp = SessionManager.getOTP(context);
-            String newOtp = "" + sendOtp;
-            if (strOtpCode.matches(newOtp)) {
-                callUserMeApi();
+        callUserMeApi();
 
+//        if (sendOtp != 0) {
+////            sendOtp = SessionManager.getOTP(context);
+//            String newOtp = "" + sendOtp;
+//            if (strOtpCode.matches(newOtp)) {
+//                callUserMeApi();
+//
+//
+//            } else {
+//                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
+////            sendOtp = resendOtp;
+//            }
 
-            } else {
-                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
-//            sendOtp = resendOtp;
-            }
 
 
 //        if (sendOtp != null) {
@@ -384,10 +398,10 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-        } else {
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
-//            sendOtp = resendOtp;
-        }
+//        } else {
+//            SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
+////            sendOtp = resendOtp;
+//        }
     }
 
     private void callUserMeApi() {

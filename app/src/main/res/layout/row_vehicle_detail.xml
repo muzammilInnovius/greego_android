@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mytextview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -8,73 +7,82 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        tools:context="com.greegoapp.Fragment.UserProfileFragment"
-        >
+        tools:context="com.greegoapp.Fragment.UserProfileFragment">
 
         <RelativeLayout
+            android:id="@+id/rlMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/scale_10dp"
             android:paddingBottom="@dimen/scale_10dp"
-            >
+            android:paddingTop="@dimen/scale_10dp">
 
-                <TextView
-                    android:id="@+id/tvYear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="@dimen/scale_5dp"
-                    android:textSize="@dimen/scale_15dp"
-                    android:layout_toRightOf="@+id/ivProPicTripHistory"
-                    android:text="@string/vehicle_year"
-                    tools:ignore="NotSibling" />
-                <TextView
-                    android:id="@+id/tvModel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/scale_15dp"
-                    android:layout_marginLeft="@dimen/scale_5dp"
-                    android:layout_toRightOf="@+id/tvYear"
-                    android:text="@string/vehicle_model"/>
+            <RadioButton
+                android:id="@+id/chkVehicleSet"
+                android:layout_width="@dimen/scale_25dp"
+                android:layout_height="@dimen/scale_25dp"
+                android:checked="false" />
 
-                <TextView
-                    android:id="@+id/tvMake"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/scale_5dp"
-                    android:layout_weight="1"
-                    android:textSize="@dimen/scale_15dp"
-                    android:layout_toRightOf="@+id/tvModel"
-                    android:textColor="@color/black"
-                    android:text="@string/vehicle_make"/>
+            <TextView
+                android:id="@+id/tvYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_5dp"
+                android:layout_toRightOf="@+id/chkVehicleSet"
+                android:text="@string/vehicle_year"
+                android:textColor="@color/black"
+                android:textSize="@dimen/scale_15dp"
+                tools:ignore="NotSibling" />
+
+            <TextView
+                android:id="@+id/tvModel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_2dp"
+                android:layout_toRightOf="@+id/tvYear"
+                android:layout_weight="1"
+                android:text="@string/vehicle_model"
+                android:textColor="@color/black"
+                android:textSize="@dimen/scale_15dp" />
+
+            <TextView
+                android:id="@+id/tvMake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_2dp"
+                android:layout_toRightOf="@+id/tvModel"
+                android:layout_weight="1"
+                android:text="@string/vehicle_make"
+                android:textColor="@color/black"
+                android:textSize="@dimen/scale_15dp" />
+
             <TextView
                 android:id="@+id/tvColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/scale_5dp"
-                android:layout_weight="1"
-                android:textSize="@dimen/scale_15dp"
+                android:layout_marginLeft="@dimen/scale_2dp"
                 android:layout_toRightOf="@+id/tvMake"
+                android:layout_weight="1"
+                android:text="@string/vehicle_color"
                 android:textColor="@color/black"
-                android:text="@string/vehicle_color"/>
+                android:textSize="@dimen/scale_15dp" />
 
             <ImageView
                 android:id="@+id/imgVwnext"
                 android:layout_width="@dimen/scale_20dp"
                 android:layout_height="@dimen/scale_20dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/scale_20dp"
                 android:layout_marginRight="@dimen/scale_10dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                mytextview:srcCompat="@mipmap/ic_remove"
-                />
-            </RelativeLayout>
+                mytextview:srcCompat="@mipmap/ic_remove" />
+        </RelativeLayout>
 
-
-
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/hint_color"
+            mytextview:layout_constraintBottom_toBottomOf="parent"
+            mytextview:layout_constraintTop_toBottomOf="@+id/rlMain" />
 
 
     </android.support.constraint.ConstraintLayout>
