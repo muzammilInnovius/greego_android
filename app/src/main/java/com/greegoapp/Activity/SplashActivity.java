@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.location.Criteria;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
@@ -47,21 +49,30 @@ public class SplashActivity extends AppCompatActivity {
     Context context;
     String TAG = SplashActivity.class.getSimpleName();
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
+    LocationManager locationManager;
+    String provider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splace_screen);
         context = SplashActivity.this;
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        provider = locationManager.getBestProvider(new Criteria(), false);
+
         getIds();
 
         if (ConnectivityDetector.isConnectingToInternet(context)) {
             if (Build.VERSION.SDK_INT < 23) {
-                //Do not need to check the permission
+                if (checkAndRequestPermissions()) {
+                    //If you have already permitted the permission
+                    startTimer();
+                    //        initialize GoogleMaps
+                    // create GoogleApiClient
+//                    createGoogleApi();
 
-                /*  Initialize Map  */
-                // create GoogleApiClient
-//                createGoogleApi();
-                startTimer();
+                }
 
             } else {
                 if (checkAndRequestPermissions()) {
@@ -115,19 +126,39 @@ public class SplashActivity extends AppCompatActivity {
                     if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
+
                         startTimer();
 //                        if (mGoogleApiClient == null) {
 //                            setUpGoogleApiClient();
 //                        }
 //                        mGoogleMap.setMyLocationEnabled(true);
                     }
-
                 } else {
                     // Permission denied
                     permissionsDenied();
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
         }
     }
 

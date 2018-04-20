@@ -371,7 +371,6 @@ public class AddPaymentMethodFragment extends Fragment implements View.OnClickLi
                                     Applog.E("Card No===> " + cardNo);
                                     edtTvCardNumber.setText(cardNo);
                                     edtTvExpDate.setText(cardsBean.getExp_month_year());
-                                    edtTvCvv.setText(cardsBean.getCvv_number());
                                     edtTvZipCode.setText(cardsBean.getZipcode());
                                 }
                             }

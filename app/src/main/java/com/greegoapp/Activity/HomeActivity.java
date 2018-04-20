@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -20,7 +21,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,7 +32,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -90,7 +89,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private FrameLayout container_body;
     TextView tvDrawUsername, tvDriveGreego;
     private Fragment mContentFragment = null;
-    private String[] drawerTitle = {"Payment", "Your Trips", "Free Rides", "Help", "Settings"};
+    private String[] drawerTitle = {"Home","Payment", "Your Trips", "Free Rides", "Help", "Settings"};
     public static int index = 0;
     private Stack<Fragment> fragmentStack;
     FragmentManager fragmentManager;
@@ -104,6 +103,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     GetUserData.DataBean userDetails;
     ArrayList<GetUserData> alUserList;
+    String userName;
+
+    public static final int HOME_SLIDER_PROFILE_UPDATE = 1000;
 
     @Override
 
@@ -199,6 +201,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setListners() {
         ivProPicHome.setOnClickListener(this);
+        ivPro.setOnClickListener(this);
+        tvDrawUsername.setOnClickListener(this);
     }
 
     private void bindView() {
@@ -217,32 +221,47 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ivProPicHome.setVisibility(View.VISIBLE);
     }
 
+    Intent in;
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ivProPicHome:
-                if (userDetails != null) {
+                if (alUserList.size() != 0) {
 
                     for (GetUserData userData : alUserList) {
-                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles()
-                                != null && userData.getData().getCards() != null) {
+                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
+                                != 0 && userData.getData().getCards().size() != 0) {
                             openDrawer();
-                        }else {
+                        } else {
                             showCheckUserUpdateData("Please complete your updates before proceeding.");
                         }
                     }
                 }
 
                 break;
+
+            case R.id.ivPro:
+                in = new Intent(HomeActivity.this, UserProfileActivity.class);
+                startActivityForResult(in, HOME_SLIDER_PROFILE_UPDATE);
+                break;
+
+            case R.id.tvDrawUsername:
+                in = new Intent(HomeActivity.this, UserProfileActivity.class);
+                startActivityForResult(in, HOME_SLIDER_PROFILE_UPDATE);
+                break;
+
+
         }
     }
+
     private void showCheckUserUpdateData(String msg) {
         try {
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("Greego").setMessage(msg);
 
 
-            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
@@ -255,11 +274,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
 
-            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
+//            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    dialog.dismiss();
+//                }
+//            });
             AlertDialog dialog = builder.create();
             dialog.show();
         } catch (Exception e) {
@@ -341,33 +360,38 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Intent in;
                     switch (pos) {
                         case 0:
+                           in = new Intent(context , HomeActivity.class);
+                           startActivity(in);
+                           finish();
+                            break;
+                        case 1:
 //                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, PaymentActivity.class);
                             startActivity(in);
                             break;
 
-                        case 1:
+                        case 2:
 //                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, TripHistoryActivity.class);
                             startActivity(in);
 //                            fragment = new TripHistoryFragment().newInstance("", "");
                             break;
 
-                        case 2:
+                        case 3:
 //                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, FreeTripsActivity.class);
                             startActivity(in);
 //                            fragment = new FreeTripsFragment().newInstance("", "");
                             break;
 
-                        case 3:
+                        case 4:
 //                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, HelpActivity.class);
                             startActivity(in);
 //                            fragment = new HelpFragment().newInstance("", "");
                             break;
 
-                        case 4:
+                        case 5:
 //                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, SettingActivity.class);
                             startActivity(in);
@@ -456,6 +480,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 setHomeValues();
                 break;
             case Activity.RESULT_CANCELED:
+                break;
+
+            case HOME_SLIDER_PROFILE_UPDATE:
+                userName = data.getStringExtra("name");
+                tvDrawUsername.setText(userName);
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);

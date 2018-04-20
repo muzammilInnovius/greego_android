@@ -11,12 +11,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +27,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -47,6 +46,7 @@ import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
+import com.greegoapp.databinding.ActivityUserProfileBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +57,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import com.greegoapp.databinding.ActivityUserProfileBinding;
+
+import static com.greegoapp.Activity.HomeActivity.HOME_SLIDER_PROFILE_UPDATE;
+import static com.greegoapp.Activity.SettingActivity.SETTING_PROFILE_UPDATE;
+import static com.greegoapp.Fragment.MapHomeFragment.MAP_HOME_PROFILE_UPDATE;
+
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     ActivityUserProfileBinding binding;
@@ -65,19 +69,20 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     Context context;
     ImageButton ibback;
     RecyclerView recyclerView;
-    ArrayList<VehicleDetailModel> alVehicleDetail;
+    ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail;
     VehicleDetailAdapter adapter;
-    VehicleDetailModel vehicleDetailModel;
     RecyclerViewItemClickListener mListener;
     ImageView ivProPic;
     private static final int SELECT_GALLERY_PIC = 101;
     private static final int SELECT_CAMERA_PIC = 99;
-    private final int MY_PERMISSIONS_REQUEST_CAMERA = 108;
+    public final int MY_PERMISSIONS_REQUEST_CAMERA = 108;
+    public static final int SELECT_CHOISE_VEHICLE = 1100;
     //  private OnFragmentInteractionListener mListener;
     GetUserData userDetails;
     EditText edtTvProfileFname, edtTvProfileLname;
-    Button btnUpdate;
+    Button btnUpdate, tvAdd;
     String strEmail;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +92,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
         snackBarView = findViewById(android.R.id.content);
         context = UserProfileActivity.this;
-        callUserMeApi();
 
         alVehicleDetail = new ArrayList<>();
 
 //        setHeaderbar();
         bindViews();
         setListner();
+        callUserMeApi();
         setRecyclerView();
 
     }
@@ -109,8 +114,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 //                fragmentTransaction.addToBackStack(null);
 //                fragmentTransaction.commit();
 
-                Intent in = new Intent(context, TripHistoryDetailActivity.class);
-                startActivity(in);
 
             }
         };
@@ -128,6 +131,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         ivProPic.setOnClickListener(this);
         ibback.setOnClickListener(this);
         btnUpdate.setOnClickListener(this);
+        tvAdd.setOnClickListener(this);
     }
 
     private void bindViews() {
@@ -137,13 +141,32 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         edtTvProfileLname = binding.edtTvProfileLname;
         edtTvProfileFname = binding.edtTvProfileFname;
         btnUpdate = binding.btnUpdate;
+        tvAdd = binding.tvAdd;
     }
 
+
+    Intent in;
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
+                if (HOME_SLIDER_PROFILE_UPDATE == 1000) {
+                    Intent data = new Intent();
+                    String userName = edtTvProfileFname.getText().toString();
+                    data.putExtra("name", userName);
+                    setResult(HOME_SLIDER_PROFILE_UPDATE, data);
+                } else if (MAP_HOME_PROFILE_UPDATE == 1002) {
+                    Intent data = new Intent();
+                    String userName = edtTvProfileFname.getText().toString();
+                    data.putExtra("name", userName);
+                    setResult(MAP_HOME_PROFILE_UPDATE, data);
+                } else if (SETTING_PROFILE_UPDATE == 1001) {
+                    Intent data = new Intent();
+                    String userName = edtTvProfileFname.getText().toString();
+                    data.putExtra("name", userName);
+                    setResult(SETTING_PROFILE_UPDATE, data);
+                }
                 finish();
                 break;
 
@@ -152,9 +175,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.btnUpdate:
-                callAcceptAgreementAPI();
+                callUpdateProfileAPI();
                 break;
 
+            case R.id.tvAdd:
+                in = new Intent(context, AddEditVehicleActivity.class);
+                startActivityForResult(in, SELECT_CHOISE_VEHICLE);
+                break;
         }
 
     }
@@ -271,6 +298,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 ivProPic.setImageURI(getImageUri(photo));
                 strProPicBase64 = encodeTobase64(photo);
             }
+        } else if (requestCode == SELECT_CHOISE_VEHICLE) {
+            callUserMeApi();
+
         }
     }
 
@@ -325,8 +355,11 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                             edtTvProfileFname.setText(userDetails.getData().getName());
                             edtTvProfileLname.setText(userDetails.getData().getLastname());
                             strEmail = userDetails.getData().getEmail();
+
+                            alVehicleDetail.addAll(userDetails.getData().getVehicles());
+
+                            adapter.notifyDataSetChanged();
 //                            SessionManager.saveUserData(context, userDetails);
-                            SnackBar.showSuccess(context, snackBarView, "Profile Update successfully.");
 //
                             //getIs_agreed = 0 new user
 
@@ -373,7 +406,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    private void callAcceptAgreementAPI() {
+    private void callUpdateProfileAPI() {
         try {
             JSONObject jsonObject = new JSONObject();
 
@@ -405,6 +438,11 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
                             Applog.E("UserDetails" + userDetails);
 //                            callUserMeApi();
+                            String userName = userDetails.getData().getName().toString();
+                            Intent data = new Intent();
+                            data.putExtra("name", userName);
+                            setResult(HOME_SLIDER_PROFILE_UPDATE, data);
+
                             SessionManager.setIsUserLoggedin(context, true);
 
                         } else {
@@ -447,4 +485,25 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (HOME_SLIDER_PROFILE_UPDATE == 1000) {
+            Intent data = new Intent();
+            String userName = edtTvProfileFname.getText().toString();
+            data.putExtra("name", userName);
+            setResult(HOME_SLIDER_PROFILE_UPDATE, data);
+        } else if (MAP_HOME_PROFILE_UPDATE == 1002) {
+            Intent data = new Intent();
+            String userName = edtTvProfileFname.getText().toString();
+            data.putExtra("name", userName);
+            setResult(MAP_HOME_PROFILE_UPDATE, data);
+        } else if (SETTING_PROFILE_UPDATE == 1001) {
+            Intent data = new Intent();
+            String userName = edtTvProfileFname.getText().toString();
+            data.putExtra("name", userName);
+            setResult(SETTING_PROFILE_UPDATE, data);
+        }
+        finish();
+    }
 }

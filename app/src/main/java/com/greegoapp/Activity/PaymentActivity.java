@@ -1,29 +1,19 @@
 package com.greegoapp.Activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
-import android.os.CountDownTimer;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.chaos.view.PinView;
-import com.greegoapp.Fragment.AddPaymentMethodFragment;
-import com.greegoapp.Interface.BackPressedFragment;
-import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.R;
-import com.stfalcon.smsverifycatcher.SmsVerifyCatcher;
+import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.databinding.ActivityPaymentBinding;
 
 public class PaymentActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,8 +21,11 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     ActivityPaymentBinding binding;
     private View snackBarView;
     Context context;
-    TextView tvAddPaymentMethod, tvAddPromoCode;
+    TextView tvAddPaymentMethod, tvAddPromoCode, tvCardDetail;
     ImageButton ibBack;
+    String cardNo;
+
+    public static final int ADD_CARD_PAYMENT_METHOD = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +37,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
         bindViews();
         setListner();
-
+        cardNo = SessionManager.getCardNo(context);
+        tvCardDetail.setText(cardNo);
     }
 
     private void setListner() {
@@ -57,6 +51,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         tvAddPaymentMethod = binding.tvAddPaymentMethod;
         tvAddPromoCode = binding.tvAddPromoCode;
         ibBack = binding.ibBack;
+        tvCardDetail = binding.tvCardDetail;
 
     }
 
@@ -66,8 +61,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tvAddPaymentMethod:
-              Intent in =new Intent(context, AddPaymentMethodActivity.class);
-              startActivity(in);
+                Intent in = new Intent(context, AddPaymentMethodActivity.class);
+                startActivityForResult(in, ADD_CARD_PAYMENT_METHOD);
                 break;
             case R.id.tvAddPromoCode:
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -97,6 +92,19 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case ADD_CARD_PAYMENT_METHOD:
+                cardNo = SessionManager.getCardNo(context);
+//                String strNumber = data.getStringExtra("cardNumber");
+                tvCardDetail.setText(cardNo);
+                break;
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 

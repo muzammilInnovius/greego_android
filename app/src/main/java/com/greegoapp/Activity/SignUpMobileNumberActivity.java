@@ -118,6 +118,11 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
                     }
                 }
                 break;
+
+            case R.id.imgVwCntyLogo:
+                spinnerCountry.setVisibility(View.VISIBLE);
+                spinnerCountry.performClick();
+                break;
         }
     }
 
@@ -141,6 +146,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
 
             jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, strMobileNo);
             jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
+            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, deviceId);
 
             Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);

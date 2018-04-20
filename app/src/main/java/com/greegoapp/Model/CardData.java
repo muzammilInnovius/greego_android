@@ -2,8 +2,9 @@ package com.greegoapp.Model;
 
 public class CardData {
 
+
     /**
-     * data : {"user_id":2,"card_number":"1111222233334444","exp_month_year":"12/2022","zipcode":"1234","updated_at":"2018-04-11 12:28:17","created_at":"2018-04-11 12:28:17","id":10}
+     * data : {"user_id":2,"card_number":"1111222233334444","exp_month_year":"12","zipcode":"1234","updated_at":"2018-04-17 13:23:16","created_at":"2018-04-17 13:23:16","id":9}
      * error_code : 0
      * message : User Card Saved
      */
@@ -40,11 +41,11 @@ public class CardData {
         /**
          * user_id : 2
          * card_number : 1111222233334444
-         * exp_month_year : 12/2022
+         * exp_month_year : 12
          * zipcode : 1234
-         * updated_at : 2018-04-11 12:28:17
-         * created_at : 2018-04-11 12:28:17
-         * id : 10
+         * updated_at : 2018-04-17 13:23:16
+         * created_at : 2018-04-17 13:23:16
+         * id : 9
          */
 
         private int user_id;

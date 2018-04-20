@@ -287,6 +287,89 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/llCost"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/scale_180dp"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            android:layout_margin="@dimen/scale_20dp"
+            android:background="@drawable/edit_vehicle_bg">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/scale_10dp">
+
+                <TextView
+                    android:id="@+id/txtJustInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Est. Cost"
+                    android:textSize="@dimen/txt_14"
+                    android:textStyle="bold"
+                    android:padding="@dimen/scale_4dp"
+                    android:textColor="@color/black"
+                    />
+
+                <TextView
+                    android:id="@+id/txtEstCost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="@dimen/txt_18"
+                    android:textStyle="bold"
+                    android:padding="@dimen/scale_4dp"
+                    android:layout_below="@+id/txtJustInfo"
+                    android:textColor="@android:color/darker_gray"
+                    />
+
+                <TextView
+                    android:id="@+id/txtJustpayment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Payment"
+                    android:textSize="@dimen/txt_14"
+                    android:textStyle="bold"
+                    android:padding="@dimen/scale_4dp"
+                    android:textColor="@color/black"
+                    android:layout_below="@+id/txtEstCost"
+                    />
+
+                <EditText
+                    android:id="@+id/edtCardDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="@dimen/scale_6dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtJustpayment"
+                    android:background="@drawable/edt_boxpickup"
+                    android:drawableLeft="@mipmap/ic_visa"
+                    android:padding="@dimen/scale_4dp"
+                    android:drawablePadding="@dimen/scale_15dp"
+                    android:text="" />
+
+                <Button
+                    android:id="@+id/btnRequest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Request"
+                    android:textColor="@color/white"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/scale_13dp"
+                    android:textAllCaps="false"
+                    android:background="#539b90"
+                    android:layout_marginRight="@dimen/scale_15dp"
+                    />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="invisible"
+            android:id="@+id/llVehical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -316,7 +399,7 @@
                     android:layout_marginLeft="@dimen/scale_15dp"
                     android:layout_marginRight="@dimen/scale_15dp"
                     android:layout_weight="0.8"
-                    android:text="What vehicle do you want Greego to driver?"
+                    android:text="What vehicle do you want Greego to drive?"
                     android:textColor="@color/black"
                     android:textSize="@dimen/txt_14" />
             </LinearLayout>
@@ -337,9 +420,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginLeft="@dimen/scale_1dp"
                     android:layout_weight="0.1"
-                    android:background="@mipmap/setup"
                     android:gravity="center" />
 
                 <TextView
@@ -347,10 +429,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/scale_15dp"
-                    android:layout_marginRight="@dimen/scale_15dp"
-                    android:layout_weight="0.8"
+                    android:layout_marginLeft="@dimen/scale_1dp"
+                    android:layout_marginRight="@dimen/scale_1dp"
+                    android:layout_weight="0.9"
                     android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
                     android:text="Edit your vehicle"
                     android:textColor="@color/app_bg"
                     android:textSize="@dimen/txt_14"
@@ -373,7 +457,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginLeft="@dimen/scale_1dp"
                     android:layout_weight="0.1"
                     android:gravity="center" />
 
@@ -382,10 +466,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/scale_15dp"
-                    android:layout_marginRight="@dimen/scale_15dp"
-                    android:layout_weight="0.8"
+                    android:layout_marginLeft="@dimen/scale_1dp"
+                    android:layout_marginRight="@dimen/scale_1dp"
+                    android:layout_weight="0.9"
                     android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
                     android:text=""
                     android:textColor="@color/app_bg"
                     android:textSize="@dimen/txt_14"
