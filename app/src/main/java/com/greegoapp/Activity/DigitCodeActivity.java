@@ -2,7 +2,6 @@ package com.greegoapp.Activity;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -10,13 +9,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -25,11 +21,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.chaos.view.PinView;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
+import com.greegoapp.FCM.Config;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.GetUserData;
 import com.greegoapp.Model.Login;
-import com.greegoapp.Model.UserData;
-import com.greegoapp.Model.VerifyOtp;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -68,6 +63,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
     int sendOtp;
     SmsVerifyCatcher smsVerifyCatcher;
     public static String deviceId = "";
+    String registerFCMKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +71,8 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         binding = DataBindingUtil.setContentView(this, R.layout.activity_digit_code);
         context = DigitCodeActivity.this;
         snackBarView = findViewById(android.R.id.content);
+
+        registerFCMKey = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0).getString("regId", "def");
 
         bindView();
         setListners();
@@ -140,7 +138,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 timer();
                 callMobileNumberAPI();
                 pinVwOtpCode.setText("");
-                KeyboardUtility.showKeyboard(context,pinVwOtpCode);
+                KeyboardUtility.showKeyboard(context, pinVwOtpCode);
                 break;
             /*    edtTvDigit1.setText("");
                 edtTvDigit2.setText("");
@@ -176,8 +174,8 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
     private void callMobileNumberAPI() {
         try {
-            deviceId = DeviceId.getDeviceId(this);
-            Applog.E("DeviceId==>" + deviceId);
+//            deviceId = DeviceId.getDeviceId(this);
+//            Applog.E("DeviceId==>" + deviceId);
 
             JSONObject jsonObject = new JSONObject();
 //            String token = SessionManager.getToken(context);
@@ -185,7 +183,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
             jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, SessionManager.getMobileNo(context));
             jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
-            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, deviceId);
+            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, registerFCMKey);
 
             Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
@@ -307,212 +305,127 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         callUserMeApi();
 
 //        if (sendOtp != 0) {
-////            sendOtp = SessionManager.getOTP(context);
 //            String newOtp = "" + sendOtp;
 //            if (strOtpCode.matches(newOtp)) {
 //                callUserMeApi();
 //
-//
 //            } else {
 //                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
-////            sendOtp = resendOtp;
 //            }
-
-
-
-//        if (sendOtp != null) {
-//        Applog.E("sendOtp==>" +sendOtp);
-//            if (strOtpCode.matches(sendOtp)) {
-//                Intent in = new Intent(context, SignUpEmailActivity.class);
-//                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(in);
-//                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-////            }
-//        } else {
-//            SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_empty));
 //        }
 
-//        try {
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put(WebFields.VERIFY_OTP.PARAM_CONTACT_NO, SessionManager.getMobileNo(context));
-//            jsonObject.put(WebFields.VERIFY_OTP.PARAM_OTP, strOtpCode);
-//
-//            Applog.E("request DigitCode=> " + jsonObject.toString());
-//            MyProgressDialog.showProgressDialog(context);
-//
-//            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-//                    WebFields.BASE_URL + WebFields.VERIFY_OTP.MODE, jsonObject, new Response.Listener<JSONObject>() {
-//
-//                @Override
-//                public void onResponse(JSONObject response) {
-//                    Applog.E("success: " + response.toString());
-//
-//                    VerifyOtp otpData = new Gson().fromJson(String.valueOf(response), VerifyOtp.class);
-//                    try {
-//                        MyProgressDialog.hideProgressDialog();
-////
-//                        if (otpData.getError_code() == 0) {
-//
-//                            Applog.E("Contact No" + otpData);
-////                            SessionManager.saveUserData(context, otpData);
-////                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
-////
-//                            if (otpData.getData().getNewX() == 1) {
-//                                Intent in = new Intent(context, HomeActivity.class);
-//                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                startActivity(in);
-//                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-//                            } else {
-//                                Intent in = new Intent(context, SignUpEmailActivity.class);
-//                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                startActivity(in);
-//                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-//                            }
-//
-//
-////
-//                        } else {
-//                            MyProgressDialog.hideProgressDialog();
-//                            SnackBar.showError(context, snackBarView, response.getString("message"));
-//                        }
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }, new Response.ErrorListener() {
-//
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    MyProgressDialog.hideProgressDialog();
-//                    Applog.E("Error: " + error.getMessage());
-//
-//                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
-//                }
-//            });
-//            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
-//                    GlobalValues.TIME_OUT,
-//                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-//                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-//
-//            AppController.getInstance().addToRequestQueue(jsonObjReq);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        } else {
-//            SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
-////            sendOtp = resendOtp;
-//        }
-    }
+        }
 
-    private void callUserMeApi() {
-        try {
-            JSONObject jsonObject = new JSONObject();
+        private void callUserMeApi() {
+            try {
+                JSONObject jsonObject = new JSONObject();
 
-            Applog.E("request: " + jsonObject.toString());
-            MyProgressDialog.showProgressDialog(context);
+                Applog.E("request: " + jsonObject.toString());
+                MyProgressDialog.showProgressDialog(context);
 
-            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                    WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                        WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
 
-                @Override
-                public void onResponse(JSONObject response) {
-                    Applog.E("success: " + response.toString());
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Applog.E("success: " + response.toString());
 
-                    GetUserData userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
-                    try {
-                        MyProgressDialog.hideProgressDialog();
+                        GetUserData userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                        try {
+                            MyProgressDialog.hideProgressDialog();
 //
-                        if (userDetails.getError_code() == 0) {
+                            if (userDetails.getError_code() == 0) {
 
-                            Applog.E("UserDetails==>Dg==>" + userDetails);
+                                Applog.E("UserDetails==>Dg==>" + userDetails);
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //
-                            //getIs_agreed = 0 new user
-                            if (userDetails.getData().getIs_agreed().matches("0")) {
-                                Intent in = new Intent(context, SignUpEmailActivity.class);
-                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-                            } else {
-                                SessionManager.setIsUserLoggedin(context, true);
-                                Intent in = new Intent(context, HomeActivity.class);
-                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
-                            }
+                                //getIs_agreed = 0 new user
+                                if (userDetails.getData().getIs_agreed().matches("0")) {
+                                    Intent in = new Intent(context, SignUpEmailActivity.class);
+                                    in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(in);
+                                    overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+                                } else {
+                                    SessionManager.setIsUserLoggedin(context, true);
+                                    Intent in = new Intent(context, HomeActivity.class);
+                                    in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(in);
+                                    overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
+                                }
 
 //
-                        } else {
-                            MyProgressDialog.hideProgressDialog();
-                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                            } else {
+                                MyProgressDialog.hideProgressDialog();
+                                SnackBar.showError(context, snackBarView, response.getString("message"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                }
-            }, new Response.ErrorListener() {
+                }, new Response.ErrorListener() {
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    MyProgressDialog.hideProgressDialog();
-                    Applog.E("Error: " + error.getMessage());
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        MyProgressDialog.hideProgressDialog();
+                        Applog.E("Error: " + error.getMessage());
 
-                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() {
-                    Map<String, String> params = new HashMap<String, String>();
+                        SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> params = new HashMap<String, String>();
 
-                    params.put(WebFields.PARAM_ACCEPT, "application/json");
-                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+                        params.put(WebFields.PARAM_ACCEPT, "application/json");
+                        params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
 
-                    return params;
-                }
-            };
-            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
-                    GlobalValues.TIME_OUT,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        return params;
+                    }
+                };
+                jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                        GlobalValues.TIME_OUT,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-            AppController.getInstance().addToRequestQueue(jsonObjReq);
-        } catch (Exception e) {
-            e.printStackTrace();
+                AppController.getInstance().addToRequestQueue(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        @Override
+        protected void onStart () {
+            super.onStart();
+            smsVerifyCatcher.onStart();
+        }
+
+        @Override
+        protected void onStop () {
+            super.onStop();
+            smsVerifyCatcher.onStop();
+        }
+
+        /**
+         * need for Android 6 real time permissions
+         */
+        @Override
+        public void onRequestPermissionsResult ( int requestCode, @NonNull String[] permissions,
+        @NonNull int[] grantResults){
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            smsVerifyCatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        private String parseCode (String message){
+            Pattern p = Pattern.compile("\\b\\d{6}\\b");
+            Matcher m = p.matcher(message);
+            String code = "";
+            while (m.find()) {
+                code = m.group(0);
+            }
+            return code;
         }
 
     }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        smsVerifyCatcher.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        smsVerifyCatcher.onStop();
-    }
-
-    /**
-     * need for Android 6 real time permissions
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        smsVerifyCatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private String parseCode(String message) {
-        Pattern p = Pattern.compile("\\b\\d{6}\\b");
-        Matcher m = p.matcher(message);
-        String code = "";
-        while (m.find()) {
-            code = m.group(0);
-        }
-        return code;
-    }
-
-}

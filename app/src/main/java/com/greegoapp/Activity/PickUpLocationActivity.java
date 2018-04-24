@@ -48,27 +48,24 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.greegoapp.Adapter.PlaceAutocompleteAdapter;
 import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.R;
+import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.databinding.ActivityPickUpLocationBinding;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface ,View.OnClickListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,LocationListener, OnMapReadyCallback {
+public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, OnMapReadyCallback {
 
     private static final String TAG = PickUpLocationActivity.class.getName();
     ActivityPickUpLocationBinding binding;
     Context context;
     private View snackBarView;
-
-
-
     Context mContext;
-
-
     private RecyclerView mRecyclerView;
     LinearLayoutManager llm;
     PlaceAutocompleteAdapter mAdapter;
@@ -81,14 +78,14 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     ImageView mivBack, ivPickClear, ivDesClear;
     static int edtType;
 
-    RelativeLayout rlSetLocationMap, rlSetCurrentLocation,rlEditextPickup;
+    RelativeLayout rlSetLocationMap, rlSetCurrentLocation, rlEditextPickup;
     LinearLayout llLocationView;
 
 
     //
-    String  ssLocation,ddLocation,address;
+    String ssLocation, ddLocation, address;
 
-    LatLng mDestinationLatLong,mSoucreLatLong;
+    LatLng mDestinationLatLong, mSoucreLatLong;
 
 
     /*  Google Map  */
@@ -108,11 +105,8 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     private LatLng mLatLng;
     private Location lastLocation;
     Button btnSetLocation;
-    public static boolean mapViewVisible=false;
-    public static boolean passValue=false;
-
-
-
+    public static boolean mapViewVisible = false;
+    public static boolean passValue = false;
 
 
     @Override
@@ -131,27 +125,30 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            passValue=true;
+            passValue = true;
             String plat = extras.getString("pickupPointLatitud");
             String plong = extras.getString("pickupPointLongitude");
             String dlat = extras.getString("dropPointLatitude");
             String dlong = extras.getString("dropPointLongitude");
-            mSoucreLatLong=new LatLng(Double.parseDouble(plat),Double.parseDouble(plong));
-            mDestinationLatLong=new LatLng(Double.parseDouble(dlat),Double.parseDouble(dlong));
-            ssLocation=getAddress(mSoucreLatLong.latitude,mSoucreLatLong.longitude);
-            ddLocation=getAddress(mDestinationLatLong.latitude,mDestinationLatLong.longitude);
+            String picLocAdd = extras.getString("picLocAddress");
+            String desLocAdd = extras.getString("destLocAddress");
+
+            mSoucreLatLong = new LatLng(Double.parseDouble(plat), Double.parseDouble(plong));
+            mDestinationLatLong = new LatLng(Double.parseDouble(dlat), Double.parseDouble(dlong));
+            ssLocation = getAddress(mSoucreLatLong.latitude, mSoucreLatLong.longitude);
+            ddLocation = getAddress(mDestinationLatLong.latitude, mDestinationLatLong.longitude);
             mEdtPickUpLocation.setText(ssLocation);
             mEdtDetstinationLocation.setText(ddLocation);
-        }else {
-            passValue=false;
+        } else {
+            passValue = false;
         }
-
 
 
         mEdtPickUpLocation.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count > 0) {
@@ -171,6 +168,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                     Log.e("", "NOT CONNECTED");
                 }
             }
+
             @Override
             public void afterTextChanged(Editable s) {
             }
@@ -214,13 +212,12 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             @Override
             public void onFocusChange(View arg0, boolean hasfocus) {
                 if (hasfocus) {
-                    edtType=0;
-                    passValue=false;
+                    edtType = 0;
+                    passValue = false;
                     Log.e("TAG", "e1 focused");
                     llLocationView.setVisibility(View.VISIBLE);
                     ivPickClear.setVisibility(View.VISIBLE);
-                    if(mAdapter!=null)
-                    {
+                    if (mAdapter != null) {
                         mAdapter.clearList();
                     }
                 } else {
@@ -232,12 +229,11 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             @Override
             public void onFocusChange(View arg0, boolean hasfocus) {
                 if (hasfocus) {
-                    edtType=1;
-                    passValue=false;
+                    edtType = 1;
+                    passValue = false;
                     llLocationView.setVisibility(View.VISIBLE);
                     ivDesClear.setVisibility(View.VISIBLE);
-                    if(mAdapter!=null)
-                    {
+                    if (mAdapter != null) {
                         mAdapter.clearList();
                     }
                     Log.e("TAG", "e1 focused");
@@ -246,8 +242,6 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 }
             }
         });
-
-
 
 
     }
@@ -262,13 +256,13 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         mivBack = binding.ivBackTop;
         ivPickClear = binding.clear;
         ivDesClear = binding.declear;
-        edtType=0;
+        edtType = 0;
 
         rlSetLocationMap = binding.rlSetLocationMap;
         llLocationView = binding.llLocationView;
         rlSetCurrentLocation = binding.rlCurrentLocation;
         btnSetLocation = binding.btnSetLocation;
-        rlEditextPickup=binding.rlPick;
+        rlEditextPickup = binding.rlPick;
 
 
         mRecyclerView.setHasFixedSize(true);
@@ -292,11 +286,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 mGoogleApiClient, BOUNDS_INDIA, null);
         mRecyclerView.setAdapter(mAdapter);
 
-
-
-
     }
-
 
 
     @Override
@@ -325,47 +315,57 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             case R.id.ll_LocationView:
                 break;
             case R.id.rlSetLocationMap:
-                KeyboardUtility.hideKeyboard(context,view);
+                KeyboardUtility.hideKeyboard(context, view);
                 btnSetLocation.setVisibility(View.VISIBLE);
                 llLocationView.setVisibility(View.GONE);
-                mapViewVisible=true;
+                mapViewVisible = true;
 
                 break;
             case R.id.rlCurrentLocation:
-                if(edtType ==0)
-                {
-                    mSoucreLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
-                    ssLocation=address;
+                if (edtType == 0) {
+                    mSoucreLatLong = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    ssLocation = address;
                     mEdtPickUpLocation.setText(ssLocation);
-                }
-                else
-                {
-                    mDestinationLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
-                    ddLocation=address;
+                } else {
+                    mDestinationLatLong = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    ddLocation = address;
                     mEdtDetstinationLocation.setText(ddLocation);
                 }
                 break;
             case R.id.edt_pickLocation:
-                edtType=0;
+                edtType = 0;
                 break;
             case R.id.edt_DesLocation:
-                edtType=1;
+                edtType = 1;
                 break;
 
             case R.id.btnSetLocation:
                 String sou = mEdtPickUpLocation.getText().toString();
                 String des = mEdtDetstinationLocation.getText().toString();
+                String picLocAddress = mEdtPickUpLocation.getText().toString();
+                String destLocAddress = mEdtDetstinationLocation.getText().toString();
+
+                Date departure = new Date();  // This is the current time for testing purposes
+                String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
+                        mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
+                        "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
+                        departure.getTime();
+
+                Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
+
                 if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
+
                     Intent data = new Intent();
                     data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
                     data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
                     data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
-                    data.putExtra("destinationLng",String.valueOf(mDestinationLatLong.longitude));
+                    data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
+                    data.putExtra("picLocAddress", picLocAddress);
+                    data.putExtra("destLocAddress", destLocAddress);
+                    data.putExtra("departure", departure);
                     setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
                     finish();
-                }
-                else
-                {
+                } else {
                     llLocationView.setVisibility(View.VISIBLE);
                 }
 
@@ -373,7 +373,6 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
         }
     }
-
 
 
     @Override
@@ -397,7 +396,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                                 mEdtPickUpLocation.setText(placeName);
                                 mEdtPickUpLocation.clearFocus();
                                 mEdtDetstinationLocation.requestFocus();
-                                mSoucreLatLong=new LatLng(places.get(0).getLatLng().latitude,places.get(0).getLatLng().longitude);
+                                mSoucreLatLong = new LatLng(places.get(0).getLatLng().latitude, places.get(0).getLatLng().longitude);
                                 if (mAdapter != null) {
                                     mAdapter.clearList();
                                 }
@@ -405,19 +404,34 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                             } else {
                                 mEdtDetstinationLocation.setText(placeName);
                                 mEdtDetstinationLocation.clearFocus();
-                                mDestinationLatLong=new LatLng(places.get(0).getLatLng().latitude,places.get(0).getLatLng().longitude);
+                                mDestinationLatLong = new LatLng(places.get(0).getLatLng().latitude, places.get(0).getLatLng().longitude);
                                 if (mAdapter != null) {
                                     mAdapter.clearList();
                                 }
                             }
 
                             String des = mEdtDetstinationLocation.getText().toString();
+                            String picLocAddress = mEdtPickUpLocation.getText().toString();
+                            String destLocAddress = mEdtDetstinationLocation.getText().toString();
+
+                            Date departure = new Date();  // This is the current time for testing purposes
+
+                            String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
+                                    mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
+                                    "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
+                                    departure.getTime();
+
+                            Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
+
                             if (des != null && !des.equals("null") && !des.equals("")) {
                                 Intent data = new Intent();
                                 data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
                                 data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
                                 data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
-                                data.putExtra("destinationLng",String.valueOf(mDestinationLatLong.longitude));
+                                data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
+                                data.putExtra("picLocAddress", picLocAddress);
+                                data.putExtra("destLocAddress", destLocAddress);
+                                data.putExtra("departure", departure);
                                 setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
                                 finish();
                             }
@@ -491,37 +505,28 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         mGoogleMap.setTrafficEnabled(false);
 
 
-
-
-
-
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
                 mLatLng = cameraPosition.target;
-                if(mapViewVisible==true)
-                {
+                if (mapViewVisible == true) {
                     try {
-                        KeyboardUtility.hideKeyboard(context,mapView);
-                        if(edtType == 0)
-                        {
-                            if(passValue==false)
-                            {
+                        KeyboardUtility.hideKeyboard(context, mapView);
+                        if (edtType == 0) {
+                            if (passValue == false) {
                                 mEdtPickUpLocation.setText("Loading....");
-                                ssLocation=getAddress(mLatLng.latitude, mLatLng.longitude);
-                                mSoucreLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
+                                ssLocation = getAddress(mLatLng.latitude, mLatLng.longitude);
+                                mSoucreLatLong = new LatLng(mLatLng.latitude, mLatLng.longitude);
                                 mEdtPickUpLocation.setText(ssLocation);
                                 mEdtPickUpLocation.clearFocus();
                                 ivPickClear.setVisibility(View.VISIBLE);
                             }
-                        }
-                        else {
+                        } else {
 
-                            if(passValue==false)
-                            {
+                            if (passValue == false) {
                                 mEdtDetstinationLocation.setText("Loading....");
                                 ddLocation = getAddress(mLatLng.latitude, mLatLng.longitude);
-                                mDestinationLatLong=new LatLng(mLatLng.latitude,mLatLng.longitude);
+                                mDestinationLatLong = new LatLng(mLatLng.latitude, mLatLng.longitude);
                                 mEdtDetstinationLocation.setText(ddLocation);
                                 mEdtDetstinationLocation.clearFocus();
                                 ivDesClear.setVisibility(View.VISIBLE);
@@ -571,7 +576,6 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     }
 
 
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
@@ -587,6 +591,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     public void onConnectionSuspended(int i) {
         mGoogleApiClient.connect();
     }
+
     // Get last known location
     private void getLastKnownLocation() {
         Log.d(TAG, "getLastKnownLocation()");
@@ -610,11 +615,10 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     private void writeLastLocation() {
         writeActualLocation(lastLocation);
 
-        if(passValue==false)
-        {
+        if (passValue == false) {
             mEdtPickUpLocation.setText("Loading....");
-            String add=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
-            mSoucreLatLong=new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+            String add = getAddress(lastLocation.getLatitude(), lastLocation.getLongitude());
+            mSoucreLatLong = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
             mEdtPickUpLocation.setText(add);
             ivPickClear.setVisibility(View.VISIBLE);
             mEdtPickUpLocation.clearFocus();
@@ -625,7 +629,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             mEdtDetstinationLocation.setSelected(false);
             mEdtDetstinationLocation.setFocusable(false);
             mEdtDetstinationLocation.setFocusableInTouchMode(true);
-            address=getAddress(lastLocation.getLatitude(),lastLocation.getLongitude());
+            address = getAddress(lastLocation.getLatitude(), lastLocation.getLongitude());
             mEdtDetstinationLocation.requestFocus();
             if (mAdapter != null) {
                 mAdapter.clearList();
@@ -633,12 +637,14 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         }
 
     }
+
     private void writeActualLocation(Location location) {
         CameraPosition cameraPosition = new CameraPosition.Builder().
                 target(new LatLng(location.getLatitude(), location.getLongitude())).bearing(360).
                 zoom(15f).tilt(40).build();
         mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
+
     // Start location Updates
     @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
@@ -647,13 +653,11 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
                 .setFastestInterval(FASTEST_INTERVAL);
-        if (checkAndRequestPermissions())
-        {
+        if (checkAndRequestPermissions()) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
         }
 
     }
-
 
 
     @Override
@@ -685,21 +689,19 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 for (int n = 0; n <= address.getMaxAddressLineIndex(); n++) {
                     addressline += " index n: " + n + ": " + address.getAddressLine(n) + ", ";
                 }
-                Log.d(TAG,"Addresses: "+addressline);
-                Log.d(TAG,"Addresses getAdminArea()"+ address.getAdminArea());
-                Log.d(TAG,"Addresses getCountryCode()"+ address.getCountryCode());
-                Log.d(TAG,"Addresses getCountryName()" + address.getCountryName());
-                Log.d(TAG,"Addresses getFeatureName()"+ address.getFeatureName());
-                Log.d(TAG,"Addresses getLocality()" + address.getLocality());
-                Log.d(TAG,"Addresses getPostalCode()" + address.getPostalCode());
+                Log.d(TAG, "Addresses: " + addressline);
+                Log.d(TAG, "Addresses getAdminArea()" + address.getAdminArea());
+                Log.d(TAG, "Addresses getCountryCode()" + address.getCountryCode());
+                Log.d(TAG, "Addresses getCountryName()" + address.getCountryName());
+                Log.d(TAG, "Addresses getFeatureName()" + address.getFeatureName());
+                Log.d(TAG, "Addresses getLocality()" + address.getLocality());
+                Log.d(TAG, "Addresses getPostalCode()" + address.getPostalCode());
                 Log.d(TAG, "" + address.getPremises());
-                Log.d(TAG,"Addresses getSubAdminArea()"+ address.getSubAdminArea());
+                Log.d(TAG, "Addresses getSubAdminArea()" + address.getSubAdminArea());
                 Log.d(TAG, "" + address.getSubLocality());
                 Log.d(TAG, "" + address.getSubThoroughfare());
-                Log.d(TAG,"Addresses getThoroughfare()"+ address.getThoroughfare());
+                Log.d(TAG, "Addresses getThoroughfare()" + address.getThoroughfare());
             }
-
-
 
 
             System.out.println("size====" + addresses.size());
@@ -723,6 +725,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
         return result.toString();
     }
+
     private boolean checkAndRequestPermissions() {
         int AccessFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         int AccessCorasLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -743,6 +746,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         }
         return true;
     }
+
     private boolean checkPermission() {
         Log.d(TAG, "checkPermission()");
         // Ask for permission if it wasn't granted yet
@@ -758,6 +762,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 MY_PERMISSIONS_REQUEST_ACCOUNTS
         );
     }
+
     // App cannot work without the permissions
     private void permissionsDenied() {
         Log.w(TAG, "permissionsDenied()");

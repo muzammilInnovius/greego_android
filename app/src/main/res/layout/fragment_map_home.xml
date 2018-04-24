@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
@@ -290,11 +291,11 @@
             android:id="@+id/llCost"
             android:layout_width="match_parent"
             android:layout_height="@dimen/scale_180dp"
-            android:orientation="vertical"
             android:layout_alignParentBottom="true"
-            android:visibility="gone"
             android:layout_margin="@dimen/scale_20dp"
-            android:background="@drawable/edit_vehicle_bg">
+            android:background="@drawable/edit_vehicle_bg"
+            android:orientation="vertical"
+            android:visibility="gone">
 
 
             <RelativeLayout
@@ -306,69 +307,64 @@
                     android:id="@+id/txtJustInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Est. Cost"
-                    android:textSize="@dimen/txt_14"
-                    android:textStyle="bold"
                     android:padding="@dimen/scale_4dp"
+                    android:text="Est. Cost"
                     android:textColor="@color/black"
-                    />
+                    android:textSize="@dimen/txt_14"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtEstCost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:textSize="@dimen/txt_18"
-                    android:textStyle="bold"
-                    android:padding="@dimen/scale_4dp"
                     android:layout_below="@+id/txtJustInfo"
+                    android:padding="@dimen/scale_4dp"
+                    android:text=""
                     android:textColor="@android:color/darker_gray"
-                    />
+                    android:textSize="@dimen/txt_18"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtJustpayment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Payment"
-                    android:textSize="@dimen/txt_14"
-                    android:textStyle="bold"
-                    android:padding="@dimen/scale_4dp"
-                    android:textColor="@color/black"
                     android:layout_below="@+id/txtEstCost"
-                    />
+                    android:padding="@dimen/scale_4dp"
+                    android:text="Payment"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_14"
+                    android:textStyle="bold" />
 
-                <EditText
+                <TextView
                     android:id="@+id/edtCardDetail"
                     android:layout_width="wrap_content"
-                    android:layout_marginTop="@dimen/scale_6dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtJustpayment"
+                    android:layout_marginTop="@dimen/scale_6dp"
                     android:background="@drawable/edt_boxpickup"
                     android:drawableLeft="@mipmap/ic_visa"
-                    android:padding="@dimen/scale_4dp"
                     android:drawablePadding="@dimen/scale_15dp"
+                    android:padding="@dimen/scale_4dp"
                     android:text="" />
 
                 <Button
                     android:id="@+id/btnRequest"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Request"
-                    android:textColor="@color/white"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:padding="@dimen/scale_13dp"
-                    android:textAllCaps="false"
-                    android:background="#539b90"
                     android:layout_marginRight="@dimen/scale_15dp"
-                    />
+                    android:background="#539b90"
+                    android:padding="@dimen/scale_13dp"
+                    android:text="Request"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white" />
 
             </RelativeLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:visibility="invisible"
             android:id="@+id/llVehical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -377,7 +373,8 @@
             android:layout_marginLeft="@dimen/scale_20dp"
             android:layout_marginRight="@dimen/scale_20dp"
             android:background="@drawable/edit_vehicle_bg"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="invisible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -480,6 +477,294 @@
 
 
         </LinearLayout>
+
+        <LinearLayout
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="@dimen/scale_2dp"
+            android:layout_marginRight="@dimen/scale_2dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/llDriverPersDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_bg"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <RelativeLayout
+                    android:id="@+id/rlDriverName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/scale_10dp"
+                    android:layout_marginRight="@dimen/scale_10dp"
+                    android:layout_marginTop="@dimen/scale_8dp">
+
+                    <TextView
+                        android:id="@+id/tvYrDriver"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Your Driver is"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/txt_12" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/scale_5dp"
+                        android:layout_toRightOf="@+id/tvYrDriver"
+                        android:text="Tom"
+                        android:textColor="@color/driver_tv_bg"
+                        android:textSize="@dimen/txt_25"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.greegoapp.Utils.RoundedImageView
+                        android:id="@+id/ivDriverPro"
+                        android:layout_width="@dimen/scale_110dp"
+                        android:layout_height="@dimen/scale_110dp"
+                        android:layout_marginLeft="@dimen/scale_10dp"
+                        android:layout_marginTop="@dimen/scale_2dp"
+                        android:background="@mipmap/ic_user_profile"
+                        android:scaleType="fitXY"
+                        app:border_color="@color/app_bg"
+                        app:corner_radius="@dimen/scale_40dp"
+                        app:round_background="true" />
+
+                    <LinearLayout
+                        android:layout_width="@dimen/scale_150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginBottom="@dimen/scale_2dp"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/driver_code_bg">
+
+                            <TextView
+                                android:id="@+id/tvPromoCode"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:padding="@dimen/scale_5dp"
+                                android:text="ABC123"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/txt_12"
+                                android:textStyle="bold" />
+                        </RelativeLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/scale_15dp"
+                            android:orientation="horizontal"
+                            android:padding="@dimen/scale_2dp"
+                            android:weightSum="2.1">
+
+                            <TextView
+                                android:id="@+id/tvContact"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="@dimen/scale_1dp"
+                                android:layout_weight="1.1"
+                                android:text="Contact"
+                                android:textColor="@color/tv_contact"
+                                android:textSize="@dimen/txt_14"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="@dimen/scale_15dp"
+                                android:layout_marginRight="@dimen/scale_1dp"
+                                android:background="@color/hint_color" />
+
+                            <TextView
+                                android:id="@+id/tvCancel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Cancel"
+                                android:textColor="@color/tv_cancel"
+                                android:textSize="@dimen/txt_14"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/scale_2dp">
+
+                            <ImageView
+                                android:id="@+id/imgVwShare"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_share" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/scale_2dp"
+                                android:layout_toRightOf="@+id/imgVwShare"
+                                android:text="Share your Trip"
+                                android:textSize="@dimen/txt_12"
+                                android:textStyle="bold" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/scale_1dp"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:background="@drawable/rounded_bg">
+
+                <TextView
+                    android:id="@+id/tvYourCurntTrip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginTop="@dimen/scale_10dp"
+                    android:text="Your Current Trip"
+                    android:textColor="@color/driver_code_bg"
+                    android:textSize="@dimen/txt_14"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvYourCurntTrip"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="@dimen/scale_10dp"
+                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginRight="@dimen/scale_15dp"
+                    android:layout_marginTop="@dimen/scale_5dp">
+
+                    <ImageView
+                        android:id="@+id/imgVwYrTrip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/scale_1dp"
+                        android:src="@mipmap/ic_marine_nautical_09_512" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_toRightOf="@+id/imgVwYrTrip"
+                        android:text="2nd Avenue"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/txt_12" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="@dimen/scale_15dp"
+                        android:text="@string/tv_change"
+                        android:textColor="@color/resend_time"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/scale_5dp"
+                android:background="@drawable/rounded_bg">
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="@dimen/scale_10dp"
+                    android:layout_marginLeft="@dimen/scale_15dp"
+                    android:layout_marginRight="@dimen/scale_15dp"
+                    android:layout_marginTop="@dimen/scale_1dp">
+
+                    <ImageView
+                        android:id="@+id/imgVwYrCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/scale_1dp"
+                        android:src="@mipmap/ic_visa" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="@dimen/scale_5dp"
+                        android:layout_toRightOf="@+id/imgVwYrCard"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="US$22.25"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/txt_12" />
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true">
+
+                            <TextView
+                                android:id="@+id/tvEnding"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ending in "
+                                android:textColor="@color/hint_color" />
+
+                            <TextView
+                                android:id="@+id/tvDriverCardNo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_toRightOf="@+id/tvEnding"
+                                android:text="4956"
+                                android:textColor="@color/black"
+                                android:textStyle="bold" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/done"

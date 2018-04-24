@@ -84,9 +84,24 @@ public class WebFields {
     public static final class USER_NEAR_DRIVER_LIST {
         public static final String MODE = "user/get/drivers";
 
-        public static final String PARAM_USER_LAT= "lat";
-        public static final String PARAM_USER_LONG= "lng";
+        public static final String PARAM_USER_LAT = "lat";
+        public static final String PARAM_USER_LONG = "lng";
     }
 
+
+    public static final class USER_ADD_REQUEST {
+        public static final String MODE = "user/add/request";
+
+        public static final String PARAM_USER_VEHICLE_ID = "user_vehicle_id";
+        public static final String PARAM_FROM_ADDRESS = "from_address";
+        public static final String PARAM_FROM_LAT = "from_lat";
+        public static final String PARAM_FROM_LNG = "from_lng";
+        public static final String PARAM_TO_ADDRESS = "to_address";
+        public static final String PARAM_TO_LAT = "to_lat";
+        public static final String PARAM_TO_LNG = "to_lng";
+        public static final String PARAM_TOTAL_EST_TRAVEL_TIME = "total_estimated_travel_time";
+        public static final String PARAM_TOTAL_EST_TRIP_COST = "total_estimated_trip_cost";
+
+    }
 
 }

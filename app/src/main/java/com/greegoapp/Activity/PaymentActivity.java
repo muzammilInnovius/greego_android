@@ -8,9 +8,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
@@ -37,8 +39,29 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
         bindViews();
         setListner();
+        setCardNumber();
+    }
+
+    private void setCardNumber() {
         cardNo = SessionManager.getCardNo(context);
-        tvCardDetail.setText(cardNo);
+
+        int length = cardNo.length();
+        if(length>0)
+        {
+            String s = cardNo;
+          /*  String s1 = s.substring(0, 4);
+            String s2 = s.substring(4, 8);
+            String s3 = s.substring(8, 12);*/
+            String s4 = s.substring(12,16);
+
+//            String dashedString = s1 + " " + s2 + " " + s3 + " "+ s4;
+            String strcardnumber ="**** **** **** "+s4;
+            tvCardDetail.setText(strcardnumber);
+        }
+        else
+        {
+            tvCardDetail.setText("**** **** **** ****");
+        }
     }
 
     private void setListner() {
@@ -98,9 +121,10 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case ADD_CARD_PAYMENT_METHOD:
-                cardNo = SessionManager.getCardNo(context);
+              /*  cardNo = SessionManager.getCardNo(context);
 //                String strNumber = data.getStringExtra("cardNumber");
-                tvCardDetail.setText(cardNo);
+                tvCardDetail.setText(cardNo);*/
+                    setCardNumber();
                 break;
 
         }

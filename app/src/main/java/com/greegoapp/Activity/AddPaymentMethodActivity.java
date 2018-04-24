@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -32,6 +33,7 @@ import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.CreditCardFormattingTextWatcher;
 import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
@@ -93,7 +95,9 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         ibBack.setOnClickListener(this);
         btnSavePaymentMethod.setOnClickListener(this);
         edtTvCvv.setOnClickListener(this);
-        edtTvCardNumber.addTextChangedListener(new CreditCardNumberFormattingTextWatcher());
+        //edtTvCardNumber.addTextChangedListener(new CreditCardNumberFormattingTextWatcher());
+        edtTvCardNumber.addTextChangedListener(new CreditCardFormattingTextWatcher(edtTvCardNumber));
+
         edtTvExpDate.addTextChangedListener(mDateEntryWatcher);
     }
     private TextWatcher mDateEntryWatcher = new TextWatcher() {
@@ -163,7 +167,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             lock = true;
             for (int i = 4; i < s.length(); i += 5) {
                 if (s.toString().charAt(i) != ' ') {
-                    s.insert(i, "/");
+                    s.insert(i, " ");
                 }
             }
             lock = false;
@@ -242,6 +246,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             JSONObject jsonObject = new JSONObject();
 
             String strCardNo = edtTvCardNumber.getText().toString();
+            strCardNo=strCardNo.replace(" ","");
             String strExpDate = edtTvExpDate.getText().toString();
             String strzipCode = edtTvZipCode.getText().toString();
 
@@ -409,7 +414,13 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 //                                        e.printStackTrace();
 //                                    }
                                     Applog.E("Card No===> " + cardNo);
-                                    edtTvCardNumber.setText(cardNo);
+                                    String s= cardNo;
+                                    String s1 = s.substring(0, 4);
+                                    String s2 = s.substring(4, 8);
+                                    String s3 = s.substring(8, 12);
+                                    String s4 = s.substring(12,16);
+                                    String strCardNumber = s1 + " " + s2 + " " + s3 + " "+ s4;
+                                    edtTvCardNumber.setText(strCardNumber);
                                     edtTvExpDate.setText(cardsBean.getExp_month_year());
                                     edtTvZipCode.setText(cardsBean.getZipcode());
                                 }

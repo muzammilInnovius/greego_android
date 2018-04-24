@@ -42,7 +42,10 @@
 
     <!--Mujju-->
     <color name="resend_time">#12319e</color>
-
+    <color name="driver_tv_bg">#92BCB8</color>
+    <color name="driver_code_bg">#76ABA6</color>
+    <color name="tv_contact">#1C6EFD</color>
+    <color name="tv_cancel">#FB3E3F</color>
 
     <!--pragnesh-->
     <color name="edt_textColor">#3C3D3D</color>

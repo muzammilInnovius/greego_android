@@ -4,7 +4,7 @@ public class Login {
 
 
     /**
-     * data : {"contact_number":"+919998841576","otp":419674,"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6Ijk5YzU0N2Q0ODA2ZGU0YzBlMzk4Zjc4MTZiNTRhNGJjYjdkMGE5MmE4ZTUzMDFmMGMxMTMzMWY1OWRlNzgxNzQyNjNiZGU5MmE3YTY2ZmNlIn0.eyJhdWQiOiIxIiwianRpIjoiOTljNTQ3ZDQ4MDZkZTRjMGUzOThmNzgxNmI1NGE0YmNiN2QwYTkyYThlNTMwMWYwYzExMzMxZjU5ZGU3ODE3NDI2M2JkZTkyYTdhNjZmY2UiLCJpYXQiOjE1MjMzNjM2MjAsIm5iZiI6MTUyMzM2MzYyMCwiZXhwIjoxNTU0ODk5NjIwLCJzdWIiOiI0Iiwic2NvcGVzIjpbXX0.xcPd57y2Et6bzh-YOQMHkmgPyo5Eil5dA7cdl53Xl1yXuTnLbihKiFdQtJ4XewHpOOXuPxPMST_hcwsg0dkN3gd63SF-ewSWrE8umkVki_KxyMEmY1o7eVy5DM7pcpOnDbkSpoW7YAwboQeiyceknYo91b8APIYhbzmxRSO2P8bCnRaoJwwQjP6lgrRGgQ6vsJXLR0CMwwzexNwD_16DIIUzsyB0LGtPc8-q0aLw08aakOiUPrlt8-jEWR0D-APbKo3MlmA-g8wJPYSNRSr8pIP7aYHiRoG9uqO6j-Lh9LMM1-OwHs31SRQnOcIrColqMM7aXReEz6foPbqRLyERQ30bKOsXd7ItF9cRQ8vyo-O5L5WZXpqbyt6-haafARE9fS4b8v4aro-ceXLor2HO7yUXtQaL59na6evQXx2M3xyFILCEGSoRQ2MP_65186p6vGo_JrVpKJsymcS7yu5qNRufMcCIBGJV9CfwWV1lhVVJpXXEEAKyX9BaXWRw642U0ZtiWvxS4pgZ-mB15V99-CE8HGht9BcTNoMjZQ0MBDpPE4TGUopCSrEBClOtNq7rus-7oFYNT7dA-cyggsnF5XJmalULaRHYdPX5KhdZFEyRgFzmhQN5M2dTW-2OIzj7gVy2-UK7B7gm6V5yo749xz3jH0wzuRsPsni-iIhDdcQ"}
+     * data : {"contact_number":"+918460003300","is_agreed":"0","otp":513208,"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImM4NmZmODg1ODMzYThmYmRkZTI3ZjZhMDBiZWNhMTQ0ZGJjNDk5ZDkzYzcxMGFhMzk4MzY5Y2M4NzliYjlmZTBkMWU0YmQ1MTlmMDhhZjZlIn0.eyJhdWQiOiIxIiwianRpIjoiYzg2ZmY4ODU4MzNhOGZiZGRlMjdmNmEwMGJlY2ExNDRkYmM0OTlkOTNjNzEwYWEzOTgzNjljYzg3OWJiOWZlMGQxZTRiZDUxOWYwOGFmNmUiLCJpYXQiOjE1MjQyOTQ3MDksIm5iZiI6MTUyNDI5NDcwOSwiZXhwIjoxNTU1ODMwNzA5LCJzdWIiOiIxMzQiLCJzY29wZXMiOltdfQ.yg-bg8qNOgRp2bSUGuYOa0Hr-5cZvJW7nKZF_qIXly18M9AxTVrLoAFBkau9RgroVOGIxxdKhe7SYQRaBn3PRq3KIe0Hqg5YmDE-tZ7-tjjrMyHKfvRvjtbGzArgheCyolUmVECvIVIDC-_nTvXVIUjY2xADgBQ7ycULBX1qVL-GY4_8ZzZtBU3RPE0RTNLnlscnd8CGhMtB3tvmr__3bTu087Y_PAfVEhMKvT0Y5N5d0ESEt2nDMHE8RyYaN_azUOcRdp3-dowK79qColpGXNOO2d-_ocvflYczRbW_K9mERC2QkeA6EU-Jl089HAotSsTBSyy5wjXs2vVuMomb_TTUCP8tL5MaoVAMi_avh9zkQxXcNEyx0qOWHAB4TNWGtepDnAHCfY8q-6IaOUq6kMGFXWY6zVr_XTEHlS46eAprTx1QVeR_glSrdi5ztKaS3DZyIxqffVadWwKYFrQhYT3_liJf_i_Zx7Tok2uXrSxce6_6ha2E3UyxxRj087zvQImrgHpj0v51s_5ym7qJqdz6IU2RZdCeplONO7RsB7-wxG55HCKgL5L_pAR82hCE9djyX6KwfJ3OQPv7q7S_aeoDQpwqfYwMg-mo0Pl1YZTL3xqUiyybbNiYAZjb6PBzYE6RySLQNBj9vcVxROvVzi6sJLrZK92bnZEn99EOyx8"}
      * error_code : 0
      * message :
      */
@@ -39,12 +39,14 @@ public class Login {
 
     public static class DataBean {
         /**
-         * contact_number : +919998841576
-         * otp : 419674
-         * token : eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6Ijk5YzU0N2Q0ODA2ZGU0YzBlMzk4Zjc4MTZiNTRhNGJjYjdkMGE5MmE4ZTUzMDFmMGMxMTMzMWY1OWRlNzgxNzQyNjNiZGU5MmE3YTY2ZmNlIn0.eyJhdWQiOiIxIiwianRpIjoiOTljNTQ3ZDQ4MDZkZTRjMGUzOThmNzgxNmI1NGE0YmNiN2QwYTkyYThlNTMwMWYwYzExMzMxZjU5ZGU3ODE3NDI2M2JkZTkyYTdhNjZmY2UiLCJpYXQiOjE1MjMzNjM2MjAsIm5iZiI6MTUyMzM2MzYyMCwiZXhwIjoxNTU0ODk5NjIwLCJzdWIiOiI0Iiwic2NvcGVzIjpbXX0.xcPd57y2Et6bzh-YOQMHkmgPyo5Eil5dA7cdl53Xl1yXuTnLbihKiFdQtJ4XewHpOOXuPxPMST_hcwsg0dkN3gd63SF-ewSWrE8umkVki_KxyMEmY1o7eVy5DM7pcpOnDbkSpoW7YAwboQeiyceknYo91b8APIYhbzmxRSO2P8bCnRaoJwwQjP6lgrRGgQ6vsJXLR0CMwwzexNwD_16DIIUzsyB0LGtPc8-q0aLw08aakOiUPrlt8-jEWR0D-APbKo3MlmA-g8wJPYSNRSr8pIP7aYHiRoG9uqO6j-Lh9LMM1-OwHs31SRQnOcIrColqMM7aXReEz6foPbqRLyERQ30bKOsXd7ItF9cRQ8vyo-O5L5WZXpqbyt6-haafARE9fS4b8v4aro-ceXLor2HO7yUXtQaL59na6evQXx2M3xyFILCEGSoRQ2MP_65186p6vGo_JrVpKJsymcS7yu5qNRufMcCIBGJV9CfwWV1lhVVJpXXEEAKyX9BaXWRw642U0ZtiWvxS4pgZ-mB15V99-CE8HGht9BcTNoMjZQ0MBDpPE4TGUopCSrEBClOtNq7rus-7oFYNT7dA-cyggsnF5XJmalULaRHYdPX5KhdZFEyRgFzmhQN5M2dTW-2OIzj7gVy2-UK7B7gm6V5yo749xz3jH0wzuRsPsni-iIhDdcQ
+         * contact_number : +918460003300
+         * is_agreed : 0
+         * otp : 513208
+         * token : eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImM4NmZmODg1ODMzYThmYmRkZTI3ZjZhMDBiZWNhMTQ0ZGJjNDk5ZDkzYzcxMGFhMzk4MzY5Y2M4NzliYjlmZTBkMWU0YmQ1MTlmMDhhZjZlIn0.eyJhdWQiOiIxIiwianRpIjoiYzg2ZmY4ODU4MzNhOGZiZGRlMjdmNmEwMGJlY2ExNDRkYmM0OTlkOTNjNzEwYWEzOTgzNjljYzg3OWJiOWZlMGQxZTRiZDUxOWYwOGFmNmUiLCJpYXQiOjE1MjQyOTQ3MDksIm5iZiI6MTUyNDI5NDcwOSwiZXhwIjoxNTU1ODMwNzA5LCJzdWIiOiIxMzQiLCJzY29wZXMiOltdfQ.yg-bg8qNOgRp2bSUGuYOa0Hr-5cZvJW7nKZF_qIXly18M9AxTVrLoAFBkau9RgroVOGIxxdKhe7SYQRaBn3PRq3KIe0Hqg5YmDE-tZ7-tjjrMyHKfvRvjtbGzArgheCyolUmVECvIVIDC-_nTvXVIUjY2xADgBQ7ycULBX1qVL-GY4_8ZzZtBU3RPE0RTNLnlscnd8CGhMtB3tvmr__3bTu087Y_PAfVEhMKvT0Y5N5d0ESEt2nDMHE8RyYaN_azUOcRdp3-dowK79qColpGXNOO2d-_ocvflYczRbW_K9mERC2QkeA6EU-Jl089HAotSsTBSyy5wjXs2vVuMomb_TTUCP8tL5MaoVAMi_avh9zkQxXcNEyx0qOWHAB4TNWGtepDnAHCfY8q-6IaOUq6kMGFXWY6zVr_XTEHlS46eAprTx1QVeR_glSrdi5ztKaS3DZyIxqffVadWwKYFrQhYT3_liJf_i_Zx7Tok2uXrSxce6_6ha2E3UyxxRj087zvQImrgHpj0v51s_5ym7qJqdz6IU2RZdCeplONO7RsB7-wxG55HCKgL5L_pAR82hCE9djyX6KwfJ3OQPv7q7S_aeoDQpwqfYwMg-mo0Pl1YZTL3xqUiyybbNiYAZjb6PBzYE6RySLQNBj9vcVxROvVzi6sJLrZK92bnZEn99EOyx8
          */
 
         private String contact_number;
+        private String is_agreed;
         private int otp;
         private String token;
 
@@ -54,6 +56,14 @@ public class Login {
 
         public void setContact_number(String contact_number) {
             this.contact_number = contact_number;
+        }
+
+        public String getIs_agreed() {
+            return is_agreed;
+        }
+
+        public void setIs_agreed(String is_agreed) {
+            this.is_agreed = is_agreed;
         }
 
         public int getOtp() {

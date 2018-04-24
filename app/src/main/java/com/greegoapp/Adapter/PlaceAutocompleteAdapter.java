@@ -85,6 +85,7 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
                 if (constraint != null) {
                     // Query the autocomplete API for the (constraint) search string.
                     mResultList = getAutocomplete(constraint);
+
                     if (mResultList != null) {
                         // The API successfully returned results.
                         results.values = mResultList;
@@ -123,6 +124,7 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
             // for a result from the API.
             AutocompletePredictionBuffer autocompletePredictions = results
                     .await(60, TimeUnit.SECONDS);
+
 
             // Confirm that the query completed successfully, otherwise return null
             final Status status = autocompletePredictions.getStatus();

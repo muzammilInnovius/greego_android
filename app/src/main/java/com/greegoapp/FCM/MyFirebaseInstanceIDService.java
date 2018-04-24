@@ -1,19 +1,18 @@
 package com.greegoapp.FCM;
 
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.greegoapp.GlobleFields.GlobalValues;
-
+import com.greegoapp.Fragment.MapHomeFragment;
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
+
     private static final String TAG = MyFirebaseInstanceIDService.class.getSimpleName();
+    public static String SEND_REGISTERATION_TO_SERVER_KEY;
 
     @Override
     public void onTokenRefresh() {
@@ -27,19 +26,21 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         sendRegistrationToServer(refreshedToken);
 
         // Notify UI that registration has completed, so the progress indicator can be hidden.
-        Intent registrationComplete = new Intent(GlobalValues.REGISTRATION_COMPLETE);
+        Intent registrationComplete = new Intent(Config.REGISTRATION_COMPLETE);
         registrationComplete.putExtra("token", refreshedToken);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 
-    private void sendRegistrationToServer(final String token) {
+    public static void sendRegistrationToServer(final String token) {
         // sending gcm token to server
         Log.e(TAG, "sendRegistrationToServer: " + token);
+
+
 
     }
 
     private void storeRegIdInPref(String token) {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(GlobalValues.SHARED_PREF, 0);
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("regId", token);
         editor.commit();

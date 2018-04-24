@@ -137,7 +137,7 @@
         <item>Suv</item>
         <item>Van</item>
     </string-array>
-
+    <string name="tv_change">Change</string>
 
     // pragnessh
     <string name="wheredogo">Where do you want to go?</string>

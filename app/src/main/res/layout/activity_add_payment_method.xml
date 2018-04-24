@@ -105,9 +105,9 @@
                         android:id="@+id/edtTvCardNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
                         android:drawableLeft="@mipmap/ic_flag"
                         android:hint="@string/card_number"
+                        android:inputType="numberDecimal"
                         android:maxLength="19" />
 
                 </android.support.design.widget.TextInputLayout>
@@ -215,7 +215,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/zipcode"
                         android:inputType="number"
-                        android:maxLength="6" />
+                        android:maxLength="5" />
 
                 </android.support.design.widget.TextInputLayout>
 

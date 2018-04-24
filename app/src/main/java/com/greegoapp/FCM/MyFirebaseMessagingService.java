@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.greegoapp.Activity.MainActivity;
-import com.greegoapp.GlobleFields.GlobalValues;
-import com.greegoapp.Utils.NotificationUtils;
+import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.MyProgressDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,14 +50,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void handleNotification(String message) {
         if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
             // app is in foreground, broadcast the push message
-            Intent pushNotification = new Intent(GlobalValues.PUSH_NOTIFICATION);
+            Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
             pushNotification.putExtra("message", message);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(pushNotification);
+            MyProgressDialog.hideProgressDialog();
+            Applog.e("==>","PushNotification");
             // play notification sound
             NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
             notificationUtils.playNotificationSound();
-        }else{
+        } else {
             // If the app is in background, firebase itself handles the notification
         }
     }
@@ -85,7 +86,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
                 // app is in foreground, broadcast the push message
-                Intent pushNotification = new Intent(GlobalValues.PUSH_NOTIFICATION);
+                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
                 pushNotification.putExtra("message", message);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
@@ -94,7 +95,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 notificationUtils.playNotificationSound();
             } else {
                 // app is in background, show the notification in notification tray
-                Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent resultIntent = new Intent(getApplicationContext(), NotificationActivity.class);
                 resultIntent.putExtra("message", message);
 
                 // check for image attachment

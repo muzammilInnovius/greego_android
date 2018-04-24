@@ -72,6 +72,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import static com.greegoapp.Fragment.MapHomeFragment.COMPLETE_UPDATE_USER_DETAILS;
+
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CallFragmentInterface, BackPressedFragment {
 
     String MAIN_TAG = HomeActivity.class.getSimpleName();
@@ -227,18 +229,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ivProPicHome:
-                if (alUserList.size() != 0) {
-
-                    for (GetUserData userData : alUserList) {
-                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
-                                != 0 && userData.getData().getCards().size() != 0) {
-                            openDrawer();
-                        } else {
-                            showCheckUserUpdateData("Please complete your updates before proceeding.");
-                        }
-                    }
-                }
-
+                callRegisterUpdateComplete();
                 break;
 
             case R.id.ivPro:
@@ -252,6 +243,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
 
+        }
+    }
+
+    private void callRegisterUpdateComplete() {
+        if (COMPLETE_UPDATE_USER_DETAILS != 0007) {
+            if (alUserList.size() != 0) {
+
+                for (GetUserData userData : alUserList) {
+                    if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
+                            != 0 && userData.getData().getCards().size() != 0) {
+                        openDrawer();
+                    } else {
+                        showCheckUserUpdateData("Please complete your updates before proceeding.");
+                    }
+                }
+            }
+        }else {
+            openDrawer();
         }
     }
 
@@ -485,6 +494,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case HOME_SLIDER_PROFILE_UPDATE:
                 userName = data.getStringExtra("name");
                 tvDrawUsername.setText(userName);
+                break;
+            case COMPLETE_UPDATE_USER_DETAILS:
+                callRegisterUpdateComplete();
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);

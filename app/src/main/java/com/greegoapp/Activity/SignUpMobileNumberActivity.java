@@ -21,13 +21,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.CustomAdapter;
 import com.greegoapp.AppController.AppController;
+import com.greegoapp.FCM.Config;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.Login;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
-import com.greegoapp.Utils.DeviceId;
 import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
@@ -54,6 +54,8 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
     String[] countryCode = {"+91", "+1", "+850", "+82"};
     int[] countryFlag = {R.mipmap.ic_indian_flag, R.mipmap.american_flag_large, R.mipmap.ic_nc_flag, R.mipmap.ic_sc_flag};
 
+    String registerFCMKey;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +63,8 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up_mobile_number);
         context = SignUpMobileNumberActivity.this;
         snackBarView = findViewById(android.R.id.content);
+
+        registerFCMKey = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0).getString("regId", "def");
 
         bindView();
         setListners();
@@ -136,17 +140,20 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
         super.onPause();
     }
 
+    String uniqueId;
+
     private void callMobileNumberAPI() {
         try {
-            deviceId = DeviceId.getDeviceId(this);
-            Applog.E("DeviceId==>" + deviceId);
+
+//            deviceId = DeviceId.getDeviceId(this);
+//            Applog.E("DeviceId==>" + deviceId + "==UUID==>" + uniqueId);
             JSONObject jsonObject = new JSONObject();
 //            String token = SessionManager.getToken(context);
 //            Applog.E("Token" + token);
 
             jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, strMobileNo);
             jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
-            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, deviceId);
+            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, registerFCMKey);
 
             Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);

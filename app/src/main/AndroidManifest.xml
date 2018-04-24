@@ -33,24 +33,11 @@
         android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_greego_lgo"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_greego_lgo"
         android:supportsRtl="true"
-        android:largeHeap="true"
         android:theme="@style/AppTheme">
 
-        <!-- <activity -->
-        <!-- android:name=".FCM.CheckFCmActivity" -->
-        <!-- android:screenOrientation="portrait" -->
-        <!-- android:windowSoftInputMode="stateHidden|adjustPan"> -->
-
-
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
 
         <activity
             android:name=".Activity.SplashActivity"
@@ -82,13 +69,18 @@
             android:name=".Activity.HomeActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-        <!-- <meta-data -->
-        <!-- android:name="com.google.android.geo.API_KEY" -->
-        <!-- android:value=" AIzaSyBSTPbkofgt1eknGU2KkHhK_GQtoXYvt2A" /> -->
-        <!--  -->
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBBvqWb09JP2hSC0xqtTXS8CHKGUCL-WPY" />
+            android:value="AIzaSyBSTPbkofgt1eknGU2KkHhK_GQtoXYvt2A" />
+
+        <!--android:value="AIzaSyD_TmqiDuhMA22OEdKtGm3cGB-uVvOq9Kg" />-->
+        <!--AIzaSyD_TmqiDuhMA22OEdKtGm3cGB-uVvOq9Kg-->
+
+        <!--AIzaSyAv3vGXFwzvjXktBy9VuxeBZFZwjtp0fGA-->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".Activity.SignUpUserNameActivity"
@@ -141,6 +133,13 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+
+
+        <activity
+            android:name=".FCM.NotificationActivity"
+            android:windowSoftInputMode="stateAlwaysHidden">
+        </activity>
+
 
         <activity android:name=".Activity.UserProfileActivity" />
         <activity
