@@ -16,12 +16,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
@@ -162,7 +161,6 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     }
                 }
             }, new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     MyProgressDialog.hideProgressDialog();
@@ -448,7 +446,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                             setResult(SELECT_CHOISE_VEHICLE, data);
                         }
 
-
+                        SnackBar.showSuccess(context, snackBarView, "Vehicle Update.");
                         finish();
 
                     } else

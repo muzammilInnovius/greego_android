@@ -1,6 +1,7 @@
 package com.greegoapp.Adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,12 +12,13 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
@@ -34,17 +36,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdapter.TripHistoryViewHolder> {
+public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdapter.VehicleDetailViewHolder> {
 
     private ArrayList<GetUserData.DataBean.VehiclesBean> VehicleModelList;
     private View snackBarView;
 
     RecyclerViewItemClickListener mListener;
     Context context;
-    private int selectedPosition = -1;
+    private int lastSelectedPosition = -1;
     boolean isChecked;
-    private RadioButton lastCheckedRB = null;
+    GetUserData.DataBean.VehiclesBean vehicleDetailModel;
     private boolean isCheck = false;
+
 
     public VehicleDetailAdapter(Context context, ArrayList<GetUserData.DataBean.VehiclesBean> users, RecyclerViewItemClickListener mListener) {
         VehicleModelList = users;
@@ -54,65 +57,58 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
 
 
     @Override
-    public TripHistoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public VehicleDetailViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         RowVehicleDetailBinding binding = DataBindingUtil.inflate(inflater, R.layout.row_vehicle_detail, parent, false);
-        return new TripHistoryViewHolder(binding.getRoot(), mListener);
+        return new VehicleDetailViewHolder(binding.getRoot(), mListener);
     }
 
+
     @Override
-    public void onBindViewHolder(final TripHistoryViewHolder holder, int position) {
-        final GetUserData.DataBean.VehiclesBean vehicleDetailModel = VehicleModelList.get(position);
+    public void onBindViewHolder(final VehicleDetailViewHolder holder, final int position) {
+
+        vehicleDetailModel = VehicleModelList.get(position);
         final String vehicle_id = vehicleDetailModel.getVehicle_id();
         final String vehicle_select_id = vehicleDetailModel.getSelected();
+        if (lastSelectedPosition == position) {
+            holder.mCheckBox.setChecked(true);
+            // callVehicleSelectApi(vehicle_id);
+
+        } else {
+            holder.mCheckBox.setChecked(false);
+        }
         if (vehicleDetailModel != null) {
             holder.tvYear.setText(vehicleDetailModel.getYear());
-            holder.tvMake.setText(vehicleDetailModel.getTransmission_type());
+            holder.tvMake.setText(vehicleDetailModel.getVehicle_name());
             holder.tvColor.setText(vehicleDetailModel.getColor());
-            holder.tvModel.setText(vehicleDetailModel.getVehicle_id());
-
-            if (vehicle_select_id.matches("0")) {
-                holder.mCheckBox.setChecked(true);
+            holder.tvModel.setText(vehicleDetailModel.getVehicle_model());
+/*
+            if (vehicle_select_id.matches("1")) {
+                Toast.makeText(context,"vehicle id: "+vehicleDetailModel.getVehicle_model(),Toast.LENGTH_LONG).show();
+               holder.mCheckBox.setChecked(true);
             } else {
-                holder.mCheckBox.setChecked(false);
-            }
+              //  holder.mCheckBox.setChecked(false);
+            }*/
         }
 
 
-        holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-
-                if (isCheck) {
-                    isCheck = false;
-                    holder.mCheckBox.setChecked(false);
-                } else {
-                    isCheck = true;
-                    holder.mCheckBox.setChecked(true);
-                    Log.i("Vehicle id ", vehicle_id);
-                    callVehicleSelectApi(vehicle_id);
-                }
-
-            }
-        });
-
-//        holder.mCheckBox.setSelected(vehicleDetailModel.isSelected());
 //
 //        holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 //            @Override
 //            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 //                if(isChecked){
-//                    holder.mCheckBox.setChecked(false);
+//                    holder.mCheckBox.setChecked(true);
 ////                    vehicleDetailModel.setSelected(true);
 //                }else {
 ////                    vehicleDetailModel.setSelected(false);
-//                    holder.mCheckBox.setChecked(true);
+//                    holder.mCheckBox.setChecked(false);
 //                }
 //            }
 //        });
 //        holder.mCheckBox.setChecked(vehicleDetailModel.isSelected());
 
     }
+
 
     private void callVehicleSelectApi(String vehicle_id) {
         try {
@@ -161,13 +157,29 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
         }
     }
 
+    /*public void update(int po,ArrayList<GetUserData.DataBean.VehiclesBean> List){
+                 lastSelectedPosition =po;
+                VehicleModelList =List;
+        Toast.makeText(context,
+                "sele "+List,
+                Toast.LENGTH_LONG).show();
 
+        Toast.makeText(context,
+                "sele "+po,
+                Toast.LENGTH_LONG).show();
+
+
+    //             notifyDataSetChanged();
+
+
+
+    }*/
     @Override
     public int getItemCount() {
         return VehicleModelList.size();
     }
 
-    public class TripHistoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class VehicleDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private RowVehicleDetailBinding mBinding;
 
@@ -176,7 +188,7 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
         ImageView imgVwnext;
         RadioButton mCheckBox;
 
-        public TripHistoryViewHolder(View view, RecyclerViewItemClickListener mListener) {
+        public VehicleDetailViewHolder(View view, RecyclerViewItemClickListener mListener) {
             super(view);
             this.mListener = mListener;
             mBinding = DataBindingUtil.bind(view);
@@ -187,7 +199,25 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
             imgVwnext = mBinding.imgVwnext;
             mCheckBox = mBinding.chkVehicleSet;
             view.setOnClickListener(this);
+            mCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    lastSelectedPosition = getAdapterPosition();
+                    /*VehicleModelList.get(lastSelectedPosition).setSelected(false);*/
+                    //      vehicleDetailModel.setSelected(lastSelectedPosition+"");
+                    callVehicleSelectApi(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
+                    VehicleModelList.get(getLayoutPosition()).setSelected(true);
+                    notifyDataSetChanged();
+                /*    Toast.makeText(context,getLayoutPosition()+
+                            "selected offer is ",
+                            Toast.LENGTH_LONG).show();*/
+                }
+            });
+
+
         }
+
 
         @Override
         public void onClick(View v) {

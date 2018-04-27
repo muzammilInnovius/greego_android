@@ -20,4 +20,6 @@ public class AppPrefFields {
     public final static String PARAM_VEHICLE_YEAR = "year";
     public final static String PARAM_VEHICLE_COLOR = "color";
 
+    public final static String PARAM_TRIP_ID= "trip_id";
+
 }

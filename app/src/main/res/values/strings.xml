@@ -130,6 +130,8 @@
     <string name="vehicle_year_empty">Please choose vehicle year.</string>
     <string name="vehicle_color_empty">Please choose vehicle color.</string>
     <string name="vehicle_car_empty">Please choose vehicle car type.</string>
+    <string name="on_trip">On trip</string>
+    <string name="your_driver">Your Driver is</string>
 
     <string-array name="typeOfModel">
         <item>Type of Car</item>
@@ -146,4 +148,10 @@
 
     <string name="start1"><font fgcolor='#519021'>S</font>tart</string>
     <string name="end1"><font fgcolor='#569A94'>E</font>nd</string>
+
+    //priyanka
+    <string name="unable_request">Before requesting a driver,</string>
+    <string name="update_info">You have to update your information</string>
+    <string name="back_home">Back to home</string>
+    <string name="no_profile">Please select your profile picture</string>
 </resources>

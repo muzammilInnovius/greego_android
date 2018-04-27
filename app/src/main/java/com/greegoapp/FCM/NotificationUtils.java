@@ -154,8 +154,9 @@ public class NotificationUtils {
     // Playing notification sound
     public void playNotificationSound() {
         try {
-            Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
-                    + "://" + mContext.getPackageName() + "/raw/alert_tones.mp3");
+//            Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+//                    + "://" + mContext.getPackageName() + "/raw/alert_tones.mp3");
+            Uri alarmSound = Uri.parse("file:////raw/alert_tones.mp3");
             Ringtone r = RingtoneManager.getRingtone(mContext, alarmSound);
             r.play();
         } catch (Exception e) {

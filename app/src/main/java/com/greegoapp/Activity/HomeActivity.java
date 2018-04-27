@@ -35,8 +35,8 @@ import android.widget.Toast;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private FrameLayout container_body;
     TextView tvDrawUsername, tvDriveGreego;
     private Fragment mContentFragment = null;
-    private String[] drawerTitle = {"Home","Payment", "Your Trips", "Free Rides", "Help", "Settings"};
+    private String[] drawerTitle = {"Home", "Payment", "Your Trips", "Free Rides", "Help", "Settings"};
     public static int index = 0;
     private Stack<Fragment> fragmentStack;
     FragmentManager fragmentManager;
@@ -259,7 +259,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             }
-        }else {
+        } else {
             openDrawer();
         }
     }
@@ -369,9 +369,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Intent in;
                     switch (pos) {
                         case 0:
-                           in = new Intent(context , HomeActivity.class);
-                           startActivity(in);
-                           finish();
+                            in = new Intent(context, HomeActivity.class);
+                            startActivity(in);
+                            finish();
                             break;
                         case 1:
 //                            ivProPicHome.setVisibility(View.GONE);

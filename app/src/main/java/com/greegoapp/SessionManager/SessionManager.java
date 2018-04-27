@@ -67,20 +67,30 @@ public class SessionManager {
     }
 
 
-    public static void saveMobileNo(Context context, Login vo) {
+    public static void saveTripId(Context context, String vo) {
         try {
             SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(AppPrefFields.PARAM_CONTACT_NO, vo.getData().getContact_number());
-            editor.putInt(AppPrefFields.PARAM_OTP, vo.getData().getOtp());
-            editor.putString(AppPrefFields.PARAM_TOKEN, vo.getData().getToken());
+            editor.putString(AppPrefFields.PARAM_TRIP_ID, vo);
 
             editor.apply();
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
         }
+    }
+
+    public static String getTripId(Context context) {
+        String tripId = "";
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            tripId = preferences.getString(AppPrefFields.PARAM_TRIP_ID, "");
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return tripId;
     }
 
     public static void setIsUserLoggedin(Context context, boolean val) {

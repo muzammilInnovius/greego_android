@@ -399,7 +399,7 @@ public class GetUserData implements Parcelable{
             }
         }
 
-        public static class VehiclesBean implements Parcelable{
+        public static class VehiclesBean implements Parcelable {
             /**
              * id : 105
              * user_id : 140
@@ -429,6 +429,16 @@ public class GetUserData implements Parcelable{
             private String vehicle_name;
             private String vehicle_model;
             private VehiclemodelBean vehiclemodel;
+
+            public boolean isSelected() {
+                return isSelected;
+            }
+
+            public void setSelected(boolean selected) {
+                isSelected = selected;
+            }
+
+            private boolean isSelected = false;
 
             protected VehiclesBean(Parcel in) {
                 id = in.readInt();
@@ -584,7 +594,8 @@ public class GetUserData implements Parcelable{
                 dest.writeParcelable(vehiclemodel, flags);
             }
 
-            public static class VehiclemodelBean implements Parcelable{
+
+            public static class VehiclemodelBean implements Parcelable {
                 /**
                  * id : 3
                  * vehicle_manufacturer_id : 1
@@ -600,6 +611,27 @@ public class GetUserData implements Parcelable{
                 private String updated_at;
                 private String created_at;
                 private VmakeBean vmake;
+
+                protected VehiclemodelBean(Parcel in) {
+                    id = in.readInt();
+                    vehicle_manufacturer_id = in.readString();
+                    model = in.readString();
+                    updated_at = in.readString();
+                    created_at = in.readString();
+                    vmake = in.readParcelable(VmakeBean.class.getClassLoader());
+                }
+
+                public static final Creator<VehiclemodelBean> CREATOR = new Creator<VehiclemodelBean>() {
+                    @Override
+                    public VehiclemodelBean createFromParcel(Parcel in) {
+                        return new VehiclemodelBean(in);
+                    }
+
+                    @Override
+                    public VehiclemodelBean[] newArray(int size) {
+                        return new VehiclemodelBean[size];
+                    }
+                };
 
                 public int getId() {
                     return id;
@@ -656,10 +688,15 @@ public class GetUserData implements Parcelable{
 
                 @Override
                 public void writeToParcel(Parcel dest, int flags) {
-
+                    dest.writeInt(id);
+                    dest.writeString(vehicle_manufacturer_id);
+                    dest.writeString(model);
+                    dest.writeString(updated_at);
+                    dest.writeString(created_at);
+                    dest.writeParcelable(vmake, flags);
                 }
 
-                public static class VmakeBean implements Parcelable{
+                public static class VmakeBean implements Parcelable {
                     /**
                      * id : 1
                      * name : ac

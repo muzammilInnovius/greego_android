@@ -12,12 +12,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.CustomAdapter;
 import com.greegoapp.AppController.AppController;
@@ -211,7 +212,9 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
 
 
     private boolean isValid() {
-        strMobileNo = "+91" + edtTvMobileNo.getText().toString();
+
+     //   Toast.makeText(context,tvCountryCode.getText().toString(),Toast.LENGTH_LONG).show();
+        strMobileNo = tvCountryCode.getText().toString() + edtTvMobileNo.getText().toString();
 
         if (strMobileNo.isEmpty()) {
             edtTvMobileNo.requestFocus();

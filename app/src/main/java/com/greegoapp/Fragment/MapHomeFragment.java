@@ -2,14 +2,18 @@ package com.greegoapp.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -32,6 +36,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -40,13 +45,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.AuthFailureError;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -67,14 +71,17 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.greegoapp.Activity.AddEditVehicleActivity;
 import com.greegoapp.Activity.AddPaymentMethodActivity;
+import com.greegoapp.Activity.HomeActivity;
 import com.greegoapp.Activity.PickUpLocationActivity;
 import com.greegoapp.Activity.UserProfileActivity;
 import com.greegoapp.AppController.AppController;
+import com.greegoapp.FCM.NotificationUtils;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.BackPressedFragment;
 import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.Model.GetTripRate;
 import com.greegoapp.Model.GetUserData;
+import com.greegoapp.Model.UserDriverTripDetails;
 import com.greegoapp.Model.UserNearDriverList;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
@@ -99,6 +106,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.greegoapp.Activity.HomeActivity.HOME_SLIDER_PROFILE_UPDATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -138,6 +147,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     boolean GpsStatus;
     private final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
     private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
+    private static final int CALL_PERMIT = 101;
 
     public final static int REQUEST_ADD_PAYMENT = 110;
     public final static int REQUEST_ADD_VEHICLE = 111;
@@ -203,7 +213,29 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     ArrayList<UserNearDriverList.DataBean> alUserNearDriverDtls;
     ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail = new ArrayList<>();
 
+    String driverData;
+    LinearLayout llDriverPersDetailsMain;
     public static final int COMPLETE_UPDATE_USER_DETAILS = 0007;
+    public static final String REQUEST_USER_TRIP = "1250";
+    MyReceiver myReceiver;
+
+    //Trip Details
+    TextView tvAcceptDriverName, tvPromoCode, tvContact, tvCancel, tvShareYrTrip, tvChangeTrip, tvTripTotalCost, tvUserCardNo;
+    ImageView ivDriverPro, imgVwShare;
+
+    int vehicalId;
+
+    ArrayList<UserDriverTripDetails.DataBean> userDrTripDetails;
+    ArrayList<UserDriverTripDetails.DataBean.DriverBean> userDrAllTripDetails;
+
+    //On trip Details
+    RelativeLayout rlOnTripUser;
+    TextView tvOnTripUser, tvOnTripTime, tvOnTripDrName, tvOnTripDrCode;
+    String strDriverContact;
+
+    //Priyanka
+    Dialog dialog;
+    String strVehicalData = null;
 
     public static MapHomeFragment newInstance(ArrayList<GetUserData> userData, String param2) {
         MapHomeFragment fragment = new MapHomeFragment();
@@ -219,6 +251,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             alUserDetails = getArguments().getParcelableArrayList("userData");
+//            driverData = getArguments().getString("driverData");
         }
     }
 
@@ -235,7 +268,17 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
         //Mujju
 //        callUserMeApi();
+
         setListners();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callUserMeApi();
+            setVehicleData();
+//            CheckGpsStatus();
+        } else {
+            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+        }
+
+
         setFirstTimeRegister();
 
         if (ConnectivityDetector.isConnectingToInternet(context)) {
@@ -268,6 +311,61 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
         return view;
     }
+
+    private void setVehicleData() {
+        tvEditVehicle.setText("Edit your vehicle");
+        imgSetting.setImageResource(R.mipmap.setup);
+        tvVehicalData.setText(strVehicalData);
+        imgVwVehicle.setImageResource(R.mipmap.ellipse_1);
+    }
+
+
+    private void callDriverRequestAccepted() {
+        myReceiver = new MyReceiver();
+        try {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(REQUEST_USER_TRIP);
+            getActivity().registerReceiver(myReceiver, intentFilter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class MyReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            // TODO Auto-generated method stub
+            userDrTripDetails = new ArrayList<>();
+            userDrTripDetails = arg1.getParcelableArrayListExtra("driverAllData");
+            setDriverTripDetails(userDrTripDetails);
+        }
+
+    }
+
+    private void setDriverTripDetails(ArrayList<UserDriverTripDetails.DataBean> userDrTripDetails) {
+        llVehical.setVisibility(View.GONE);
+        txtAddress.setVisibility(View.GONE);
+        llCostDesign.setVisibility(View.GONE);
+        llDriverPersDetailsMain.setVisibility(View.VISIBLE);
+        try {
+            String strCardNo=cardNo.substring(12,16);
+            tvUserCardNo.setText(strCardNo);
+        }catch (Exception e)
+        {
+            Log.e("Error",e.toString());
+        }
+
+        for (UserDriverTripDetails.DataBean tripDetails : userDrTripDetails) {
+            tvTripTotalCost.setText("$"+tripDetails.getTotal_trip_amount());
+            tvAcceptDriverName.setText(tripDetails.getDriver().getName());
+            tvPromoCode.setText(tripDetails.getDriver().getPromocode());
+            strDriverContact = tripDetails.getDriver().getContact_number();
+
+        }
+
+    }
+
 
     private void callNearDriverAPI(String currentLat, String currentLong) {
         try {
@@ -391,7 +489,8 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 for (GetUserData userData : alUserDetails) {
 
 
-                    if (userData.getData().getProfile_pic() == null) {
+//                    if (userData.getData().getProfile_pic().matches("null")) {
+                        if (userData.getData().getProfile_pic() == null) {
                         rlVwUpdateMain.setVisibility(View.VISIBLE);
                         rlUpdateData.setVisibility(View.GONE);
                         txtVwProfile.setTextColor(getResources().getColor(R.color.hint_color));
@@ -421,7 +520,8 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                     }
 
 
-                    if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
+                    if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() != 0 &&
+                            userData.getData().getCards().size() != 0) {
 
                         Intent data = new Intent();
                         getActivity().setResult(COMPLETE_UPDATE_USER_DETAILS, data);
@@ -430,23 +530,28 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                         rlUpdateData.setVisibility(View.GONE);
                         txtAddress.setVisibility(View.VISIBLE);
                         llVehical.setVisibility(View.VISIBLE);
+
+
                     } else {
 
+                        if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() == 0) {
+                            txtVwCount.setText("3");
+                        }else
                         //Any two array null set 2
                         if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() == 0) {
                             txtVwCount.setText("2");
-                        } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() == 0) {
+                        } else if (userData.getData().getProfile_pic().matches("null") && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() == 0) {
                             txtVwCount.setText("2");
-                        } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
+                        } else if (userData.getData().getProfile_pic().matches("null") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                             txtVwCount.setText("2");
                         }
 
                         //Any one array null set 1
                         else if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() == 0) {
                             txtVwCount.setText("1");
-                        } else if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
+                        } else if (userData.getData().getProfile_pic().matches("null") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                             txtVwCount.setText("1");
-                        } else if (userData.getData().getProfile_pic() == null && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
+                        } else if (userData.getData().getProfile_pic().matches("null") && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
                             txtVwCount.setText("1");
                         }
 
@@ -475,17 +580,42 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         rlVehicleNo.setOnClickListener(this);
         rlPaymentNo.setOnClickListener(this);
         btnDone.setOnClickListener(this);
-//        llEditVehicle.setOnClickListener(this);
+        llEditVehicle.setOnClickListener(this);
         llSetVehicle.setOnClickListener(this);
         btnRequest.setOnClickListener(this);
+
+        tvContact.setOnClickListener(this);
+        tvCancel.setOnClickListener(this);
+        tvShareYrTrip.setOnClickListener(this);
+        imgVwShare.setOnClickListener(this);
+        tvChangeTrip.setOnClickListener(this);
     }
 
 
     private void bindViews() {
+        //User OnTrip
+        rlOnTripUser = binding.rlOnTripUser;
+        tvOnTripUser = binding.tvOnTripUser;
+        tvOnTripTime = binding.tvOnTripTime;
+        tvOnTripDrName = binding.tvOnTripDrName;
+        tvOnTripDrCode = binding.tvOnTripDrCode;
+
+//        Driver Personal details
+        llDriverPersDetailsMain = binding.llDriverPersDetailsMain;
+        tvAcceptDriverName = binding.tvAcceptDriverName;
+        tvPromoCode = binding.tvPromoCode;
+        tvContact = binding.tvContact;
+        tvCancel = binding.tvCancel;
+        tvShareYrTrip = binding.tvShareYrTrip;
+        tvChangeTrip = binding.tvChangeTrip;
+        tvTripTotalCost = binding.tvTripTotalCost;
+        tvUserCardNo = binding.tvUserCardNo;
+        ivDriverPro = binding.ivDriverPro;
+        imgVwShare = binding.imgVwShare;
+
         btnRequest = binding.btnRequest;
         txtEstMentCost = binding.txtEstCost;
         edtCardNo = binding.edtCardDetail;
-        llEditVehicle = binding.llEditVehicle;
         llCostDesign = binding.llCost;
 
         llVehical = binding.llVehical;
@@ -515,31 +645,31 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         rlUpdateData.setVisibility(View.GONE);
         rlVwUpdateMain.setVisibility(View.GONE);
 
-        strManufacur = SessionManager.getUpdatedVehical(context).getManufacture();
-        strModel = SessionManager.getUpdatedVehical(context).getModel();
-        strYear = SessionManager.getUpdatedVehical(context).getYear();
-        strColor = SessionManager.getUpdatedVehical(context).getColor();
-
-        if (strManufacur.matches("Edit your vehicle")) {
-            tvVehicalData.setText("Edit your vehicle");
-            imgVwVehicle.setImageResource(R.mipmap.setup);
-
-            tvEditVehicle.setText("");
-            isEditVehical = false;
-        } else {
-            isEditVehical = true;
-            tvVehicalData.setText("Edit your vehicle");
-            imgVwVehicle.setImageResource(R.mipmap.setup);
-
-            if (strYear == 0) {
-                tvEditVehicle.setText("");
-            } else {
-                tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
-                imgSetting.setImageResource(R.mipmap.ellipse_1);
-            }
-
-
-        }
+//        strManufacur = SessionManager.getUpdatedVehical(context).getManufacture();
+//        strModel = SessionManager.getUpdatedVehical(context).getModel();
+//        strYear = SessionManager.getUpdatedVehical(context).getYear();
+//        strColor = SessionManager.getUpdatedVehical(context).getColor();
+//
+//        if (strManufacur.matches("Edit your vehicle")) {
+//            tvVehicalData.setText("Edit your vehicle");
+//            imgVwVehicle.setImageResource(R.mipmap.setup);
+//
+//            tvEditVehicle.setText("");
+//            isEditVehical = false;
+//        } else {
+//            isEditVehical = true;
+//            tvVehicalData.setText("Edit your vehicle");
+//            imgVwVehicle.setImageResource(R.mipmap.setup);
+//
+//            if (strYear == 0) {
+//                tvEditVehicle.setText("");
+//            } else {
+//                tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
+//                imgSetting.setImageResource(R.mipmap.ellipse_1);
+//            }
+//
+//
+//        }
     }
 
 
@@ -589,6 +719,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 llVehical.setVisibility(View.GONE);
                 txtAddress.setVisibility(View.GONE);
                 llCostDesign.setVisibility(View.VISIBLE);
+                llDriverPersDetailsMain.setVisibility(View.GONE);
 
                 createRoute(pickupPoint, dropPoint);
             }
@@ -604,40 +735,54 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 String model = data.getStringExtra("model");
                 String yr = data.getStringExtra("year");
                 String clo = data.getStringExtra("color");
-
-                if (strManufacur.matches("Edit your vehicle") && strYear == 0) {
-                    tvVehicalData.setText("Edit your vehicle");
-                    imgVwVehicle.setImageResource(R.mipmap.setup);
-
-//                    tvEditVehicle.setText("");
-                    isEditVehical = false;
-                } else {
-                    isEditVehical = true;
-                    tvVehicalData.setText("Edit your vehicle");
-                    imgVwVehicle.setImageResource(R.mipmap.setup);
-
-//                    tvEditVehicle.setText(manu + " " + model + " " + yr + " " + clo);
-                    tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
-                    imgSetting.setImageResource(R.mipmap.ellipse_1);
-                }
+               /* tvVehicalData.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
+                tvEditVehicle.setText("Edit your vehicle");
+                imgSetting.setImageResource(R.mipmap.setup);
+                imgVwVehicle.setImageResource(R.mipmap.ellipse_1);*/
+               setVehicleData();
+//                if (strManufacur.matches("Edit your vehicle") && strYear == 0) {
+//                    tvVehicalData.setText("Edit your vehicle");
+//                    imgVwVehicle.setImageResource(R.mipmap.setup);
+//
+////                    tvEditVehicle.setText("");
+//                    isEditVehical = false;
+//                } else {
+//                    isEditVehical = true;
+//                    tvVehicalData.setText("Edit your vehicle");
+//                    imgVwVehicle.setImageResource(R.mipmap.setup);
+//
+////                    tvEditVehicle.setText(manu + " " + model + " " + yr + " " + clo);
+//                    tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
+//                    imgSetting.setImageResource(R.mipmap.ellipse_1);
+//                }
 
             }
         } else if (requestCode == REQUEST_ADD_VEHICLE) {
             callUserMeApi();
+            setVehicleData();
         } else if (requestCode == MAP_HOME_PROFILE_UPDATE) {
             callUserMeApi();
+            setVehicleData();
         } else if (requestCode == REQUEST_ADD_PAYMENT) {
             callUserMeApi();
+            setVehicleData();
+        }else if(requestCode == HOME_SLIDER_PROFILE_UPDATE){
+            callUserMeApi();
+            setVehicleData();
         }
     }
 
+    public static final int EDIT_VEHICAL_REQUEST = 11011;
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onClick(View view) {
         Fragment fragment = null;
         Intent in;
         switch (view.getId()) {
-
+            case R.id.btnBackHome:
+                dialog.dismiss();
+                break;
             case R.id.txtAddress:
 
                 if (alUserDetails != null) {
@@ -664,19 +809,19 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 callUserRrequestAPI();
                 break;
 
-            case R.id.llSetVehicle:
-                if (isEditVehical) {
-                    in = new Intent(context, AddEditVehicleActivity.class);
-                    startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
-                } else {
-
-                }
-                break;
-
-            case R.id.llEditVehicle:
+//            case R.id.llSetVehicle:
 //                if (isEditVehical) {
 //                    in = new Intent(context, AddEditVehicleActivity.class);
 //                    startActivityForResult(in, ADD_EDIT_VEHICAL_REQUEST);
+//                } else {
+//
+//                }
+//                break;
+
+            case R.id.llSetVehicle:
+//                if (isEditVehical) {
+                in = new Intent(context, UserProfileActivity.class);
+                startActivityForResult(in, EDIT_VEHICAL_REQUEST);
 //                } else {
 //
 //                }
@@ -732,6 +877,33 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                 in = new Intent(context, AddPaymentMethodActivity.class);
                 startActivityForResult(in, REQUEST_ADD_PAYMENT);
                 break;
+
+            case R.id.tvContact:
+                boolean check=requestCallPermission();
+                if(check==false)
+                {
+                    requestCallPermission();
+                }
+                else
+                {   Intent intent = new Intent(Intent.ACTION_CALL);
+                    intent.setData(Uri.parse("tel:" + strDriverContact));
+                    context.startActivity(intent);
+                }         //   SnackBar.showValidationError(context, snackBarView, "Request successfully sent!!!");
+                break;
+            case R.id.tvCancel:
+                showCallbacksCancelTrip("Are you sure you want to Cancel Trip?");
+                break;
+            case R.id.tvShareYrTrip:
+                shareUserTripDetails();
+                break;
+            case R.id.imgVwShare:
+                shareUserTripDetails();
+                break;
+            case R.id.tvChangeTrip:
+                Intent mIntent = new Intent(context, PickUpLocationActivity.class);
+                startActivityForResult(mIntent, PICK_CONTACT_REQUEST);
+                break;
+
         }
 
         if (fragment != null) {
@@ -744,7 +916,51 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    int vehicalId;
+    // Method to share either text or URL.
+    private void shareUserTripDetails() {
+        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+        // Add data to the intent, the receiving app will decide
+        // what to do with it.
+        share.putExtra(Intent.EXTRA_SUBJECT, "Mu trip details");
+        share.putExtra(Intent.EXTRA_TEXT, "http://www.codeofaninja.com");
+
+        startActivity(Intent.createChooser(share, "Share link!"));
+    }
+
+
+    private void showCallbacksCancelTrip(String msgCancelTrip) {
+        try {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context)
+                    .setTitle("Greego").setMessage(msgCancelTrip);
+
+
+            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    if (ConnectivityDetector
+                            .isConnectingToInternet(context)) {
+                        Intent mIntent = new Intent(context, HomeActivity.class);
+                        startActivity(mIntent);
+                    } else {
+                        SnackBar.showInternetError(context, snackBarView);
+                    }
+                }
+            });
+
+            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            android.app.AlertDialog dialog = builder.create();
+            dialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void callUserRrequestAPI() {
         try {
@@ -752,7 +968,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
                 for (GetUserData.DataBean.VehiclesBean vehicalData : alVehicleDetail) {
                     if (vehicalData.getSelected().matches("0")) {
-                        vehicalId = Integer.parseInt(vehicalData.getVehicle_id());
+                        vehicalId = vehicalData.getId();
 
                     }
                 }
@@ -794,7 +1010,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 //                        if (userDetail.getError_code() == 0) {
 
 
-                    SnackBar.showSuccess(context, snackBarView, "Request successfully sent!!!");
+//                    SnackBar.showSuccess(context, snackBarView, "Request successfully sent!!!");
 
 
 //                        } else {
@@ -843,11 +1059,11 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
     private void showCheckUserUpdateData(String msg) {
         try {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                    .setTitle("Greego").setMessage(msg);
+            /*AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    .setView(R.layout.dialog_unable_request);
 
 
-            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+          *//*  builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
@@ -858,7 +1074,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                         SnackBar.showInternetError(context, snackBarView);
                     }
                 }
-            });
+            });*//*
 
 //            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
 //                public void onClick(DialogInterface dialog, int id) {
@@ -866,6 +1082,13 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 //                }
 //            });
             AlertDialog dialog = builder.create();
+            dialog.show();*/
+            dialog = new Dialog(context);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.setContentView(R.layout.dialog_unable_request);
+            Button btnHome = (Button) dialog.findViewById(R.id.btnBackHome);
+            btnHome.setOnClickListener(this);
             dialog.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -906,6 +1129,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onStart() {
         super.onStart();
+        callDriverRequestAccepted();
         setUpGoogleApiClient();
         mGoogleApiClient.connect();
     }
@@ -913,6 +1137,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onStop() {
         super.onStop();
+
         // Disconnect GoogleApiClient when stopping Activity
         if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
@@ -1017,7 +1242,22 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+    private boolean requestCallPermission() {
+        int result = ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE);
+        if (result != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CALL_PHONE)) {
 
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, CALL_PERMIT);
+
+            } else {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, CALL_PERMIT);
+            }
+            return false;
+        } else {
+            // Toast.makeText(getApplicationContext(), "Permission  Granted", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+    }
     private boolean checkAndRequestPermissions() {
         int AccessFineLocation = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION);
         int AccessCorasLocation = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -1293,12 +1533,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         return result.toString();
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected())
-            mGoogleApiClient.disconnect();
-    }
 
     @Override
     public void onDestroy() {
@@ -1312,8 +1546,16 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
             mGoogleApiClient.connect();
         }
 
+        NotificationUtils.clearNotifications(context);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected())
+            mGoogleApiClient.disconnect();
+
+    }
 
     private void createRoute(LatLng pickupPoint, LatLng dropPoint) {
         String url = getMapsApiDirectionsUrl(pickupPoint, dropPoint);
@@ -1750,13 +1992,30 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                             alUserDetails.add(userDetail);
 
                             alVehicleDetail.addAll(userDetail.getData().getVehicles());
-                            setFirstTimeRegister();
+//                            setFirstTimeRegister();
 
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //
                             //getIs_agreed = 0 new user
+                            //priyanka
 
+                            if (alVehicleDetail.size() != 0) {
+
+                                for (GetUserData.DataBean.VehiclesBean vehicalData : alVehicleDetail) {
+                                    if (vehicalData.getSelected().matches("1")) {
+                                        vehicalId = Integer.parseInt(vehicalData.getVehicle_id());
+                                        strManufacur = vehicalData.getVehicle_name();
+                                        strModel = vehicalData.getVehicle_model();
+                                        strColor = vehicalData.getColor();
+                                        strYear = Integer.parseInt(vehicalData.getYear());
+                                        strVehicalData = strManufacur + " " + strModel + " " + strYear + " " + strColor;
+                                    }
+                                }
+                            }
+
+                         //   Toast.makeText(context, strVehicalData, Toast.LENGTH_LONG).show();
+                            setVehicleData();
 //
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -1810,25 +2069,29 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (addresses.size() > 0) {
-            System.out.println("size====" + addresses.size());
-            Address address = addresses.get(0);
+        try {
+            if (addresses.size() > 0) {
+                System.out.println("size====" + addresses.size());
+                Address address = addresses.get(0);
 
-            statCode = address.getAdminArea();
+                statCode = address.getAdminArea();
 
-            for (int i = 0; i <= addresses.get(0).getMaxAddressLineIndex(); i++) {
-                if (i == addresses.get(0).getMaxAddressLineIndex()) {
-                    result.append(addresses.get(0).getAddressLine(i));
-                } else {
-                    result.append(addresses.get(0).getAddressLine(i) + ",");
+                for (int i = 0; i <= addresses.get(0).getMaxAddressLineIndex(); i++) {
+                    if (i == addresses.get(0).getMaxAddressLineIndex()) {
+                        result.append(addresses.get(0).getAddressLine(i));
+                    } else {
+                        result.append(addresses.get(0).getAddressLine(i) + ",");
+                    }
                 }
-            }
 
-            System.out.println("ad==" + address);
-            System.out.println("result---" + result.toString());
+                System.out.println("ad==" + address);
+                System.out.println("result---" + result.toString());
 
 //                autoComplete_location.setText(result.toString());
 // Here is you AutoCompleteTextView where you want to set your string address (You can remove it if you not need it)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return result.toString();

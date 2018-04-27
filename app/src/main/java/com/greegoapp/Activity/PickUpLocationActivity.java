@@ -28,7 +28,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -677,51 +681,57 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (addresses.size() > 0) {
 
-            HashMap itemAddress;
-            ArrayList itemList = new ArrayList<HashMap<String, String>>();
-            Log.d("Addresses", "" + "Start to print the ArrayList");
-            for (int i = 0; i < addresses.size(); i++) {
-                itemAddress = new HashMap<String, String>();
-                Address address = addresses.get(i);
-                String addressline = "Addresses from getAddressLine(): ";
-                for (int n = 0; n <= address.getMaxAddressLineIndex(); n++) {
-                    addressline += " index n: " + n + ": " + address.getAddressLine(n) + ", ";
+        try {
+            if (addresses.size() > 0) {
+
+                HashMap itemAddress;
+                ArrayList itemList = new ArrayList<HashMap<String, String>>();
+                Log.d("Addresses", "" + "Start to print the ArrayList");
+                for (int i = 0; i < addresses.size(); i++) {
+                    itemAddress = new HashMap<String, String>();
+                    Address address = addresses.get(i);
+                    String addressline = "Addresses from getAddressLine(): ";
+                    for (int n = 0; n <= address.getMaxAddressLineIndex(); n++) {
+                        addressline += " index n: " + n + ": " + address.getAddressLine(n) + ", ";
+                    }
+                    Log.d(TAG, "Addresses: " + addressline);
+                    Log.d(TAG, "Addresses getAdminArea()" + address.getAdminArea());
+                    Log.d(TAG, "Addresses getCountryCode()" + address.getCountryCode());
+                    Log.d(TAG, "Addresses getCountryName()" + address.getCountryName());
+                    Log.d(TAG, "Addresses getFeatureName()" + address.getFeatureName());
+                    Log.d(TAG, "Addresses getLocality()" + address.getLocality());
+                    Log.d(TAG, "Addresses getPostalCode()" + address.getPostalCode());
+                    Log.d(TAG, "" + address.getPremises());
+                    Log.d(TAG, "Addresses getSubAdminArea()" + address.getSubAdminArea());
+                    Log.d(TAG, "" + address.getSubLocality());
+                    Log.d(TAG, "" + address.getSubThoroughfare());
+                    Log.d(TAG, "Addresses getThoroughfare()" + address.getThoroughfare());
                 }
-                Log.d(TAG, "Addresses: " + addressline);
-                Log.d(TAG, "Addresses getAdminArea()" + address.getAdminArea());
-                Log.d(TAG, "Addresses getCountryCode()" + address.getCountryCode());
-                Log.d(TAG, "Addresses getCountryName()" + address.getCountryName());
-                Log.d(TAG, "Addresses getFeatureName()" + address.getFeatureName());
-                Log.d(TAG, "Addresses getLocality()" + address.getLocality());
-                Log.d(TAG, "Addresses getPostalCode()" + address.getPostalCode());
-                Log.d(TAG, "" + address.getPremises());
-                Log.d(TAG, "Addresses getSubAdminArea()" + address.getSubAdminArea());
-                Log.d(TAG, "" + address.getSubLocality());
-                Log.d(TAG, "" + address.getSubThoroughfare());
-                Log.d(TAG, "Addresses getThoroughfare()" + address.getThoroughfare());
-            }
 
 
-            System.out.println("size====" + addresses.size());
-            Address address = addresses.get(0);
+                System.out.println("size====" + addresses.size());
+                Address address = addresses.get(0);
 
 
-            for (int i = 0; i <= addresses.get(0).getMaxAddressLineIndex(); i++) {
-                if (i == addresses.get(0).getMaxAddressLineIndex()) {
-                    result.append(addresses.get(0).getAddressLine(i));
-                } else {
-                    result.append(addresses.get(0).getAddressLine(i) + ",");
+                for (int i = 0; i <= addresses.get(0).getMaxAddressLineIndex(); i++) {
+                    if (i == addresses.get(0).getMaxAddressLineIndex()) {
+                        result.append(addresses.get(0).getAddressLine(i));
+                    } else {
+                        result.append(addresses.get(0).getAddressLine(i) + ",");
+                    }
                 }
-            }
 
 
-            System.out.println("ad==" + address);
-            System.out.println("result---" + result.toString());
+                System.out.println("ad==" + address);
+                System.out.println("result---" + result.toString());
 
 //                autoComplete_location.setText(result.toString()); // Here is you AutoCompleteTextView where you want to set your string address (You can remove it if you not need it)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
 
         return result.toString();
     }

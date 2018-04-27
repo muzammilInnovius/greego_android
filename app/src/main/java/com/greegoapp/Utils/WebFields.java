@@ -104,4 +104,8 @@ public class WebFields {
 
     }
 
+    public static final class GET_USER_TRIP_DETAILS {
+        public static final String MODE = "user/get/tripdetails";
+        public static final String PARAM_TRIP_ID = "trip_id";
+    }
 }

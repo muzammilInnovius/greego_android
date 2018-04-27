@@ -287,6 +287,7 @@
 
         </RelativeLayout>
 
+        <!--Cost designing-->
         <LinearLayout
             android:id="@+id/llCost"
             android:layout_width="match_parent"
@@ -364,6 +365,7 @@
 
         </LinearLayout>
 
+        <!--Vehical designing-->
         <LinearLayout
             android:id="@+id/llVehical"
             android:layout_width="match_parent"
@@ -374,7 +376,7 @@
             android:layout_marginRight="@dimen/scale_20dp"
             android:background="@drawable/edit_vehicle_bg"
             android:orientation="vertical"
-            android:visibility="invisible">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -432,7 +434,7 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="Edit your vehicle"
+
                     android:textColor="@color/app_bg"
                     android:textSize="@dimen/txt_14"
                     android:textStyle="bold" />
@@ -469,7 +471,7 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text=""
+                    android:text="Edit your vehicle"
                     android:textColor="@color/app_bg"
                     android:textSize="@dimen/txt_14"
                     android:textStyle="bold" />
@@ -478,22 +480,24 @@
 
         </LinearLayout>
 
+        <!--Driver personal designing-->
+
         <LinearLayout
-            android:visibility="invisible"
+            android:id="@+id/llDriverPersDetailsMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="@dimen/scale_2dp"
             android:layout_marginRight="@dimen/scale_2dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="invisible">
 
             <LinearLayout
                 android:id="@+id/llDriverPersDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_bg"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/rlDriverName"
@@ -513,9 +517,9 @@
                         android:textSize="@dimen/txt_12" />
 
                     <TextView
+                        android:id="@+id/tvAcceptDriverName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
                         android:layout_marginLeft="@dimen/scale_5dp"
                         android:layout_toRightOf="@+id/tvYrDriver"
                         android:text="Tom"
@@ -616,6 +620,7 @@
                                 android:src="@mipmap/ic_share" />
 
                             <TextView
+                                android:id="@+id/tvShareYrTrip"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="@dimen/scale_2dp"
@@ -678,6 +683,7 @@
                         android:textSize="@dimen/txt_12" />
 
                     <TextView
+                        android:id="@+id/tvChangeTrip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
@@ -724,6 +730,7 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tvTripTotalCost"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
@@ -744,7 +751,7 @@
                                 android:textColor="@color/hint_color" />
 
                             <TextView
-                                android:id="@+id/tvDriverCardNo"
+                                android:id="@+id/tvUserCardNo"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
@@ -765,6 +772,110 @@
 
         </LinearLayout>
 
+
+        <!--User On Trip Details-->
+        <RelativeLayout
+            android:visibility="invisible"
+            android:id="@+id/rlOnTripUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/scale_25dp">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_10dp"
+                android:layout_marginRight="@dimen/scale_10dp"
+                android:layout_marginTop="@dimen/scale_70dp"
+                android:background="@drawable/on_trip_bg">
+
+
+                <TextView
+                    android:id="@+id/tvOnTripUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginTop="@dimen/scale_35dp"
+                    android:text="@string/on_trip"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/txt_18"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/tvOnTripTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="@dimen/scale_25dp"
+                    android:layout_marginTop="@dimen/scale_35dp"
+                    android:text="5 min"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/txt_14" />
+
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="@dimen/scale_5dp"
+                android:layout_marginRight="@dimen/scale_5dp"
+                android:background="@drawable/rounded_bg"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/scale_25dp"
+                    android:layout_marginTop="@dimen/scale_5dp"
+                    android:text="@string/your_driver"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/txt_16"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/tvOnTripDrName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/scale_2dp"
+                    android:text="Tom"
+                    android:textColor="@color/on_trip_bg"
+                    android:textSize="@dimen/txt_24"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="@dimen/scale_150dp"
+                    android:layout_height="@dimen/scale_30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/scale_2dp"
+                    android:layout_marginTop="@dimen/scale_2dp"
+                    android:background="@color/on_trip_bg">
+
+                    <TextView
+                        android:id="@+id/tvOnTripDrCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:padding="@dimen/scale_2dp"
+                        android:text="ABC123"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/txt_16"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/done"

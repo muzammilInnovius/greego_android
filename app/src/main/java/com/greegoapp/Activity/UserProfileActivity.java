@@ -3,9 +3,11 @@ package com.greegoapp.Activity;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,17 +23,21 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.AuthFailureError;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
+import com.android.volley.request.SimpleMultiPartRequest;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.VehicleDetailAdapter;
 import com.greegoapp.AppController.AppController;
@@ -39,7 +45,6 @@ import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
 import com.greegoapp.Model.GetUserData;
 import com.greegoapp.Model.UserData;
-import com.greegoapp.Model.VehicleDetailModel;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -70,7 +75,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     ImageButton ibback;
     RecyclerView recyclerView;
     ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail;
-    VehicleDetailAdapter adapter;
+    public static VehicleDetailAdapter adapter;
     RecyclerViewItemClickListener mListener;
     ImageView ivProPic;
     private static final int SELECT_GALLERY_PIC = 101;
@@ -124,7 +129,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-
+        //    adapter.notifyDataSetChanged();
     }
 
     private void setListner() {
@@ -175,15 +180,92 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.btnUpdate:
-                callUpdateProfileAPI();
+//                callUpdateProfileAPI();
+                callUpdateProAPI();
                 break;
 
             case R.id.tvAdd:
                 in = new Intent(context, AddEditVehicleActivity.class);
                 startActivityForResult(in, SELECT_CHOISE_VEHICLE);
                 break;
+
         }
 
+    }
+
+    private void callUpdateProAPI() {
+        SimpleMultiPartRequest smr = new SimpleMultiPartRequest(Request.Method.POST, WebFields.BASE_URL + WebFields.SIGN_UP.MODE,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("Response", response);
+                        try {
+                            JSONObject jObj = new JSONObject(response);
+                            String message = jObj.getString("message");
+                            try {
+                                UserData userDetails = new Gson().fromJson(String.valueOf(response), UserData.class);
+                                try {
+                                    MyProgressDialog.hideProgressDialog();
+//
+                                    if (userDetails.getError_code() == 0) {
+
+                                        Applog.E("UserDetails" + userDetails);
+//                            callUserMeApi();
+                                        String userName = userDetails.getData().getName().toString();
+                                        Intent data = new Intent();
+                                        data.putExtra("name", userName);
+                                        setResult(HOME_SLIDER_PROFILE_UPDATE, data);
+
+                                        SessionManager.setIsUserLoggedin(context, true);
+                                        SnackBar.showSuccess(context, snackBarView, "Profile Update.");
+                                    } else {
+                                        MyProgressDialog.hideProgressDialog();
+                                        SnackBar.showError(context, snackBarView, message);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        } catch (JSONException e) {
+                            // JSON error
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+
+                params.put(WebFields.PARAM_ACCEPT, "application/json");
+                params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                return params;
+            }
+        };
+
+        String strFName = edtTvProfileFname.getText().toString();
+        String strLName = edtTvProfileLname.getText().toString();
+
+        smr.addFile(WebFields.SIGN_UP.PARAM_PRO_PIC, filePath_driving_license);
+        smr.addFile(WebFields.SIGN_UP.PARAM_FIRST_NAME, strFName);
+        smr.addFile(WebFields.SIGN_UP.PARAM_LAST_NAME, strLName);
+        smr.addFile(WebFields.SIGN_UP.PARAM_EMAIL, strEmail);
+        smr.addFile(WebFields.SIGN_UP.PARAM_CITY, "");
+        try {
+            AppController.getInstance().addToRequestQueue(smr);
+        } catch (Exception e) {
+            SnackBar.showError(context, snackBarView, "Error");
+        }
     }
 
     private void checkPermission() {
@@ -222,11 +304,14 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
             builder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    Intent intent = new Intent();
+                  /*  Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
                     startActivityForResult(Intent.createChooser(intent,
-                            "Select Picture"), SELECT_GALLERY_PIC);
+                            "Select Picture"), SELECT_GALLERY_PIC);*/
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, SELECT_GALLERY_PIC);
                 }
             });
 
@@ -268,10 +353,11 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void openCamera() {
-        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, SELECT_CAMERA_PIC);
     }
 
+    String filePath_driving_license;
     private Uri mImageUri;
     private Bitmap bitmap = null;
     private String strProPicBase64 = "";
@@ -280,28 +366,51 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            // user chose an image from the gallery
-            // loadAsync(data.getData());
+
+//            // user chose an image from the gallery
+//            // loadAsync(data.getData());
             if (requestCode == SELECT_GALLERY_PIC) {
-                mImageUri = data.getData();
-                try {
-                    bitmap = getBitmapFromUri(mImageUri);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                ivProPic.setImageURI(mImageUri);
-                strProPicBase64 = encodeTobase64(bitmap);
-
+                Uri picUri = data.getData();
+                ivProPic.setImageURI(picUri);
+                filePath_driving_license = getPath(picUri);
+//                mImageUri = data.getData();
+//                try {
+//                    bitmap = getBitmapFromUri(mImageUri);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//                ivProPic.setImageURI(mImageUri);
+//                strProPicBase64 = encodeTobase64(bitmap);
+//
             } else if (requestCode == SELECT_CAMERA_PIC) {
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
-                ivProPic.setImageURI(getImageUri(photo));
-                strProPicBase64 = encodeTobase64(photo);
+                Uri picUri = data.getData();
+
+                ivProPic.setImageURI(picUri);
+                filePath_driving_license = getPath(picUri);
+
+
+//                Bitmap photo = (Bitmap) data.getExtras().get("data");
+//                ivProPic.setImageURI(getImageUri(photo));
+//                strProPicBase64 = encodeTobase64(photo);
             }
         } else if (requestCode == SELECT_CHOISE_VEHICLE) {
             callUserMeApi();
 
         }
+    }
+
+    private String getPath(Uri contentUri) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader loader = new CursorLoader(getApplicationContext(), contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        Log.e("result path", result);
+        return result;
     }
 
     public Uri getImageUri(Bitmap inImage) {
@@ -505,5 +614,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             setResult(SETTING_PROFILE_UPDATE, data);
         }
         finish();
+    }
+
+    public static void adapterChange() {
+        adapter.notifyDataSetChanged();
     }
 }

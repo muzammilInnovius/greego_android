@@ -13,6 +13,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
@@ -27,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocompleteAdapter.PlaceViewHolder> implements Filterable{
+public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocompleteAdapter.PlaceViewHolder> implements Filterable {
 
-    public interface PlaceAutoCompleteInterface{
+    public interface PlaceAutoCompleteInterface {
         void onPlaceClick(ArrayList<PlaceAutocomplete> mResultList, int position);
     }
 
@@ -49,20 +50,21 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
 
 
     public PlaceAutocompleteAdapter(Context context, int resource, GoogleApiClient googleApiClient,
-                                    LatLngBounds bounds, AutocompleteFilter filter){
+                                    LatLngBounds bounds, AutocompleteFilter filter) {
         this.mContext = context;
         layout = resource;
         mGoogleApiClient = googleApiClient;
-        mBounds = bounds;
-        mPlaceFilter = filter;
-        this.mListener = (PlaceAutoCompleteInterface)mContext;
+        mBounds = null;
+//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry("AU").build();
+        mPlaceFilter = new AutocompleteFilter.Builder().setCountry("USA").build();
+        this.mListener = (PlaceAutoCompleteInterface) mContext;
     }
 
     /*
     Clear List items
      */
-    public void clearList(){
-        if(mResultList!=null && mResultList.size()>0){
+    public void clearList() {
+        if (mResultList != null && mResultList.size() > 0) {
             mResultList.clear();
         }
     }
@@ -176,7 +178,7 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
         mPredictionHolder.mParentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onPlaceClick(mResultList,i);
+                mListener.onPlaceClick(mResultList, i);
             }
         });
 
@@ -184,7 +186,7 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
 
     @Override
     public int getItemCount() {
-        if(mResultList != null)
+        if (mResultList != null)
             return mResultList.size();
         else
             return 0;
