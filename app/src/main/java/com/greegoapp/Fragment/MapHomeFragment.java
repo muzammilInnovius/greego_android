@@ -524,14 +524,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                         llVehical.setVisibility(View.VISIBLE);
 
                         alVehicleDetail.addAll(userData.getData().getVehicles());
-//                            setFirstTimeRegister();
-
-//                            SessionManager.saveUserData(context, userDetails);
-//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
-//
-                        //getIs_agreed = 0 new user
-                        //priyanka
-
                         if (alVehicleDetail.size() != 0) {
 
                             for (GetUserData.DataBean.VehiclesBean vehicalData : alVehicleDetail) {
