@@ -270,14 +270,6 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 //        callUserMeApi();
 
         setListners();
-        if (ConnectivityDetector.isConnectingToInternet(context)) {
-            callUserMeApi();
-            setVehicleData();
-//            CheckGpsStatus();
-        } else {
-            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
-        }
-
 
         setFirstTimeRegister();
 
@@ -530,6 +522,36 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                         rlUpdateData.setVisibility(View.GONE);
                         txtAddress.setVisibility(View.VISIBLE);
                         llVehical.setVisibility(View.VISIBLE);
+
+                        alVehicleDetail.addAll(userData.getData().getVehicles());
+//                            setFirstTimeRegister();
+
+//                            SessionManager.saveUserData(context, userDetails);
+//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
+//
+                        //getIs_agreed = 0 new user
+                        //priyanka
+
+                        if (alVehicleDetail.size() != 0) {
+
+                            for (GetUserData.DataBean.VehiclesBean vehicalData : alVehicleDetail) {
+                                if (vehicalData.getSelected().matches("1")) {
+                                    vehicalId = Integer.parseInt(vehicalData.getVehicle_id());
+                                    strManufacur = vehicalData.getVehicle_name();
+                                    strModel = vehicalData.getVehicle_model();
+                                    strColor = vehicalData.getColor();
+                                    strYear = Integer.parseInt(vehicalData.getYear());
+                                    strVehicalData = strManufacur + " " + strModel + " " + strYear + " " + strColor;
+                                }
+                            }
+                        }
+
+
+                        if (ConnectivityDetector.isConnectingToInternet(context)) {
+                            setVehicleData();
+                        } else {
+                            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+                        }
 
 
                     } else {
@@ -2015,7 +2037,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
                             }
 
                          //   Toast.makeText(context, strVehicalData, Toast.LENGTH_LONG).show();
-                            setVehicleData();
+//                            setVehicleData();
 //
                         } else {
                             MyProgressDialog.hideProgressDialog();
