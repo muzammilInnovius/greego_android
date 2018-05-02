@@ -29,7 +29,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -38,6 +37,8 @@ import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
 import com.android.volley.request.SimpleMultiPartRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.VehicleDetailAdapter;
 import com.greegoapp.AppController.AppController;
@@ -59,9 +60,14 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.greegoapp.Activity.HomeActivity.HOME_SLIDER_PROFILE_UPDATE;
 import static com.greegoapp.Activity.SettingActivity.SETTING_PROFILE_UPDATE;
@@ -86,8 +92,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     GetUserData userDetails;
     EditText edtTvProfileFname, edtTvProfileLname;
     Button btnUpdate, tvAdd;
-    String strEmail;
-
+    String strEmail, profilePicUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +109,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         bindViews();
         setListner();
         callUserMeApi();
-        setRecyclerView();
 
     }
 
@@ -119,7 +123,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 //                fragmentTransaction.addToBackStack(null);
 //                fragmentTransaction.commit();
 
-
             }
         };
 
@@ -129,7 +132,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-        //    adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
+
     }
 
     private void setListner() {
@@ -159,16 +163,19 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 if (HOME_SLIDER_PROFILE_UPDATE == 1000) {
                     Intent data = new Intent();
                     String userName = edtTvProfileFname.getText().toString();
+                    data.putExtra("profilePic", profilePicUrl);
                     data.putExtra("name", userName);
                     setResult(HOME_SLIDER_PROFILE_UPDATE, data);
                 } else if (MAP_HOME_PROFILE_UPDATE == 1002) {
                     Intent data = new Intent();
                     String userName = edtTvProfileFname.getText().toString();
+                    data.putExtra("profilePic", profilePicUrl);
                     data.putExtra("name", userName);
                     setResult(MAP_HOME_PROFILE_UPDATE, data);
                 } else if (SETTING_PROFILE_UPDATE == 1001) {
                     Intent data = new Intent();
                     String userName = edtTvProfileFname.getText().toString();
+                    data.putExtra("profilePic", profilePicUrl);
                     data.putExtra("name", userName);
                     setResult(SETTING_PROFILE_UPDATE, data);
                 }
@@ -180,8 +187,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.btnUpdate:
-//                callUpdateProfileAPI();
-                callUpdateProAPI();
+                callUpdateProfileAPI();
+//                callUpdateProAPI();
                 break;
 
             case R.id.tvAdd:
@@ -202,44 +209,35 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                         try {
                             JSONObject jObj = new JSONObject(response);
                             String message = jObj.getString("message");
-                            try {
-                                UserData userDetails = new Gson().fromJson(String.valueOf(response), UserData.class);
-                                try {
-                                    MyProgressDialog.hideProgressDialog();
+
+                            UserData userDetails = new Gson().fromJson(String.valueOf(response), UserData.class);
+
+                            MyProgressDialog.hideProgressDialog();
 //
-                                    if (userDetails.getError_code() == 0) {
+                            if (userDetails.getError_code() == 0) {
 
-                                        Applog.E("UserDetails" + userDetails);
+                                Applog.E("UserDetails" + userDetails);
 //                            callUserMeApi();
-                                        String userName = userDetails.getData().getName().toString();
-                                        Intent data = new Intent();
-                                        data.putExtra("name", userName);
-                                        setResult(HOME_SLIDER_PROFILE_UPDATE, data);
+                                String userName = userDetails.getData().getName().toString();
+                                Intent data = new Intent();
+                                data.putExtra("name", userName);
+                                setResult(HOME_SLIDER_PROFILE_UPDATE, data);
 
-                                        SessionManager.setIsUserLoggedin(context, true);
-                                        SnackBar.showSuccess(context, snackBarView, "Profile Update.");
-                                    } else {
-                                        MyProgressDialog.hideProgressDialog();
-                                        SnackBar.showError(context, snackBarView, message);
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                SessionManager.setIsUserLoggedin(context, true);
+                                SnackBar.showSuccess(context, snackBarView, "Profile Update.");
+                            } else {
+                                MyProgressDialog.hideProgressDialog();
+                                SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                             }
-
-                        } catch (JSONException e) {
-                            // JSON error
+                        } catch (Exception e) {
                             e.printStackTrace();
-                            Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
             }
         }) {
             @Override
@@ -264,7 +262,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         try {
             AppController.getInstance().addToRequestQueue(smr);
         } catch (Exception e) {
-            SnackBar.showError(context, snackBarView, "Error");
+            SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
         }
     }
 
@@ -371,33 +369,121 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 //            // loadAsync(data.getData());
             if (requestCode == SELECT_GALLERY_PIC) {
 
-                Uri picUri = data.getData();
-                ivProPic.setImageURI(picUri);
-                filePath_driving_license = getPath(picUri);
-//                mImageUri = data.getData();
-//                try {
-//                    bitmap = getBitmapFromUri(mImageUri);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//                ivProPic.setImageURI(mImageUri);
-//                strProPicBase64 = encodeTobase64(bitmap);
+//                Uri picUri = data.getData();
+//                ivProPic.setImageURI(picUri);
+//                filePath_driving_license = getPath(picUri);
+                mImageUri = data.getData();
+                try {
+                    bitmap = getBitmapFromUri(mImageUri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                ivProPic.setImageURI(mImageUri);
+                strProPicBase64 = encodeTobase64(bitmap);
+
+                callUserProUpdate();
 //
             } else if (requestCode == SELECT_CAMERA_PIC) {
-                Uri picUri = data.getData();
+//
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                ivProPic.setImageURI(getImageUri(photo));
+                strProPicBase64 = encodeTobase64(photo);
 
-                ivProPic.setImageURI(picUri);
-                filePath_driving_license = getPath(picUri);
-
-
-//                Bitmap photo = (Bitmap) data.getExtras().get("data");
-//                ivProPic.setImageURI(getImageUri(photo));
-//                strProPicBase64 = encodeTobase64(photo);
+                callUserProUpdate();
             }
         } else if (requestCode == SELECT_CHOISE_VEHICLE) {
             callUserMeApi();
 
+
+        }
+    }
+
+    private void callUserProUpdate() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put(WebFields.PROFILE_UPDATE.PARAM_IMAGE, strProPicBase64);
+
+            Applog.E("request Profile Pic=> " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.PROFILE_UPDATE.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+                    UserData userDetails = new Gson().fromJson(String.valueOf(response), UserData.class);
+                    try {
+                        MyProgressDialog.hideProgressDialog();
+//
+                        if (userDetails.getError_code() == 0) {
+
+                            Applog.E("UserDetails" + userDetails);
+//                            callUserMeApi();
+                            profilePicUrl = userDetails.getData().getProfile_pic();
+
+
+                            if (profilePicUrl != null) {
+                                Glide.clear(ivProPic);
+                                Glide.with(getApplicationContext())
+                                        .load(profilePicUrl)
+                                        .centerCrop()
+                                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                                        .crossFade().skipMemoryCache(true)
+                                        .into(ivProPic);
+
+                            } else {
+                                ivProPic.setImageResource(R.mipmap.ic_user_profile);
+                            }
+
+
+                            String userName = userDetails.getData().getName().toString();
+                            Intent data = new Intent();
+                            data.putExtra("profilePic", profilePicUrl);
+                            data.putExtra("name", userName);
+                            setResult(HOME_SLIDER_PROFILE_UPDATE, data);
+
+                            SessionManager.setIsUserLoggedin(context, true);
+
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -440,7 +526,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         return imageEncoded;
     }
 
-
     private void callUserMeApi() {
         try {
             JSONObject jsonObject = new JSONObject();
@@ -456,6 +541,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     Applog.E("success: " + response.toString());
 
                     GetUserData userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                    alVehicleDetail = new ArrayList<>();
                     try {
                         MyProgressDialog.hideProgressDialog();
 //
@@ -465,19 +551,37 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                             edtTvProfileLname.setText(userDetails.getData().getLastname());
                             strEmail = userDetails.getData().getEmail();
 
+//                            ivProPic.setImageURI(Uri.parse(userDetails.getData().getProfile_pic()));
+
+                            profilePicUrl = userDetails.getData().getProfile_pic();
+
+
+                            if (profilePicUrl != null) {
+                                Glide.clear(ivProPic);
+                                Glide.with(getApplicationContext())
+                                        .load(profilePicUrl)
+                                        .centerCrop()
+                                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                                        .crossFade().skipMemoryCache(true)
+                                        .into(ivProPic);
+
+                            } else {
+                                ivProPic.setImageResource(R.mipmap.ic_user_profile);
+                            }
+
+
                             alVehicleDetail.addAll(userDetails.getData().getVehicles());
+                            Applog.E("vehicle size==>" + alVehicleDetail.size());
 
-                            adapter.notifyDataSetChanged();
-//                            SessionManager.saveUserData(context, userDetails);
-//
-                            //getIs_agreed = 0 new user
+                            setRecyclerView();
 
+//                            adapter.notifyDataSetChanged();
 //
                         } else {
                             MyProgressDialog.hideProgressDialog();
-                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                            SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -527,7 +631,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             Applog.E("Email==>" + strEmail);
             jsonObject.put(WebFields.SIGN_UP.PARAM_EMAIL, strEmail);
             jsonObject.put(WebFields.SIGN_UP.PARAM_CITY, "");
-            jsonObject.put(WebFields.SIGN_UP.PARAM_PRO_PIC, strProPicBase64);
+            jsonObject.put(WebFields.SIGN_UP.PARAM_PRO_PIC, "");
 
             Applog.E("request DigitCode=> " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
@@ -594,6 +698,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -616,7 +721,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         finish();
     }
 
-    public static void adapterChange() {
-        adapter.notifyDataSetChanged();
-    }
+//    public static void adapterChange() {
+//        adapter.notifyDataSetChanged();
+//    }
 }

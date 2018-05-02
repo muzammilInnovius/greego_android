@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.greegoapp.Model.CardData;
+import com.greegoapp.Model.GetUserData;
 import com.greegoapp.Model.Login;
 import com.greegoapp.Model.UserData;
 import com.greegoapp.Model.VehicleUpdate;
@@ -239,12 +240,25 @@ public class SessionManager {
     }
 
 
-    public static long getUserID(Context context) {
-        long userId = 0;
+    public static void saveUserId(Context context, GetUserData vo) {
         try {
             SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-            userId = preferences.getLong(
-                    AppPrefFields.PARAM_USERID, 0);
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt(AppPrefFields.PARAM_USERID, vo.getData().getId());
+
+            editor.apply();
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    public static int getUserID(Context context) {
+        int userId = 0;
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            userId = preferences.getInt(AppPrefFields.PARAM_USERID, 0);
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();

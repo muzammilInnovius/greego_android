@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.greegoapp.Fragment.MapHomeFragment.MY_PERMISSIONS_REQUEST_ACCOUNTS;
 
 public class SplashActivity extends AppCompatActivity {
 

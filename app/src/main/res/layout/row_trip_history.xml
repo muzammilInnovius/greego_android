@@ -4,11 +4,15 @@
     xmlns:mytextview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_marginTop="@dimen/scale_1dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        card_view:cardCornerRadius="4dp"
         tools:context="com.greegoapp.Fragment.TripHistoryFragment">
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -56,6 +60,7 @@
                     android:textSize="@dimen/txt_14" />
 
                 <TextView
+                    android:id="@+id/tvTripTotalCost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvTripDate"
@@ -72,16 +77,16 @@
 
             <ImageView
                 android:id="@+id/imgVwnext"
-                android:layout_width="@dimen/scale_20dp"
-                android:layout_height="@dimen/scale_20dp"
+                android:layout_width="@dimen/scale_25dp"
+                android:layout_height="@dimen/scale_25dp"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
                 android:layout_marginLeft="@dimen/scale_20dp"
                 android:layout_marginRight="@dimen/scale_10dp"
-                mytextview:srcCompat="@mipmap/ic_finish_arrow" />
+                mytextview:srcCompat="@mipmap/ic_trip_history" />
 
         </RelativeLayout>
 
 
-    </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
 </layout>

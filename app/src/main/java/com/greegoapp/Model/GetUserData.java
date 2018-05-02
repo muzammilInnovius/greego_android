@@ -709,6 +709,25 @@ public class GetUserData implements Parcelable{
                     private String created_at;
                     private String updated_at;
 
+                    protected VmakeBean(Parcel in) {
+                        id = in.readInt();
+                        name = in.readString();
+                        created_at = in.readString();
+                        updated_at = in.readString();
+                    }
+
+                    public static final Creator<VmakeBean> CREATOR = new Creator<VmakeBean>() {
+                        @Override
+                        public VmakeBean createFromParcel(Parcel in) {
+                            return new VmakeBean(in);
+                        }
+
+                        @Override
+                        public VmakeBean[] newArray(int size) {
+                            return new VmakeBean[size];
+                        }
+                    };
+
                     public int getId() {
                         return id;
                     }
@@ -748,7 +767,10 @@ public class GetUserData implements Parcelable{
 
                     @Override
                     public void writeToParcel(Parcel dest, int flags) {
-
+                        dest.writeInt(id);
+                        dest.writeString(name);
+                        dest.writeString(created_at);
+                        dest.writeString(updated_at);
                     }
                 }
             }

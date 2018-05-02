@@ -6,6 +6,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -35,14 +36,13 @@ import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_USER_TRIP;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
-
+    String trip_id, status = null;
     private NotificationUtils notificationUtils;
     Context context = this;
     ArrayList<UserDriverTripDetails.DataBean> alUserDrTripDetails;
-    ArrayList<UserDriverTripDetails.DataBean.DriverBean> alUserDrDetails;
+    JSONObject json;
 
     @Override
-
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Log.e(TAG, "From: " + remoteMessage.getFrom());
 
@@ -59,13 +59,34 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.e(TAG, "Data Payload: " + remoteMessage.getData().toString());
-
+            String payload = remoteMessage.getData().toString();
             try {
-                JSONObject json = new JSONObject(remoteMessage.getData().toString());
-                handleDataMessage(json);
+                if (payload.contains("status")) {
+                    json = new JSONObject(remoteMessage.getData().toString());
+                    payload = json.optString("status");
+                    if (payload.contains("2")) {
+                        status = "2";
+                        //json = new JSONObject(remoteMessage.getData().toString());
+                    } else if (payload.contains("3")) {
+                        status = "3";
+                        //json = new JSONObject(remoteMessage.getData().toString());
+                    } else if (payload.contains("4")) {
+                        status = "4";
+                        //  json = new JSONObject(remoteMessage.getData().toString());
+                    }
+                    Log.e("Payload check", " happy :): ");
+                } else {
+                    status = "1";
+                    //json = new JSONObject(remoteMessage.getData().toString());
+                }
+                json = new JSONObject(remoteMessage.getData().toString());
+                trip_id = json.optString("trip_id");
+                handleDataMessage(trip_id, status);
+
             } catch (Exception e) {
                 Log.e(TAG, "Exception: " + e.getMessage());
             }
+
         }
     }
 
@@ -80,7 +101,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             pushNotification.putExtra("message", tripId);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(pushNotification);
 
-
 //            MyProgressDialog.hideProgressDialog();
             Applog.e("==>", "PushNotification");
             // play notification sound
@@ -89,9 +109,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             SessionManager.saveTripId(this, tripId);
 
-//            Intent resultIntent = new Intent(getApplicationContext(), HomeActivity.class);
-//            resultIntent.putExtra("message", tripId);
-
 
         } else {
             // If the app is in background, firebase itself handles the notification
@@ -99,64 +116,84 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
 
-    private void handleDataMessage(JSONObject json) {
+    private void handleDataMessage(String trip_id, String status) {
         NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
 
 
-        Log.e(TAG, "push json: " + json.toString());
+//        Log.e(TAG, "push json: " + json.toString());
         Applog.e("==>3=>", "PushNotification" + json.toString());
-        String data = json.toString();
-        data = data.substring(data.indexOf(":")+1,data.length()-1);
-        callUserTripDetailsAPI(data);
+//        try {
+//            JSONObject dataStatus = json.getJSONObject("status");
+//            JSONObject dataStatus = json.getJSONObject("trip_id");
+//
+//            String tripStatus = dataStatus.getString("status");
+//
+//
+//            if (tripStatus != null){
+//                String tripId = json.toString();
+//                tripId = tripId.substring(tripId.indexOf(":") + 1, tripId.length() - 1);
+//
+//                Intent intent = new Intent();
+//                intent.setAction(REQUEST_USER_TRIP);
+//                intent.putExtra("tripId",tripId);
+//                intent.putExtra("tripStatus", tripStatus);
+//                sendBroadcast(intent);
+//            }else {
+
+        if (status.equals("1")){
+            String data = json.toString();
+            data = data.substring(data.indexOf(":") + 1, data.length() - 1);
+            callUserTripDetailsAPI(trip_id);
+        }else {
+            Intent intent = new Intent();
+            intent.setAction(REQUEST_USER_TRIP);
+            intent.putExtra("tripStatus", status);
+            sendBroadcast(intent);
+        }
+
+
+//            }
+
 
         try {
-            JSONObject data1 = json.getJSONObject("data");
-//
-            String title = data1.getString("title");
-            String message = data1.getString("message");
-//            boolean isBackground = data.getBoolean("is_background");
-            String imageUrl = data1.getString("image");
-            String timestamp = data1.getString("timestamp");
-            JSONObject payload = data1.getJSONObject("payload");
-//
-//            Log.e(TAG, "title: " + title);
-//            Log.e(TAG, "message: " + message);
-//            Log.e(TAG, "isBackground: " + isBackground);
-//            Log.e(TAG, "payload: " + payload.toString());
-//            Log.e(TAG, "imageUrl: " + imageUrl);
-//            Log.e(TAG, "timestamp: " + timestamp);
+//            JSONObject data1 = json.getJSONObject("data");
+////
+//            String title = data1.getString("trip_id");
+//            String message = data1.getString("message");
+////            boolean isBackground = data.getBoolean("is_background");
+//            String imageUrl = data1.getString("image");
+//            String timestamp = data1.getString("timestamp");
+//            JSONObject payload = data1.getJSONObject("payload");
 
 
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
                 // app is in foreground, broadcast the push message
                 Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                pushNotification.putExtra("message", message);
+//                pushNotification.putExtra("message", message);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-                Applog.e("==>4=>", "PushNotification" + message);
-                Toast.makeText(this, "Push notification msg" + message, Toast.LENGTH_SHORT).show();
+//                Applog.e("==>4=>", "PushNotification" + message);
+//                Toast.makeText(this, "Push notification msg" + message, Toast.LENGTH_SHORT).show();
 
                 // play notification sound
                 notificationUtils.playNotificationSound();
             } else {
                 notificationUtils.playNotificationSound();
 
-                Applog.e("==>5=>", "PushNotification" + message);
+//                Applog.e("==>5=>", "PushNotification" + message);
                 // app is in background, show the notification in notification tray
                 Intent resultIntent = new Intent(getApplicationContext(), HomeActivity.class);
-                resultIntent.putExtra("message", message);
+//                resultIntent.putExtra("message", message);
 
                 // check for image attachment
-                if (TextUtils.isEmpty(imageUrl)) {
-                    showNotificationMessage(getApplicationContext(), title, message, timestamp, resultIntent);
-                } else {
-                    // image is present, show notification with image
-                    showNotificationMessageWithBigImage(getApplicationContext(), title, message, timestamp, resultIntent, imageUrl);
-                }
+//                if (TextUtils.isEmpty(imageUrl)) {
+//                    showNotificationMessage(getApplicationContext(), title, message, timestamp, resultIntent);
+//                } else {
+//                     image is present, show notification with image
+//                    showNotificationMessageWithBigImage(getApplicationContext(), title, message, timestamp, resultIntent, imageUrl);
+//                }
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Json Exception: " + e.getMessage());
         } catch (Exception e) {
-            Log.e(TAG, "Exception: " + e.getMessage());
+            Log.e(TAG, "Json Exception: " + e.getMessage());
         }
     }
 
@@ -187,7 +224,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             jsonObject.put(WebFields.GET_USER_TRIP_DETAILS.PARAM_TRIP_ID, Integer.parseInt(tripId));
 
             Applog.E("request: trip " + jsonObject.toString());
-//            MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     WebFields.BASE_URL + WebFields.GET_USER_TRIP_DETAILS.MODE, jsonObject, new Response.Listener<JSONObject>() {
@@ -198,10 +234,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
                     UserDriverTripDetails driverTripDetails = new Gson().fromJson(String.valueOf(response), UserDriverTripDetails.class);
-//                    UserDriverTripDetails.DataBean.DriverBean driverDetails = new Gson().fromJson(String.valueOf(response), UserDriverTripDetails.DataBean.DriverBean.class);
 
                     alUserDrTripDetails = new ArrayList<>();
-//                    alUserDrDetails = new ArrayList<>();
 
                     if (driverTripDetails.getError_code() == 0) {
 
@@ -212,29 +246,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         Applog.E("size==>" + alUserDrTripDetails);
                         MyProgressDialog.hideProgressDialog();
 
-
                         Intent intent = new Intent();
                         intent.setAction(REQUEST_USER_TRIP);
-//                        intent.putExtra("driverData", response.toString());
+                        intent.putExtra("tripStatus", status);
                         intent.putParcelableArrayListExtra("driverAllData", alUserDrTripDetails);
-
                         sendBroadcast(intent);
-
-
-//                    Intent resultIntent = new Intent(context, MapHomeFragment.class);
-//                    resultIntent.putExtra("driverData", response.toString());
-//                    startActivity(resultIntent);
-
-
-//                            if (nearDriver.getData().size() != 0) {
-//                                alUserNearDriverDtls.addAll(nearDriver.getData());
-//                            alUserNearDriverDtls.add(nrDriverData);
-//                                Applog.E("near array size after==>" + alUserNearDriverDtls.size());
-
-
-//                                setNearDriver();
-//                            }
-
 
                     } else {
                         MyProgressDialog.hideProgressDialog();
@@ -260,6 +276,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     return params;
                 }
             };
+
+            MyProgressDialog.hideProgressDialog();
             jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
                     GlobalValues.TIME_OUT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,

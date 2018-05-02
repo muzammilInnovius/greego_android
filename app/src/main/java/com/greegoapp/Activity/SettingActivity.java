@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
@@ -35,8 +39,12 @@ import com.greegoapp.databinding.ActivitySettingBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener {
     ActivitySettingBinding binding;
@@ -46,10 +54,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     ImageButton ibback;
     RelativeLayout rl_name, rl_phone, rl_email, rl_btnlogout;
     View snackBarView;
-    TextView tvUserName, tvUserEmail, tvUserPhone;
+    TextView tvUserName, tvUserEmail, tvUserPhone,tvJoinDate;
     GetUserData userDetails;
-
+    ImageView ivProPic;
     public static final int SETTING_PROFILE_UPDATE = 1001;
+    String userName,profilePic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +97,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         tvUserName = binding.tvUserName;
         tvUserEmail = binding.tvUserEmail;
         tvUserPhone = binding.tvUserPhone;
+        ivProPic = binding.ivProPic;
+        tvJoinDate=binding.tvJoinDate;
     }
 
     Intent in;
@@ -96,7 +107,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
-                KeyboardUtility.hideKeyboard(context,view);
+                KeyboardUtility.hideKeyboard(context, view);
                 finish();
                 break;
             case R.id.rlName:
@@ -110,7 +121,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 //                fragmentTransaction.commit();
                 break;
             case R.id.rlEmail:
-                Toast.makeText(context, "email layout click", Toast.LENGTH_LONG).show();
+                in = new Intent(SettingActivity.this, UserEmailActivity.class);
+               startActivity(in);
                 break;
             case R.id.rlLogout:
                 showCallbacksLogout("Are you sure you want to Logout?");
@@ -118,7 +130,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    String userName;
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -126,6 +138,17 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
             case SETTING_PROFILE_UPDATE:
                 userName = data.getStringExtra("name");
+                profilePic = data.getStringExtra("profilePic");
+
+                Glide.clear(ivProPic);
+                Glide.with(getApplicationContext())
+                        .load(profilePic)
+                        .centerCrop()
+                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                        .crossFade().skipMemoryCache(true)
+                        .into(ivProPic);
+
+//                ivProPic.setImageURI(Uri.parse(profilePic));
                 tvUserName.setText(userName);
                 break;
         }
@@ -190,13 +213,37 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                         if (userDetails.getError_code() == 0) {
 
                             Applog.E("UserUpdate==>Dg==>" + userDetails);
-
+                            String date = userDetails.getData().getCreated_at();
+                            date=date.substring(0,10);
+                            Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+                            String formatedstring = (String) android.text.format.DateFormat.format("dd-MMM-yyyy",date1);
+                            formatedstring=formatedstring.substring(3);
+                            formatedstring=formatedstring.replace("-"," ");
                             String userName = userDetails.getData().getName();
                             String emailId = userDetails.getData().getEmail();
                             String mobileNO = userDetails.getData().getContact_number();
+
+                            profilePic =userDetails.getData().getProfile_pic();
+//                            ivProPic.setImageURI(Uri.parse(profilePic));
+
+                            profilePic =  userDetails.getData().getProfile_pic();
+                            if (profilePic != null) {
+                                Glide.clear(ivProPic);
+                                Glide.with(getApplicationContext())
+                                        .load(profilePic)
+                                        .centerCrop()
+                                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                                        .crossFade().skipMemoryCache(true)
+                                        .into(ivProPic);
+
+                            } else {
+                                ivProPic.setImageResource(R.mipmap.ic_user_profile);
+                            }
+
                             tvUserName.setText(userName);
                             tvUserEmail.setText(emailId);
                             tvUserPhone.setText(mobileNO);
+                            tvJoinDate.setText(formatedstring);
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //
@@ -208,6 +255,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                             SnackBar.showError(context, snackBarView, response.getString("message"));
                         }
                     } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }

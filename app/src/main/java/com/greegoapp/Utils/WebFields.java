@@ -2,7 +2,11 @@ package com.greegoapp.Utils;
 
 public class WebFields {
 
-    public static final String BASE_URL = "http://innoviussoftware.com/greego/public/api/";
+//    Local Url
+//    public static final String BASE_URL = "http://innoviussoftware.com/greego/public/api/";
+
+    //    Live URl
+    public static final String BASE_URL = "https://www.kroslinkstech.in/greego/public/api/";
 
     public static final String USERID = "userId";
     public static final String STATUS = "status";
@@ -107,5 +111,47 @@ public class WebFields {
     public static final class GET_USER_TRIP_DETAILS {
         public static final String MODE = "user/get/tripdetails";
         public static final String PARAM_TRIP_ID = "trip_id";
+        public static final String PARAM_TRIP_STATUS = "STATUS";
+    }
+
+    public static final class DELETE_VEHICLE {
+        public static final String MODE = "user/delete/vehicle";
+        public static final String PARAM_VEHICLE_ID = "vehicle_id";
+    }
+
+
+    public static final class PROFILE_UPDATE {
+        public static final String MODE = "user/add/profile_pic_base64";
+        public static final String PARAM_IMAGE = "image";
+    }
+
+    public static final class SELECT_DELETE_CARD {
+        public static final String SELECT_CARD_MODE = "user/select/card";
+        public static final String DELETE_CARD_MODE = "user/delete/card";
+        public static final String PARAM_CARD_ID = "card_id";
+    }
+
+
+    public static final class CANCLE_TRIP_REQUEST {
+        public static final String MODE = "user/cancle/request";
+
+        public static final String PARAM_REQUEST_ID = "request_id";
+
+    }
+
+//    https://www.kroslinkstech.in/greego/public/api/user/add/driverrating
+
+    public static final class DRIVER_RATING{
+        public static final String MODE = "user/add/driverrating";
+
+        public static final String PARAM_RATING= "rating";
+        public static final String PARAM_TRIP_ID= "trip_id";
+    }
+
+
+    public static final class GET_TRIP_HISTORY{
+        public static final String MODE = "user/get/triphistory";
+
+        public static final String PARAM_USER_ID= "user_id";
     }
 }

@@ -19,13 +19,24 @@ public class GlobalValues {
     public static final int SIGN_UP_WITH_FB = 2;
     public static final String IS_FROM_CHANGE_ACCOUNT = "is_from_change_account";
     public static final String IS_FROM_LOGOUT = "is_from_logout";
-    public static final String COUNTRY = "USA";
 
-    public static final String ACCOUNT_TYPE = "AccountType";
-    public static final String MANAGE_ACCOUNTANTS_TYPE = "AccountantsType";
-    public static final String TRANSACTION_DETAILS = "transactionDetail";
-    public static final String IS_TRANSACTION_DELETE = "isTransactionDelete";
-    public static final String FAVORITE_CHART_OF_ACCOUNT_TYPE = "ExpenseAccountantsType";
+    //Country
+    public static final String COUNTRY_USA = "USA";
+    public static final String COUNTRY_AUSTRALIA = "AU";
+    public static final String COUNTRY_INDIA = "IN";
+
+
+
+    //Trip status User - Driver
+
+    public static final String DRIVER_CANCELLED = "0";
+    public static final String DRIVER_ASSIGNED = "1";
+    public static final String DRIVER_ON_WAY= "2";
+    public static final String DRIVER_WAITING= "2";
+    public static final String DRIVER_ONGOING= "3";
+    public static final String DRIVER_COMPLETED= "4";
+
+
 
     public static final int TAX_LIMIT = 6;
     // global topic to receive app wide push notifications
@@ -41,12 +52,9 @@ public class GlobalValues {
 
     public static final String SHARED_PREF = "ah_firebase";
 
-
-
     public static final int PAYMENT_METHOD_SELECTION_ACC_RECEIVABLE = 1451;
 
     public static final int TIME_OUT = 15000;
-
 
 
     public static long dataDifferent(String dateStop) {

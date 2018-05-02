@@ -2,12 +2,16 @@ package com.greegoapp.Activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,14 +23,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,6 +43,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -71,6 +79,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.UUID;
 
 import static com.greegoapp.Fragment.MapHomeFragment.COMPLETE_UPDATE_USER_DETAILS;
 
@@ -96,7 +105,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Stack<Fragment> fragmentStack;
     FragmentManager fragmentManager;
 
-    //Pregnesh
+    Dialog dialog;
+
+    //pp
     public static final int MY_PERMISSION_REQUEST = 1;
     LocationManager locationManager;
     public boolean isGPSEnable = false;
@@ -105,12 +116,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     GetUserData.DataBean userDetails;
     ArrayList<GetUserData> alUserList;
-    String userName;
+    String userName, profilePic;
 
     public static final int HOME_SLIDER_PROFILE_UPDATE = 1000;
+    MapHomeFragment fragmentPro = null;
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         drawerLayoutAdapter = new DrawerLayoutAdapter(HomeActivity.this, drawerTitle);
@@ -179,7 +190,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             if (isGPSEnable()) {
                 try {
 
-                    Fragment fragmentPro = null;
+
                     fragmentPro = new MapHomeFragment().newInstance(alUserList, "");
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -228,6 +239,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnBackHome:
+                dialog.dismiss();
+                break;
+
             case R.id.ivProPicHome:
                 callRegisterUpdateComplete();
                 break;
@@ -251,7 +266,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             if (alUserList.size() != 0) {
 
                 for (GetUserData userData : alUserList) {
-                    if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
+                    if (!userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size()
                             != 0 && userData.getData().getCards().size() != 0) {
                         openDrawer();
                     } else {
@@ -266,11 +281,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void showCheckUserUpdateData(String msg) {
         try {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                    .setTitle("Greego").setMessage(msg);
+            /*AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    .setView(R.layout.dialog_unable_request);
 
 
-            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+          *//*  builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
@@ -281,7 +296,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         SnackBar.showInternetError(context, snackBarView);
                     }
                 }
-            });
+            });*//*
 
 //            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
 //                public void onClick(DialogInterface dialog, int id) {
@@ -289,6 +304,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                }
 //            });
             AlertDialog dialog = builder.create();
+            dialog.show();*/
+            dialog = new Dialog(context);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.setContentView(R.layout.dialog_unable_request);
+            Button btnHome = (Button) dialog.findViewById(R.id.btnBackHome);
+            btnHome.setOnClickListener(this);
             dialog.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -430,40 +452,75 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     @Override
+    public void onBackPressed() {
+
+
+        LinearLayout llCostDesignLayout = fragmentPro.getCostDesignLayout();
+        LinearLayout llDriverPersDetailsMainLayout = fragmentPro.getDriverPersDetailsMainLayout();
+        RelativeLayout rlOnTripLayout = fragmentPro.getOnTripLayout();
+
+        if (llCostDesignLayout.getVisibility() == View.GONE) {
+            showDialog("Exit", "Are you Sure to Exit greego ?", 0);
+        } else if (llDriverPersDetailsMainLayout.getVisibility() == View.GONE) {
+            showDialog("Exit", "Are you Sure to Exit Trip ?", 2);
+        } else if (rlOnTripLayout.getVisibility() == View.GONE) {
+            showDialog("Exit", "Are you Sure to Exit Trip ?", 3);
+        } else {
+            showDialog("Request", "Are you Sure to Cancel Request ?", 1);
+
+        }
+
+
+    }
+
+    public void showDialog(String str1, String str2, final int x) {
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle(str1);
+        alertDialogBuilder
+                .setMessage(str2)
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+
+                        if (x == 1) {
+                            dialog.cancel();
+                            Intent in2 = new Intent(context, HomeActivity.class);
+                            startActivity(in2);
+                            finish();
+                        } else {
+                            finish();
+                        }
+
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+
+        // show it
+        alertDialog.show();
+
+
+    }
+
+    @Override
     public void onBackPressed(Context context) {
         try {
             onBackPressed();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        FragmentManager manager = getSupportFragmentManager();
-
-        if (manager.getBackStackEntryCount() > 2) {
-            // If there are back-stack entries, leave the FragmentActivity
-            // implementation take care of them.
-            manager.popBackStack();
-
-        } else {
-            finish();
-        }
-
-
-//        if (container_body.getChildCount() == 1) {
-//            super.onBackPressed();
-//            if (container_body.getChildCount() == 0) {
-//               finish();
-//                // load your first Fragment here
-//            }
-//        } else if (container_body.getChildCount() == 0) {
-//            setHomeValues();
-//            // load your first Fragment here
-//        } else {
-//            super.onBackPressed();
-//        }
     }
 
 
@@ -492,7 +549,38 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case HOME_SLIDER_PROFILE_UPDATE:
+                profilePic = data.getStringExtra("profilePic");
                 userName = data.getStringExtra("name");
+
+                if (profilePic != null) {
+                    Glide.clear(ivPro);
+                    Glide.with(getApplicationContext())
+                            .load(profilePic)
+                            .centerCrop()
+                            .signature(new StringSignature(UUID.randomUUID().toString()))
+                            .crossFade().skipMemoryCache(true)
+                            .into(ivPro);
+
+                } else {
+                    ivPro.setImageResource(R.mipmap.ic_user_profile);
+                }
+
+                if (profilePic != null) {
+                    Glide.clear(ivProPicHome);
+                    Glide.with(getApplicationContext())
+                            .load(profilePic)
+                            .centerCrop()
+                            .signature(new StringSignature(UUID.randomUUID().toString()))
+                            .crossFade().skipMemoryCache(true)
+                            .into(ivProPicHome);
+
+                } else {
+                    ivProPicHome.setImageResource(R.mipmap.ic_user_profile);
+                }
+
+
+//                ivPro.setImageURI(Uri.parse(profilePic));
+//                ivProPicHome.setImageURI(Uri.parse(profilePic));
                 tvDrawUsername.setText(userName);
                 break;
             case COMPLETE_UPDATE_USER_DETAILS:
@@ -628,7 +716,37 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             Applog.E("UserUpdate==>Dg==>" + userDetail);
 
                             String userName = userDetail.getData().getName();
+//                            ivPro.setImageURI(Uri.parse(userDetail.getData().getProfile_pic()));
+//                            ivProPicHome.setImageURI(Uri.parse(userDetail.getData().getProfile_pic()));
                             tvDrawUsername.setText(userName);
+
+                            profilePic = userDetail.getData().getProfile_pic();
+                            if (profilePic != null) {
+                                Glide.clear(ivPro);
+                                Glide.with(getApplicationContext())
+                                        .load(profilePic)
+                                        .centerCrop()
+                                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                                        .crossFade().skipMemoryCache(true)
+                                        .into(ivPro);
+
+                            } else {
+                                ivPro.setImageResource(R.mipmap.ic_user_profile);
+                            }
+
+                            if (profilePic != null) {
+                                Glide.clear(ivProPicHome);
+                                Glide.with(getApplicationContext())
+                                        .load(profilePic)
+                                        .centerCrop()
+                                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                                        .crossFade().skipMemoryCache(true)
+                                        .into(ivProPicHome);
+
+                            } else {
+                                ivProPicHome.setImageResource(R.mipmap.ic_user_profile);
+                            }
+
 
                             if (Build.VERSION.SDK_INT < 23) {
                                 setHomeValues();

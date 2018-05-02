@@ -116,7 +116,6 @@
                 android:textSize="@dimen/txt_18"
                 />
             <TextView
-                android:id="@+id/tvInviteCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/scale_45dp"
@@ -139,6 +138,7 @@
             app:layout_constraintTop_toBottomOf="@+id/rlDetail"
             >
             <TextView
+                android:id="@+id/tvInviteCode"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/code"
@@ -148,7 +148,7 @@
                 android:textColor="@color/black"/>
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/ivInviteCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

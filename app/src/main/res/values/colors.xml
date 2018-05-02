@@ -47,7 +47,9 @@
     <color name="tv_contact">#1C6EFD</color>
     <color name="tv_cancel">#FB3E3F</color>
     <color name="on_trip_bg">#5ca6a0</color>
-
+    <color name="vehical_bg">#569A94</color>
+    <color name="bg_screen">#DFDFDF</color>
+    <color name="btn_submit">#E9E9E9</color>
     <!--pragnesh-->
     <color name="edt_textColor">#3C3D3D</color>
     <!--priyanka-->

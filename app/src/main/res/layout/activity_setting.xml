@@ -122,8 +122,8 @@
 
                         <com.greegoapp.Utils.RoundedImageView
                             android:id="@+id/ivProPic"
-                            android:layout_width="@dimen/scale_80dp"
-                            android:layout_height="@dimen/scale_80dp"
+                            android:layout_width="@dimen/scale_60dp"
+                            android:layout_height="@dimen/scale_60dp"
                             android:layout_centerVertical="true"
                             android:layout_margin="@dimen/scale_1dp"
                             android:elevation="4dp"

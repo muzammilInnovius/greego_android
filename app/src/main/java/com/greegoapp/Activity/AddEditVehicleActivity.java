@@ -78,6 +78,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
     CallFragmentInterface callMyFragment;
     ImageView imgVwAutomaticSelect, imgVwManualSelect;
     String strYear, strColor;
+    VehicleUpdate vehicleUpdate = new VehicleUpdate();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +123,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
 
                             GetManufactures.DataBean makeData = new GetManufactures.DataBean();
                             makeData.setId(0);
+                            makeData.setName("Choose vehicle make");
                             alManufactur.add(0, makeData);
 
 
@@ -307,18 +309,17 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
 
             case R.id.tvAutoMatic:
                 if (autoType) {
-                    imgVwAutomaticSelect.setVisibility(View.GONE);
+                    imgVwAutomaticSelect.setVisibility(View.VISIBLE);
                     imgVwManualSelect.setVisibility(View.GONE);
-                    tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
+                    tvAutoMatic.setTextColor(getResources().getColor(R.color.app_bg));
                     tvManual.setTextColor(getResources().getColor(R.color.hint_color));
                     autoType = false;
                 } else {
                     imgVwAutomaticSelect.setVisibility(View.VISIBLE);
                     imgVwManualSelect.setVisibility(View.GONE);
-                    transmissionType = 0;
                     autoType = true;
-                    tvAutoMatic.setTextColor(getResources().getColor(R.color.app_bg));
-                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
+                    tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
+                    tvManual.setTextColor(getResources().getColor(R.color.app_bg));
 
                 }
                 break;
@@ -333,7 +334,6 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     imgVwAutomaticSelect.setVisibility(View.GONE);
                     imgVwManualSelect.setVisibility(View.VISIBLE);
                     autoType = false;
-                    transmissionType = 1;
                     tvManual.setTextColor(getResources().getColor(R.color.app_bg));
                     tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
                 }
@@ -388,7 +388,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
         return true;
     }
 
-    VehicleUpdate vehicleUpdate = new VehicleUpdate();
+
 
     private void callSaveVehicleAPI() {
         try {
@@ -411,6 +411,8 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
 
                     SnackBar.showSuccess(context, snackBarView, "Vehicle Add successfully.");
                     UpdateVehicle vehicleData = new Gson().fromJson(String.valueOf(response), UpdateVehicle.class);
+                    vehicleUpdate = new VehicleUpdate();
+
                     if (vehicleData.getError_code() == 0) {
 
 
@@ -443,6 +445,16 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                             setResult(ADD_EDIT_VEHICAL_REQUEST, data);
                         } else if (SELECT_CHOISE_VEHICLE == 1100) {
                             Intent data = new Intent();
+                            data.putExtra("manufacture", strManufactur);
+                            data.putExtra("model", strVehicle);
+                            data.putExtra("year", strYear);
+                            data.putExtra("color", strColor);
+
+                            vehicleUpdate.setManufacture(strManufactur);
+                            vehicleUpdate.setModel(strVehicle);
+                            vehicleUpdate.setYear(Integer.parseInt(strYear));
+                            vehicleUpdate.setColor(strColor);
+                            SessionManager.saveVehical(context,vehicleUpdate);
                             setResult(SELECT_CHOISE_VEHICLE, data);
                         }
 
@@ -572,6 +584,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
 
                         GetVehicle.DataBean questionDatum1 = new GetVehicle.DataBean();
                         questionDatum1.setId(0);
+                        questionDatum1.setModel("Choose vehicle model");
                         alVehical.add(0, questionDatum1);
 
 
@@ -670,7 +683,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     alVehical = null;
                     spinnerMake.setSelection(0);
                     spinnerModel.setSelection(0);
-                    edtTvModel.setText("CHOOSE VEHICLE MODEL");
+//                    edtTvModel.setText("Choose vehicle model");
                     callVehicalModelApi(questionDatum.getId());
                 }
             } catch (Exception e) {

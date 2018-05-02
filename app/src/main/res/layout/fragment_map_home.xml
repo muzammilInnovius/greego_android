@@ -389,7 +389,7 @@
                     android:layout_marginLeft="@dimen/scale_15dp"
                     android:layout_marginTop="@dimen/scale_1dp"
                     android:layout_weight="0.2"
-                    android:background="@mipmap/ic_sport_car_coupe_auto" />
+                    android:background="@mipmap/ic_car" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -434,8 +434,7 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:singleLine="true"
-
-                    android:textColor="@color/app_bg"
+                    android:textColor="@color/vehical_bg"
                     android:textSize="@dimen/txt_14"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -481,7 +480,6 @@
         </LinearLayout>
 
         <!--Driver personal designing-->
-
         <LinearLayout
             android:id="@+id/llDriverPersDetailsMain"
             android:layout_width="match_parent"
@@ -542,7 +540,7 @@
                         android:background="@mipmap/ic_user_profile"
                         android:scaleType="fitXY"
                         app:border_color="@color/app_bg"
-                        app:corner_radius="@dimen/scale_40dp"
+                        app:corner_radius="@dimen/scale_55dp"
                         app:round_background="true" />
 
                     <LinearLayout
@@ -674,11 +672,13 @@
                         android:src="@mipmap/ic_marine_nautical_09_512" />
 
                     <TextView
+                        android:id="@+id/tvAvanueAddress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
+                        android:layout_toLeftOf="@+id/tvChangeTrip"
                         android:layout_toRightOf="@+id/imgVwYrTrip"
-                        android:text="2nd Avenue"
+                        android:text="2nd Avenuefghghghghghghgh "
                         android:textColor="@color/black"
                         android:textSize="@dimen/txt_12" />
 
@@ -688,7 +688,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerInParent="true"
-                        android:layout_marginRight="@dimen/scale_15dp"
+                        android:layout_marginLeft="@dimen/scale_1dp"
+                        android:layout_marginRight="@dimen/scale_1dp"
                         android:text="@string/tv_change"
                         android:textColor="@color/resend_time"
                         android:textStyle="bold" />
@@ -772,14 +773,13 @@
 
         </LinearLayout>
 
-
         <!--User On Trip Details-->
         <RelativeLayout
-            android:visibility="invisible"
             android:id="@+id/rlOnTripUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/scale_25dp">
+            android:layout_marginBottom="@dimen/scale_25dp"
+            android:visibility="invisible">
 
 
             <RelativeLayout

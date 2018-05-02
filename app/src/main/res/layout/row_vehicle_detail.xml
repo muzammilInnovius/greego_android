@@ -18,9 +18,10 @@
 
             <RadioButton
                 android:id="@+id/chkVehicleSet"
-                android:layout_width="@dimen/scale_25dp"
-                android:layout_height="@dimen/scale_25dp"
-                android:checked="false" />
+                android:layout_width="@dimen/scale_20dp"
+                android:layout_height="@dimen/scale_20dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/ic_un_tick" />
 
             <TextView
                 android:id="@+id/tvYear"
@@ -67,7 +68,7 @@
                 android:textSize="@dimen/scale_15dp" />
 
             <ImageView
-                android:id="@+id/imgVwnext"
+                android:id="@+id/imgVwDelete"
                 android:layout_width="@dimen/scale_20dp"
                 android:layout_height="@dimen/scale_20dp"
                 android:layout_alignParentRight="true"

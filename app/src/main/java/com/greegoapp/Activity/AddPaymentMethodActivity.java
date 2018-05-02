@@ -84,7 +84,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         bindViews();
         setListner();
 
-        callUserMeApi();
+//        callUserMeApi();
 
     }
 
@@ -177,9 +177,9 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ibBack:
-                Intent  in = new Intent(AddPaymentMethodActivity.this, HomeActivity.class);
-               startActivity(in);
-//                finish();
+//                Intent  in = new Intent(AddPaymentMethodActivity.this, HomeActivity.class);
+//               startActivity(in);
+                finish();
 //                Fragment fragment = new PaymentFragment();
 //                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

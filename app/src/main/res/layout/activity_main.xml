@@ -30,8 +30,8 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/scale_20dp"
-            android:layout_marginRight="@dimen/scale_20dp"
+            android:layout_marginLeft="@dimen/scale_15dp"
+            android:layout_marginRight="@dimen/scale_15dp"
             android:layout_marginTop="@dimen/scale_15dp"
             app:layout_constraintTop_toBottomOf="@+id/imgVwMain">
 
@@ -50,11 +50,10 @@
                 android:id="@+id/llNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/scale_8dp"
-                android:layout_marginRight="@dimen/scale_5dp"
+                android:layout_marginLeft="@dimen/scale_2dp"
+                android:layout_marginRight="@dimen/scale_2dp"
                 android:layout_marginTop="@dimen/scale_35dp"
                 android:orientation="horizontal"
-                android:padding="@dimen/scale_2dp"
                 app:layout_constraintTop_toBottomOf="@+id/tvDontDriveTitle">
 
                 <ImageView
@@ -69,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/scale_5dp"
+                    android:layout_marginLeft="@dimen/scale_2dp"
                     android:text="+1"
                     android:textColor="@color/hint_color"
                     android:textSize="@dimen/txt_14"
@@ -77,16 +76,17 @@
 
                 <TextView
                     android:id="@+id/tvMobileNo"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/scale_5dp"
+                    android:layout_marginLeft="@dimen/scale_1dp"
                     android:background="@null"
-                    android:gravity="center_vertical"
-                    android:hint="@string/mobile_no_hint"
-                    android:inputType="number"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/txt_14" />
+                    android:clickable="false"
+                    android:gravity="start"
+                    android:singleLine="true"
+                    android:text="@string/mobile_no_hint"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/txt_13" />
 
             </LinearLayout>
 

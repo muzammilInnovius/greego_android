@@ -59,7 +59,7 @@ public class UserData {
         private Object lastname;
         private String contact_number;
         private Object city;
-        private Object profile_pic;
+        private String  profile_pic;
         private Object promocode;
         private String verified;
         private String is_iphone;
@@ -115,11 +115,11 @@ public class UserData {
             this.city = city;
         }
 
-        public Object getProfile_pic() {
+        public String getProfile_pic() {
             return profile_pic;
         }
 
-        public void setProfile_pic(Object profile_pic) {
+        public void setProfile_pic(String  profile_pic) {
             this.profile_pic = profile_pic;
         }
 

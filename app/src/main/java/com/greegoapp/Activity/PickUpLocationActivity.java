@@ -349,13 +349,13 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 String picLocAddress = mEdtPickUpLocation.getText().toString();
                 String destLocAddress = mEdtDetstinationLocation.getText().toString();
 
-                Date departure = new Date();  // This is the current time for testing purposes
-                String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
-                        mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
-                        "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
-                        departure.getTime();
-
-                Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
+//                Date departure = new Date();  // This is the current time for testing purposes
+//                String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
+//                        mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
+//                        "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
+//                        departure.getTime();
+//
+//                Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
 
                 if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
 
@@ -366,7 +366,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                     data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
                     data.putExtra("picLocAddress", picLocAddress);
                     data.putExtra("destLocAddress", destLocAddress);
-                    data.putExtra("departure", departure);
+                    data.putExtra("departure", "");
                     setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
                     finish();
                 } else {
@@ -418,14 +418,14 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                             String picLocAddress = mEdtPickUpLocation.getText().toString();
                             String destLocAddress = mEdtDetstinationLocation.getText().toString();
 
-                            Date departure = new Date();  // This is the current time for testing purposes
-
-                            String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
-                                    mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
-                                    "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
-                                    departure.getTime();
-
-                            Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
+//                            Date departure = new Date();  // This is the current time for testing purposes
+//
+//                            String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
+//                                    mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
+//                                    "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
+//                                    departure.getTime();
+//
+//                            Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
 
                             if (des != null && !des.equals("null") && !des.equals("")) {
                                 Intent data = new Intent();
@@ -435,7 +435,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                                 data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
                                 data.putExtra("picLocAddress", picLocAddress);
                                 data.putExtra("destLocAddress", destLocAddress);
-                                data.putExtra("departure", departure);
+                                data.putExtra("departure", "");
                                 setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
                                 finish();
                             }

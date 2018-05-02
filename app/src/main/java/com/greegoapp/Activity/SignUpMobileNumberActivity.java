@@ -1,5 +1,6 @@
 package com.greegoapp.Activity;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -12,7 +13,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -65,7 +65,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
         context = SignUpMobileNumberActivity.this;
         snackBarView = findViewById(android.R.id.content);
 
-        registerFCMKey = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0).getString("regId", "def");
+        registerFCMKey = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0).getString("regId", "");
 
         bindView();
         setListners();
@@ -98,6 +98,9 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+
+
+
             case R.id.ibBack:
                 KeyboardUtility.hideKeyboard(context, view);
                 Intent in = new Intent(context, MainActivity.class);
@@ -166,8 +169,9 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
 
-                    Login loginData = new Gson().fromJson(String.valueOf(response), Login.class);
                     try {
+                        Login loginData = new Gson().fromJson(String.valueOf(response), Login.class);
+
                         MyProgressDialog.hideProgressDialog();
                         if (loginData.getError_code() == 0) {
 
@@ -183,9 +187,9 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
 
                         } else {
                             MyProgressDialog.hideProgressDialog();
-                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                            SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -213,7 +217,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
 
     private boolean isValid() {
 
-     //   Toast.makeText(context,tvCountryCode.getText().toString(),Toast.LENGTH_LONG).show();
+        //   Toast.makeText(context,tvCountryCode.getText().toString(),Toast.LENGTH_LONG).show();
         strMobileNo = tvCountryCode.getText().toString() + edtTvMobileNo.getText().toString();
 
         if (strMobileNo.isEmpty()) {

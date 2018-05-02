@@ -194,8 +194,8 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
 
-                    Login loginData = new Gson().fromJson(String.valueOf(response), Login.class);
                     try {
+                        Login loginData = new Gson().fromJson(String.valueOf(response), Login.class);
                         MyProgressDialog.hideProgressDialog();
                         if (loginData.getError_code() == 0) {
 
@@ -215,9 +215,9 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
                         } else {
                             MyProgressDialog.hideProgressDialog();
-                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                            SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -353,6 +353,8 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                                     overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
                                 }
 
+
+                                SessionManager.saveUserId(context,userDetails);
 //
                             } else {
                                 MyProgressDialog.hideProgressDialog();

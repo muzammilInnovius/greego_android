@@ -140,6 +140,15 @@
         <item>Van</item>
     </string-array>
     <string name="tv_change">Change</string>
+    <string name="tv_update_email">What\'s your email again?</string>
+    <string name="tv_confirm_email">Please confirm you email using the link below.</string>
+    <string name="tv_send_conf_email">Send Confirmation email</string>
+
+    <!--Trip compeleted-->
+    <string name="trip_with_dr_dtls">How was the trip with </string>
+    <string name="rate_yr_dr_dtls">Rate your driver who makes your day special</string>
+    <string name="submit">Submit</string>
+
 
     // pragnessh
     <string name="wheredogo">Where do you want to go?</string>

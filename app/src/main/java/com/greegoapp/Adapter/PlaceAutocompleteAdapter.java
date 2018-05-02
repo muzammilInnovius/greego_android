@@ -22,6 +22,7 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.R;
 
 import java.util.ArrayList;
@@ -55,8 +56,8 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
         layout = resource;
         mGoogleApiClient = googleApiClient;
         mBounds = null;
-//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry("AU").build();
-        mPlaceFilter = new AutocompleteFilter.Builder().setCountry("USA").build();
+        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_INDIA).build();
+//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_USA).build();
         this.mListener = (PlaceAutoCompleteInterface) mContext;
     }
 

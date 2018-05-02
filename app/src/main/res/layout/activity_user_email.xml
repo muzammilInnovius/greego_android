@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_screen"
+        android:orientation="vertical"
+        tools:context="com.greegoapp.Activity.UserEmailActivity">
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/scale_40dp"
+            android:background="@color/white"
+            android:clickable="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/ibBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/scale_3dp"
+                android:layout_marginRight="@dimen/scale_5dp"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:background="@android:color/transparent"
+                android:padding="@dimen/scale_6dp"
+                android:src="@mipmap/ic_back"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/scale_3dp"
+                android:layout_marginRight="@dimen/scale_5dp"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:background="@android:color/transparent"
+                android:padding="@dimen/scale_8dp"
+                android:src="@mipmap/ic_edit"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/txt_3"
+                android:layout_marginTop="@dimen/scale_5dp"
+                android:text="@string/header_title"
+                android:textColor="@color/black"
+                android:textSize="@dimen/txt_20"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
+        <TextView
+            android:id="@+id/tvPaymentTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="@dimen/scale_5dp"
+            android:text="@string/tv_update_email"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="@dimen/txt_18"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/header" />
+
+
+        <RelativeLayout
+            android:id="@+id/rlEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/scale_5dp"
+            android:background="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/rlConfirm"
+            app:layout_constraintTop_toBottomOf="@+id/tvPaymentTitle">
+
+
+            <RelativeLayout
+                android:id="@+id/rlCliean"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/scale_40dp"
+                android:background="@color/white"
+                android:clickable="true"
+                android:paddingLeft="@dimen/scale_10dp"
+                android:paddingRight="@dimen/scale_10dp" />
+
+            <RelativeLayout
+                android:id="@+id/rlPhone"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/scale_85dp"
+                android:layout_below="@+id/rlCliean"
+                android:background="@color/white"
+                android:clickable="true"
+                android:paddingLeft="@dimen/scale_10dp"
+                android:paddingRight="@dimen/scale_10dp">
+
+                <ImageView
+                    android:id="@+id/imgVwPhone"
+                    android:layout_width="@dimen/scale_40dp"
+                    android:layout_height="@dimen/scale_40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="@dimen/scale_5dp"
+                    android:scaleType="fitXY"
+                    android:src="@mipmap/ic_mail" />
+
+                <TextView
+                    android:id="@+id/edtTvUserEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/imgVwPhone"
+                    android:background="@null"
+                    android:clickable="true"
+                    android:paddingLeft="@dimen/scale_2dp"
+                    android:text="@string/hint_email"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_15"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imgVwCancel"
+                    android:layout_width="@dimen/scale_10dp"
+                    android:layout_height="@dimen/scale_10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@mipmap/ic_cancel" />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/rlConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/scale_5dp"
+            android:background="@color/white"
+            app:layout_constraintTop_toBottomOf="@+id/rlEmail">
+
+
+            <!--<RelativeLayout-->
+            <!--android:id="@+id/rlCliean"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="@dimen/scale_40dp"-->
+            <!--android:background="@color/white"-->
+            <!--android:clickable="true"-->
+            <!--android:paddingLeft="@dimen/scale_10dp"-->
+            <!--android:paddingRight="@dimen/scale_10dp"/>-->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:clickable="true"
+                android:paddingLeft="@dimen/scale_10dp"
+                android:paddingRight="@dimen/scale_10dp">
+
+
+                <TextView
+                    android:id="@+id/tvConfirmEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/scale_15dp"
+                    android:text="@string/tv_confirm_email"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_12"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/tvSendConfEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvConfirmEmail"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="@dimen/scale_15dp"
+                    android:text="@string/tv_send_conf_email"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/txt_12"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
