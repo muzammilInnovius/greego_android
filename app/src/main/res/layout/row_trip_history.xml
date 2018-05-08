@@ -4,12 +4,11 @@
     xmlns:mytextview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
-        android:layout_marginTop="@dimen/scale_1dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/scale_1dp"
         card_view:cardCornerRadius="4dp"
         tools:context="com.greegoapp.Fragment.TripHistoryFragment">
 
@@ -37,6 +36,7 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/imgVwnext"
                 android:layout_toRightOf="@+id/ivProPicTripHistory"
                 android:paddingLeft="@dimen/scale_5dp">
 
@@ -63,9 +63,9 @@
                     android:id="@+id/tvTripTotalCost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:layout_below="@+id/tvTripDate"
                     android:layout_marginLeft="@dimen/scale_15dp"
-                    android:layout_toRightOf="@+id/tvTripTime"
                     android:layout_weight="1"
                     android:text="@string/trip_price"
                     android:textColor="@color/black"
@@ -81,7 +81,7 @@
                 android:layout_height="@dimen/scale_25dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
-                android:layout_marginLeft="@dimen/scale_20dp"
+                android:layout_marginLeft="@dimen/scale_1dp"
                 android:layout_marginRight="@dimen/scale_10dp"
                 mytextview:srcCompat="@mipmap/ic_trip_history" />
 

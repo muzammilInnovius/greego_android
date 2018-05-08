@@ -118,8 +118,11 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
                 if (isValid()) {
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
-
-                        callMobileNumberAPI();
+                        if (registerFCMKey != null) {
+                            callMobileNumberAPI();
+                        }else {
+                            SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                        }
 
                     } else {
                         SnackBar.showInternetError(context, snackBarView);
@@ -157,7 +160,11 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
 
             jsonObject.put(WebFields.SIGN_IN.PARAM_CONTACT_NO, strMobileNo);
             jsonObject.put(WebFields.SIGN_IN.PARAM_IS_PHONE_NO, 0);
-            jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, registerFCMKey);
+//            if (registerFCMKey != null) {
+                jsonObject.put(WebFields.SIGN_IN.PARAM_DEVICE_ID, registerFCMKey);
+//            }else {
+//                SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+//            }
 
             Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);

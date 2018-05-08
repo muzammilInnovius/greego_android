@@ -11,10 +11,10 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -38,26 +38,26 @@ import com.greegoapp.databinding.ActivityPaymentBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import static com.greegoapp.Fragment.MapHomeFragment.CHANGE_CONTACT_NO;
 
 public class PaymentActivity extends AppCompatActivity implements View.OnClickListener {
-
+    public static String cardselected;
     ActivityPaymentBinding binding;
     private View snackBarView;
     Context context;
     TextView tvAddPaymentMethod, tvAddPromoCode, tvCardDetail;
     ImageButton ibBack;
     String cardNo;
-
+    public String selectCardNo;
     public static final int ADD_CARD_PAYMENT_METHOD = 1001;
 
-
     //priyanka(27/4)
-    private android.support.v7.widget.RecyclerView rvCards;
+    private RecyclerView rvCards;
     public static CardsNumberAdapter adapter;
-    private java.util.ArrayList<com.greegoapp.Model.GetUserData.DataBean.CardsBean> cardData;
+    private ArrayList<GetUserData.DataBean.CardsBean> cardData;
     private RecyclerViewItemClickListener itemClickListener;
     SwipeRefreshLayout swiper;
 
@@ -73,26 +73,26 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         setListner();
         callUserMeApi();
 //        setCardNumber();
+
+        Applog.E("selectCardNo====> " + selectCardNo);
+
     }
 
     private void setCardNumber() {
         cardNo = SessionManager.getCardNo(context);
 
         int length = cardNo.length();
-        if(length>0)
-        {
+        if (length > 0) {
             String s = cardNo;
           /*  String s1 = s.substring(0, 4);
             String s2 = s.substring(4, 8);
             String s3 = s.substring(8, 12);*/
-            String s4 = s.substring(12,16);
+            String s4 = s.substring(12, 16);
 
 //            String dashedString = s1 + " " + s2 + " " + s3 + " "+ s4;
-            String strcardnumber ="**** **** **** "+s4;
+            String strcardnumber = "**** **** **** " + s4;
             //        tvCardDetail.setText(strcardnumber);
-        }
-        else
-        {
+        } else {
             //        tvCardDetail.setText("**** **** **** ****");
         }
     }
@@ -111,7 +111,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         rvCards = binding.rvCards;
         cardData = new java.util.ArrayList<>();
 
-        itemClickListener=new RecyclerViewItemClickListener() {
+        itemClickListener = new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
 
@@ -154,17 +154,22 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 dialog.show();
                 break;
             case R.id.ibBack:
+//                callUserMeApi();
                 if (CHANGE_CONTACT_NO == 2001) {
                     Intent data = new Intent();
-                    data.putExtra("changeCardNo", cardNo);
+                    data.putExtra("changeCardNo", cardselected);
                     setResult(CHANGE_CONTACT_NO, data);
-                }else {
-
                 }
                 finish();
                 break;
 
         }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -188,7 +193,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
             org.json.JSONObject jsonObject = new org.json.JSONObject();
 
             Applog.E("request: " + jsonObject.toString());
-            MyProgressDialog.showProgressDialog(context);
+//            MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
@@ -198,9 +203,10 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                     Applog.E("success: " + response.toString());
 
                     GetUserData userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+                    GetUserData.DataBean.CardsBean userCardDtls = new Gson().fromJson(String.valueOf(response), GetUserData.DataBean.CardsBean.class);
 
                     try {
-                        MyProgressDialog.hideProgressDialog();
+//                        MyProgressDialog.hideProgressDialog();
 //
                         if (userDetails.getError_code() == 0) {
                             cardData.clear();
@@ -216,11 +222,23 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                             rvCards.setAdapter(adapter);
                             rvCards.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true));
 
+
+                            if (userCardDtls != null) {
+
+                                if (userCardDtls.getSelected() == 1) {
+
+                                    selectCardNo = userCardDtls.getCard_number();
+                                }
+                            }
+
                         } else {
                             MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));
                         }
-                    } catch (JSONException e) {
+                    } catch (
+                            JSONException e)
+
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -251,7 +269,10 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
             AppController.getInstance().addToRequestQueue(jsonObjReq);
-        } catch (Exception e) {
+        } catch (
+                Exception e)
+
+        {
             e.printStackTrace();
         }
 

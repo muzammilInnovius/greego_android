@@ -66,7 +66,6 @@ import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
-import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivityHomeBinding;
@@ -83,7 +82,7 @@ import java.util.UUID;
 
 import static com.greegoapp.Fragment.MapHomeFragment.COMPLETE_UPDATE_USER_DETAILS;
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CallFragmentInterface, BackPressedFragment {
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, BackPressedFragment,CallFragmentInterface {
 
     String MAIN_TAG = HomeActivity.class.getSimpleName();
     ActivityHomeBinding binding;
@@ -120,13 +119,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public static final int HOME_SLIDER_PROFILE_UPDATE = 1000;
     MapHomeFragment fragmentPro = null;
+    View view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         drawerLayoutAdapter = new DrawerLayoutAdapter(HomeActivity.this, drawerTitle);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         context = HomeActivity.this;
@@ -139,11 +139,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         bindView();
 //        setHeaderbar();
         setListners();
+
         if (ConnectivityDetector.isConnectingToInternet(context)) {
             callUserMeApi();
 //            CheckGpsStatus();
         } else {
-            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+            SnackBar.showInternetError(context, snackBarView);
         }
 
 
@@ -190,12 +191,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             if (isGPSEnable()) {
                 try {
 
-
                     fragmentPro = new MapHomeFragment().newInstance(alUserList, "");
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    fragmentTransaction.replace(R.id.containerBody, fragmentPro);
+                    fragmentTransaction.add(R.id.containerBody, fragmentPro);
                     fragmentTransaction.addToBackStack(null);
 //                    fragmentTransaction.commit();
                     fragmentTransaction.commitAllowingStateLoss();
@@ -454,22 +454,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onBackPressed() {
 
+        try {
+            LinearLayout llCostDesignLayout = fragmentPro.getCostDesignLayout();
+            LinearLayout llDriverPersDetailsMainLayout = fragmentPro.getDriverPersDetailsMainLayout();
+            RelativeLayout rlOnTripLayout = fragmentPro.getOnTripLayout();
 
-        LinearLayout llCostDesignLayout = fragmentPro.getCostDesignLayout();
-        LinearLayout llDriverPersDetailsMainLayout = fragmentPro.getDriverPersDetailsMainLayout();
-        RelativeLayout rlOnTripLayout = fragmentPro.getOnTripLayout();
-
-        if (llCostDesignLayout.getVisibility() == View.GONE) {
-            showDialog("Exit", "Are you Sure to Exit greego ?", 0);
-        } else if (llDriverPersDetailsMainLayout.getVisibility() == View.GONE) {
-            showDialog("Exit", "Are you Sure to Exit Trip ?", 2);
-        } else if (rlOnTripLayout.getVisibility() == View.GONE) {
-            showDialog("Exit", "Are you Sure to Exit Trip ?", 3);
-        } else {
-            showDialog("Request", "Are you Sure to Cancel Request ?", 1);
-
+            if (llCostDesignLayout.getVisibility() == View.GONE) {
+                showDialog("Exit", "Are you Sure to Exit greego ?", 0);
+//            finish();
+            } else {
+                showDialog("Request", "Are you Sure to Cancel Request ?", 1);
+//            finish();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
 
     }
 
@@ -482,7 +481,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
 
                         if (x == 1) {
                             dialog.cancel();
@@ -535,6 +533,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         fragmentTransaction.commit();
     }
 
+    @Override
+    public void callUpdateVehicalMethod(ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail) {
+        MapHomeFragment businessContactFragment = (MapHomeFragment)
+                getSupportFragmentManager().findFragmentByTag(MapHomeFragment.class.getSimpleName());
+        if (businessContactFragment != null) {
+            businessContactFragment.updateVehicalData(alVehicleDetail);
+        }
+    }
+
+
+
 
 // pragnesh
 
@@ -549,6 +558,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case HOME_SLIDER_PROFILE_UPDATE:
+//                if (ConnectivityDetector.isConnectingToInternet(context)) {
+//                    callUserMeApi();
+//                } else {
+//                    Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+//                }
                 profilePic = data.getStringExtra("profilePic");
                 userName = data.getStringExtra("name");
 
@@ -562,7 +576,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             .into(ivPro);
 
                 } else {
-                    ivPro.setImageResource(R.mipmap.ic_user_profile);
+                    ivPro.setImageResource(R.mipmap.ic_place_holder);
                 }
 
                 if (profilePic != null) {
@@ -575,12 +589,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             .into(ivProPicHome);
 
                 } else {
-                    ivProPicHome.setImageResource(R.mipmap.ic_user_profile);
+                    ivProPicHome.setImageResource(R.mipmap.ic_place_holder);
                 }
 
 
-//                ivPro.setImageURI(Uri.parse(profilePic));
-//                ivProPicHome.setImageURI(Uri.parse(profilePic));
                 tvDrawUsername.setText(userName);
                 break;
             case COMPLETE_UPDATE_USER_DETAILS:
@@ -692,7 +704,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             JSONObject jsonObject = new JSONObject();
 
             Applog.E("request: " + jsonObject.toString());
-            MyProgressDialog.showProgressDialog(context);
+//            MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
@@ -705,11 +717,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.DataBean.class);
                     GetUserData userDetail = new Gson().fromJson(String.valueOf(response), GetUserData.class);
                     try {
-                        MyProgressDialog.hideProgressDialog();
+//                        MyProgressDialog.hideProgressDialog();
                         alUserList = new ArrayList<>();
 
                         if (userDetail.getError_code() == 0) {
-
 
                             alUserList.add(userDetail);
 
@@ -731,7 +742,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                         .into(ivPro);
 
                             } else {
-                                ivPro.setImageResource(R.mipmap.ic_user_profile);
+                                ivPro.setImageResource(R.mipmap.ic_place_holder);
                             }
 
                             if (profilePic != null) {
@@ -744,7 +755,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                         .into(ivProPicHome);
 
                             } else {
-                                ivProPicHome.setImageResource(R.mipmap.ic_user_profile);
+                                ivProPicHome.setImageResource(R.mipmap.ic_place_holder);
                             }
 
 
@@ -756,6 +767,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             }
 
+                            SessionManager.saveUserDetails(context, userDetail);
+
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
 //
@@ -763,7 +776,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //
                         } else {
-                            MyProgressDialog.hideProgressDialog();
+//                            MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));
                         }
                     } catch (JSONException e) {
@@ -774,7 +787,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    MyProgressDialog.hideProgressDialog();
+//                    MyProgressDialog.hideProgressDialog();
                     Applog.E("Error: " + error.getMessage());
 
                     SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));

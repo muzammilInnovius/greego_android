@@ -113,7 +113,7 @@ public class TripHistoryModel implements Parcelable {
         private String profile_pic;
         private String contact_number;
         private String email;
-        private Object promocode;
+        private String promocode;
 
         protected DataBean(Parcel in) {
             request_id = in.readInt();
@@ -301,11 +301,11 @@ public class TripHistoryModel implements Parcelable {
             this.email = email;
         }
 
-        public Object getPromocode() {
+        public String getPromocode() {
             return promocode;
         }
 
-        public void setPromocode(Object promocode) {
+        public void setPromocode(String promocode) {
             this.promocode = promocode;
         }
 

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -54,11 +53,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     ImageButton ibback;
     RelativeLayout rl_name, rl_phone, rl_email, rl_btnlogout;
     View snackBarView;
-    TextView tvUserName, tvUserEmail, tvUserPhone,tvJoinDate;
+    TextView tvUserName, tvUserEmail, tvUserPhone, tvJoinDate;
     GetUserData userDetails;
     ImageView ivProPic;
     public static final int SETTING_PROFILE_UPDATE = 1001;
-    String userName,profilePic;
+    public static final int SETTING_EMAIL_UPDATE = 1011;
+    String userName, profilePic, emailId,mobileNo,lastName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +98,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         tvUserEmail = binding.tvUserEmail;
         tvUserPhone = binding.tvUserPhone;
         ivProPic = binding.ivProPic;
-        tvJoinDate=binding.tvJoinDate;
+        tvJoinDate = binding.tvJoinDate;
     }
 
     Intent in;
@@ -122,7 +122,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.rlEmail:
                 in = new Intent(SettingActivity.this, UserEmailActivity.class);
-               startActivity(in);
+                in.putExtra("email", emailId);
+                in.putExtra("username", userName);
+                in.putExtra("mobileNo", mobileNo);
+                in.putExtra("lastName", lastName);
+                startActivityForResult(in, SETTING_EMAIL_UPDATE);
                 break;
             case R.id.rlLogout:
                 showCallbacksLogout("Are you sure you want to Logout?");
@@ -131,12 +135,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
 
             case SETTING_PROFILE_UPDATE:
+//                callUserMeApi();
                 userName = data.getStringExtra("name");
                 profilePic = data.getStringExtra("profilePic");
 
@@ -148,8 +152,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                         .crossFade().skipMemoryCache(true)
                         .into(ivProPic);
 
-//                ivProPic.setImageURI(Uri.parse(profilePic));
                 tvUserName.setText(userName);
+                break;
+
+            case SETTING_EMAIL_UPDATE:
+                emailId = data.getStringExtra("email");
+                tvUserEmail.setText(emailId);
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -214,19 +222,20 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
                             Applog.E("UserUpdate==>Dg==>" + userDetails);
                             String date = userDetails.getData().getCreated_at();
-                            date=date.substring(0,10);
+                            date = date.substring(0, 10);
                             Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-                            String formatedstring = (String) android.text.format.DateFormat.format("dd-MMM-yyyy",date1);
-                            formatedstring=formatedstring.substring(3);
-                            formatedstring=formatedstring.replace("-"," ");
-                            String userName = userDetails.getData().getName();
-                            String emailId = userDetails.getData().getEmail();
-                            String mobileNO = userDetails.getData().getContact_number();
+                            String formatedstring = (String) android.text.format.DateFormat.format("dd-MMM-yyyy", date1);
+                            formatedstring = formatedstring.substring(3);
+                            formatedstring = formatedstring.replace("-", " ");
 
-                            profilePic =userDetails.getData().getProfile_pic();
+                            userName = userDetails.getData().getName();
+                            emailId = userDetails.getData().getEmail();
+                            mobileNo = userDetails.getData().getContact_number();
+
+                            profilePic = userDetails.getData().getProfile_pic();
 //                            ivProPic.setImageURI(Uri.parse(profilePic));
 
-                            profilePic =  userDetails.getData().getProfile_pic();
+                            profilePic = userDetails.getData().getProfile_pic();
                             if (profilePic != null) {
                                 Glide.clear(ivProPic);
                                 Glide.with(getApplicationContext())
@@ -237,12 +246,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                                         .into(ivProPic);
 
                             } else {
-                                ivProPic.setImageResource(R.mipmap.ic_user_profile);
+                                ivProPic.setImageResource(R.mipmap.ic_place_holder);
                             }
 
                             tvUserName.setText(userName);
                             tvUserEmail.setText(emailId);
-                            tvUserPhone.setText(mobileNO);
+                            tvUserPhone.setText(mobileNo);
                             tvJoinDate.setText(formatedstring);
 //                            SessionManager.saveUserData(context, userDetails);
 //                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));

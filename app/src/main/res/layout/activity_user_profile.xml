@@ -123,7 +123,7 @@
                             android:layout_height="@dimen/scale_50dp"
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="@dimen/scale_10dp"
-                            android:background="@mipmap/ic_profile"
+                            android:background="@mipmap/ic_place_holder"
                             android:elevation="4dp"
                             android:scaleType="fitXY"
                             app:border_color="@color/app_bg"

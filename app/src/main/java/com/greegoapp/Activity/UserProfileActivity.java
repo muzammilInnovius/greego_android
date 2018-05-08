@@ -43,6 +43,7 @@ import com.google.gson.Gson;
 import com.greegoapp.Adapter.VehicleDetailAdapter;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
+import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
 import com.greegoapp.Model.GetUserData;
 import com.greegoapp.Model.UserData;
@@ -94,11 +95,17 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     Button btnUpdate, tvAdd;
     String strEmail, profilePicUrl;
 
+    Intent in;
+    String filePath_driving_license;
+    private Uri mImageUri;
+    private Bitmap bitmap = null;
+    private String strProPicBase64 = "";
+    private CallFragmentInterface callMyFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
-
 
         snackBarView = findViewById(android.R.id.content);
         context = UserProfileActivity.this;
@@ -154,7 +161,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    Intent in;
 
     @Override
     public void onClick(View view) {
@@ -165,12 +171,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     String userName = edtTvProfileFname.getText().toString();
                     data.putExtra("profilePic", profilePicUrl);
                     data.putExtra("name", userName);
+//                    callMyFragment.callUpdateVehicalMethod(alVehicleDetail);
                     setResult(HOME_SLIDER_PROFILE_UPDATE, data);
                 } else if (MAP_HOME_PROFILE_UPDATE == 1002) {
                     Intent data = new Intent();
                     String userName = edtTvProfileFname.getText().toString();
-                    data.putExtra("profilePic", profilePicUrl);
-                    data.putExtra("name", userName);
+//                    data.putExtra("profilePic", profilePicUrl);
+//                    data.putExtra("name", userName);
                     setResult(MAP_HOME_PROFILE_UPDATE, data);
                 } else if (SETTING_PROFILE_UPDATE == 1001) {
                     Intent data = new Intent();
@@ -355,10 +362,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         startActivityForResult(cameraIntent, SELECT_CAMERA_PIC);
     }
 
-    String filePath_driving_license;
-    private Uri mImageUri;
-    private Bitmap bitmap = null;
-    private String strProPicBase64 = "";
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -436,7 +440,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                                         .into(ivProPic);
 
                             } else {
-                                ivProPic.setImageResource(R.mipmap.ic_user_profile);
+                                ivProPic.setImageResource(R.mipmap.ic_place_holder);
                             }
 
 
@@ -704,8 +708,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         super.onBackPressed();
         if (HOME_SLIDER_PROFILE_UPDATE == 1000) {
             Intent data = new Intent();
-            String userName = edtTvProfileFname.getText().toString();
-            data.putExtra("name", userName);
+//            String userName = edtTvProfileFname.getText().toString();
+//            data.putExtra("name", userName);
+            callMyFragment.callUpdateVehicalMethod(alVehicleDetail);
             setResult(HOME_SLIDER_PROFILE_UPDATE, data);
         } else if (MAP_HOME_PROFILE_UPDATE == 1002) {
             Intent data = new Intent();
@@ -724,4 +729,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 //    public static void adapterChange() {
 //        adapter.notifyDataSetChanged();
 //    }
+
+
+
+
 }

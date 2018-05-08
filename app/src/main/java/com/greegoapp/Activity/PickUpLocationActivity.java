@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -49,19 +50,27 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.gson.Gson;
 import com.greegoapp.Adapter.PlaceAutocompleteAdapter;
+import com.greegoapp.AppController.AppController;
 import com.greegoapp.Fragment.MapHomeFragment;
+import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.R;
+import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.KeyboardUtility;
+import com.greegoapp.Utils.SnackBar;
+import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivityPickUpLocationBinding;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, OnMapReadyCallback {
 
@@ -74,7 +83,6 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     LinearLayoutManager llm;
     PlaceAutocompleteAdapter mAdapter;
 
-
     private static final LatLngBounds BOUNDS_INDIA = new LatLngBounds(
             new LatLng(-33.880490, 151.184363), new LatLng(-33.858754, 151.229596));
 
@@ -84,11 +92,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
     RelativeLayout rlSetLocationMap, rlSetCurrentLocation, rlEditextPickup;
     LinearLayout llLocationView;
-
-
-    //
     String ssLocation, ddLocation, address;
-
     LatLng mDestinationLatLong, mSoucreLatLong;
 
 
@@ -111,7 +115,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     Button btnSetLocation;
     public static boolean mapViewVisible = false;
     public static boolean passValue = false;
-
+    String totalDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -349,13 +353,9 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 String picLocAddress = mEdtPickUpLocation.getText().toString();
                 String destLocAddress = mEdtDetstinationLocation.getText().toString();
 
-//                Date departure = new Date();  // This is the current time for testing purposes
-//                String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
-//                        mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
-//                        "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
-//                        departure.getTime();
-//
-//                Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
+
+//                myCalcTime(mSoucreLatLong.latitude,mSoucreLatLong.longitude,mDestinationLatLong.latitude,mDestinationLatLong.longitude);
+
 
                 if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
 
@@ -366,12 +366,13 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                     data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
                     data.putExtra("picLocAddress", picLocAddress);
                     data.putExtra("destLocAddress", destLocAddress);
-                    data.putExtra("departure", "");
+                    data.putExtra("departure", 12);
                     setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
                     finish();
                 } else {
                     llLocationView.setVisibility(View.VISIBLE);
                 }
+
 
                 break;
 
@@ -414,20 +415,17 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                                 }
                             }
 
+
+                            String sou = mEdtPickUpLocation.getText().toString();
                             String des = mEdtDetstinationLocation.getText().toString();
                             String picLocAddress = mEdtPickUpLocation.getText().toString();
                             String destLocAddress = mEdtDetstinationLocation.getText().toString();
 
-//                            Date departure = new Date();  // This is the current time for testing purposes
-//
-//                            String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +
-//                                    mSoucreLatLong.latitude + "," + mSoucreLatLong.longitude + "&destination=" + mDestinationLatLong.latitude +
-//                                    "," + mDestinationLatLong.longitude + "&mode=transit&sensor=false&region=fr&departure_time=" +
-//                                    departure.getTime();
-//
-//                            Applog.E("Duration Time==>" + departure.getTime() + " url=>" + url);
 
-                            if (des != null && !des.equals("null") && !des.equals("")) {
+//               myCalcTime(mSoucreLatLong.latitude,mSoucreLatLong.longitude,mDestinationLatLong.latitude,mDestinationLatLong.longitude);
+
+                            if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
+
                                 Intent data = new Intent();
                                 data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
                                 data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
@@ -435,10 +433,13 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                                 data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
                                 data.putExtra("picLocAddress", picLocAddress);
                                 data.putExtra("destLocAddress", destLocAddress);
-                                data.putExtra("departure", "");
+                                data.putExtra("departure", 12);
                                 setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
                                 finish();
+                            } else {
+                                llLocationView.setVisibility(View.VISIBLE);
                             }
+
 
                         } else {
                             Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show();
@@ -808,5 +809,190 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             }
         }
     }
+
+
+    //Calculat googgle map timining
+    private void myCalcTime(double lat1, double lng1, double lat2, double lng2) {
+        /*Toast.makeText(context, "" + trip_id, Toast.LENGTH_SHORT).show();*/
+        String source = getAddress(lat1, lng1);
+        String des = getAddress(lat2, lng2);
+        String url = "" + WebFields.DIST_URL.MODE + WebFields.DIST_URL.ORIGINS + source + WebFields.DIST_URL.DESTINATION + des +
+                "&key=AIzaSyDleLMo3h7J3f6FdG8ELCuArBajMLVFxKM";
+        try {
+            JSONObject jsonObject = new JSONObject();
+            Applog.E("request: " + jsonObject.toString());
+//            MyProgressDialog.showProgressDialog(context);
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+//                    MyProgressDialog.hideProgressDialog();
+                    GoogleResponsePojo googleResponsePojo = new Gson().fromJson(response.toString(), GoogleResponsePojo.class);
+//                    tvRemainTime.setText("" + googleResponsePojo.getRows().get(0).getElements().get(0).getDuration().getText() + " Away");
+//                    tvDropInTime.setText("" + googleResponsePojo.getRows().get(0).getElements().get(0).getDuration().getText());
+
+                    totalDuration = googleResponsePojo.getRows().get(0).getElements().get(0).getDuration().getText();
+
+                    //Applog.d("123456",response.optJSONObject("rows").optJSONObject("elements").optJSONObject("distance").optString("text")+":"+response.optJSONObject("rows").optJSONObject("elements").optJSONObject("duration").optString("text"));
+                    Applog.E("success: " + response.toString());
+
+
+//                    String des = mEdtDetstinationLocation.getText().toString();
+//                    String picLocAddress = mEdtPickUpLocation.getText().toString();
+//                    String destLocAddress = mEdtDetstinationLocation.getText().toString();
+//
+//                    if (des != null && !des.equals("null") && !des.equals("")) {
+//                        Intent data = new Intent();
+//                        data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
+//                        data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
+//                        data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
+//                        data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
+//                        data.putExtra("picLocAddress", picLocAddress);
+//                        data.putExtra("destLocAddress", destLocAddress);
+//                        data.putExtra("departure", totalDuration);
+//                        setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
+//                        finish();
+//                    }
+                }
+
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+//                    MyProgressDialog.hideProgressDialog();
+                    error.getStackTrace();
+                    Applog.E("Error: " + error.getMessage());
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public class GoogleResponsePojo {
+
+        private List<String> destination_addresses;
+        private List<String> origin_addresses;
+        private List<Rows> rows;
+        private String status;
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public void setDestination_addresses(List<String> destination_addresses) {
+            this.destination_addresses = destination_addresses;
+        }
+
+        public void setOrigin_addresses(List<String> origin_addresses) {
+            this.origin_addresses = origin_addresses;
+        }
+
+        public void setRows(List<Rows> rows) {
+            this.rows = rows;
+        }
+
+        public List<String> getDestination_addresses() {
+            return destination_addresses;
+        }
+
+        public List<String> getOrigin_addresses() {
+            return origin_addresses;
+        }
+
+        public List<Rows> getRows() {
+            return rows;
+        }
+//getters
+    }
+
+
+    private static class Rows {
+        private List<Element> elements;
+
+        public void setElements(List<Element> elements) {
+            this.elements = elements;
+        }
+
+        public List<Element> getElements() {
+            return elements;
+        }
+//getters
+    }
+
+    private static class Element {
+        private TextValue distance;
+        private TextValue duration;
+        private String status;
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public void setDistance(TextValue distance) {
+            this.distance = distance;
+        }
+
+        public void setDuration(TextValue duration) {
+            this.duration = duration;
+        }
+
+        //getters
+
+        public TextValue getDistance() {
+            return distance;
+        }
+
+        public TextValue getDuration() {
+            return duration;
+        }
+    }
+
+    private static class TextValue {
+        private String text;
+        private String value;
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        //getters
+
+        public String getText() {
+            return text;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
 
 }

@@ -52,6 +52,7 @@ public class WebFields {
         public static final String PARAM_CARD_NUMBER = "card_number";
         public static final String PARAM_EXP_MONTH_YEAR = "exp_month_year";
         public static final String PARAM_ZIPCODE = "zipcode";
+        public static final String PARAM_CARD_TOKEN ="card_token";
 
     }
 
@@ -153,5 +154,13 @@ public class WebFields {
         public static final String MODE = "user/get/triphistory";
 
         public static final String PARAM_USER_ID= "user_id";
+    }
+
+
+    public static final class DIST_URL{
+        public static final String MODE="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&";
+        public static final String ORIGINS="origins=";
+        public static final String DESTINATION="&destinations=";
+        public static final String KEY="&key=AIzaSyDleLMo3h7J3f6FdG8ELCuArBajMLVFxKM";
     }
 }

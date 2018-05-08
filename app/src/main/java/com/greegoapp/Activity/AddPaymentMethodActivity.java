@@ -1,11 +1,14 @@
 package com.greegoapp.Activity;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -16,6 +19,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -23,7 +27,6 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
-import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.CardData;
 import com.greegoapp.Model.GetUserData;
@@ -31,12 +34,19 @@ import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
-import com.greegoapp.Utils.CreditCardFormattingTextWatcher;
 import com.greegoapp.Utils.KeyboardUtility;
+import com.greegoapp.Utils.MYEditCard;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivityAddPaymentMethodBinding;
+import com.stripe.android.Stripe;
+import com.stripe.android.TokenCallback;
+import com.stripe.android.exception.AuthenticationException;
+import com.stripe.android.model.Card;
+import com.stripe.android.model.Token;
+import com.stripe.model.Charge;
+import com.stripe.model.Customer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,9 +57,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Intent;
-
-import static com.greegoapp.Activity.HomeActivity.HOME_SLIDER_PROFILE_UPDATE;
 import static com.greegoapp.Activity.PaymentActivity.ADD_CARD_PAYMENT_METHOD;
 import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_ADD_PAYMENT;
 
@@ -60,7 +67,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     Context context;
     DatePicker datePicker;
 
-    TextInputEditText edtTvCardNumber,edtTvExpDate;
+    TextInputEditText edtTvExpDate;
 
     EditText edtTvCvv, edtTvZipCode;
     Button save;
@@ -71,6 +78,9 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     ArrayList<GetUserData.DataBean.CardsBean> cardData;
     TextView tvEditPaymentTitle;
     ImageButton ibBack;
+    String strCardNo, cardToken;
+    MYEditCard edtTvCardNumber;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,37 +99,157 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     }
 
 
+    String stripPay() {
+        strCardNo = edtTvCardNumber.getText().toString();
+        String date = edtTvExpDate.getText().toString();
+        String cvvno = edtTvCvv.getText().toString();
+        String zipcode = edtTvZipCode.getText().toString();
+
+        Stripe stripe;
+
+        Card card = new Card(strCardNo, Integer.parseInt(date.substring(0, 2)), Integer.parseInt("20" + date.substring(3)), cvvno);
+// Remember to validate the card object before you use it to save time.
+        if (!card.validateCard()) {
+            // Do not continue token creation.
+            edtTvCardNumber.requestFocus();
+            SnackBar.showValidationError(context, snackBarView, getString(R.string.card_not_valid));
+//            Toast.makeText(this, "card not valid", Toast.LENGTH_SHORT).show();
+        } else {
+
+
+            try {
+                MyProgressDialog.showProgressDialog(context);
+                stripe = new Stripe("pk_test_GF0y48SCqViKdCSA8LwOPFVj");
+//            googleMap.clear();
+//            customGoogleMap.clear();
+                stripe.createToken(
+                        card,
+                        new TokenCallback() {
+                            @SuppressLint("StaticFieldLeak")
+                            public void onSuccess(final Token token) {
+
+                                Log.e("check token", ":::::" + token.getId());
+                                Log.e("check token all data", ":::::" + token);
+
+
+//                                final Map<String, Object> parames = new HashMap<>();
+//                                parames.put("amount", 88);
+//                                parames.put("currency", "usd");
+//                                parames.put("description", "ajit payment");
+//                                parames.put("source", token.getId());
+
+                                try {
+                                    new AsyncTask<Void, Void, Void>() {
+
+                                        Charge charge;
+
+                                        @Override
+                                        protected Void doInBackground(
+                                                Void... params) {
+                                            try {
+
+                                                com.stripe.Stripe.apiKey = "sk_test_BXg8CAB9wtNTm1lNBe3HMK2X";
+
+
+                                                Map<String, Object> chargeParams = new HashMap<>();
+                                                chargeParams.put("source", token.getId());
+                                                chargeParams.put("email", "paying.user@example.com");
+
+                                                Customer customer = Customer.create(chargeParams);
+
+                                                Log.e("aj", customer.getId());
+
+
+                                                cardToken = customer.getId();
+
+                                                if (cardToken != null) {
+                                                    callSavePaymentMethodAPI();
+                                                }
+
+                                        /*charge = Charge
+                                                .create(parames);
+*/
+
+                                            } catch (Exception e) {
+                                                // TODO Auto-generated catch block
+                                                e.printStackTrace();
+                                            }
+                                            return null;
+                                        }
+
+                                        protected void onPostExecute(Void result) {
+
+
+                                        }
+
+                                        ;
+
+                                    }.execute();
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+
+                            public void onError(Exception error) {
+                                // Show localized error message
+                                Log.e("check", "erorr" + error.getMessage());
+
+                            }
+                        }
+                );
+
+
+            } catch (AuthenticationException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return cardToken;
+    }
+
     private void setListner() {
         ibBack.setOnClickListener(this);
         btnSavePaymentMethod.setOnClickListener(this);
         edtTvCvv.setOnClickListener(this);
-        //edtTvCardNumber.addTextChangedListener(new CreditCardNumberFormattingTextWatcher());
-        edtTvCardNumber.addTextChangedListener(new CreditCardFormattingTextWatcher(edtTvCardNumber));
+        edtTvCardNumber.addTextChangedListener(new CreditCardNumberFormattingTextWatcher());
+//        edtTvCardNumber.addTextChangedListener(new CreditCardFormattingTextWatcher(edtTvCardNumber));
+//
+//        edtTvExpDate.addTextChangedListener(mDateEntryWatcher);
+//
+//
 
+        edtTvCardNumber.getCardNumber(); // Get the card number
+        edtTvCardNumber.isValid(); // Is the card number valid
+        edtTvCardNumber.getCardType();
         edtTvExpDate.addTextChangedListener(mDateEntryWatcher);
+
     }
+
+
     private TextWatcher mDateEntryWatcher = new TextWatcher() {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             String working = s.toString();
             boolean isValid = true;
-            if (working.length()==2 && before ==0) {
-                if (Integer.parseInt(working) < 1 || Integer.parseInt(working)>12) {
+            if (working.length() == 2 && before == 0) {
+                if (Integer.parseInt(working) < 1 || Integer.parseInt(working) > 12) {
                     isValid = false;
                 } else {
-                    working+="/";
+                    working += "/";
                     edtTvExpDate.setText(working);
                     edtTvExpDate.setSelection(working.length());
                 }
-            }
-            else if (working.length()==5 && before ==0) {
+            } else if (working.length() == 5 && before == 0) {
                 String enteredYear = working.substring(3);
                 int currentYear = Calendar.getInstance().get(Calendar.YEAR);
                 if (Integer.parseInt(enteredYear) < currentYear) {
                     isValid = false;
                 }
-            } else if (working.length()!=7) {
+            } else if (working.length() != 7) {
                 isValid = false;
             }
 
@@ -127,10 +257,12 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         }
 
         @Override
-        public void afterTextChanged(Editable s) {}
+        public void afterTextChanged(Editable s) {
+        }
 
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
 
     };
 
@@ -165,7 +297,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             lock = true;
             for (int i = 4; i < s.length(); i += 5) {
                 if (s.toString().charAt(i) != ' ') {
-                    s.insert(i, " ");
+                    s.insert(i, "-");
                 }
             }
             lock = false;
@@ -189,22 +321,20 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                 break;
             case R.id.btnSavePaymentMethod:
                 KeyboardUtility.hideKeyboard(context, view);
-                if (isValid()) {
-                    if (ConnectivityDetector
-                            .isConnectingToInternet(context)) {
+//                if (isValid()) {
 
-                        callSavePaymentMethodAPI();
+                if (ConnectivityDetector
+                        .isConnectingToInternet(context)) {
+                    stripPay();
 
-                    } else {
-                        SnackBar.showInternetError(context, snackBarView);
-                    }
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
                 }
+//                }
                 break;
-
 
         }
     }
-
 
     private void getDate() {
 
@@ -243,18 +373,18 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         try {
             JSONObject jsonObject = new JSONObject();
 
-            String strCardNo = edtTvCardNumber.getText().toString();
-            strCardNo=strCardNo.replace(" ","");
+            strCardNo = edtTvCardNumber.getText().toString();
+            strCardNo = strCardNo.replace("-", "");
             String strExpDate = edtTvExpDate.getText().toString();
             String strzipCode = edtTvZipCode.getText().toString();
-
 
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_NUMBER, strCardNo);
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_EXP_MONTH_YEAR, strExpDate);
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_ZIPCODE, strzipCode);
+            jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_TOKEN, cardToken);
 
             Applog.E("request UpdateCard=> " + jsonObject.toString());
-            MyProgressDialog.showProgressDialog(context);
+//            MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     WebFields.BASE_URL + WebFields.UPDATE_CARD.MODE, jsonObject, new Response.Listener<JSONObject>() {
@@ -265,19 +395,20 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                     try {
                         CardData cardDetails = new Gson().fromJson(String.valueOf(response), CardData.class);
                         MyProgressDialog.hideProgressDialog();
+
                         if (cardDetails.getError_code() == 0) {
                             SessionManager.setIsUserLoggedin(context, true);
                             Applog.E("UserDetails" + cardDetails);
-                            String card_number =cardDetails.getData().getCard_number();
+                            String card_number = cardDetails.getData().getCard_number();
 
-                            SessionManager.saveCardDetails(context,cardDetails);
+                            SessionManager.saveCardDetails(context, cardDetails);
 
-                            if (REQUEST_ADD_PAYMENT ==110){
+                            if (REQUEST_ADD_PAYMENT == 110) {
                                 Intent data = new Intent();
                                 setResult(REQUEST_ADD_PAYMENT, data);
-                            }else if (ADD_CARD_PAYMENT_METHOD == 1001){
+                            } else if (ADD_CARD_PAYMENT_METHOD == 1001) {
                                 Intent data = new Intent();
-                                data.putExtra("cardNumber",card_number);
+                                data.putExtra("cardNumber", card_number);
                                 setResult(ADD_CARD_PAYMENT_METHOD, data);
                             }
 
@@ -336,20 +467,21 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     }
 
     private boolean isValid() {
-        String cardno = edtTvCardNumber.getText().toString();
+        strCardNo = edtTvCardNumber.getText().toString();
         String date = edtTvExpDate.getText().toString();
         String cvvno = edtTvCvv.getText().toString();
         String zipcode = edtTvZipCode.getText().toString();
-
-        if (cardno.length() < 19) {
-            edtTvCardNumber.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_card_no));
-            return false;
-        } else if (date.isEmpty()) {
+//
+//        if (strCardNo.length() < 19) {
+//            edtTvCardNumber.requestFocus();
+//            SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_card_no));
+//            return false;
+//        } else
+        if (date.isEmpty()) {
             edtTvExpDate.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_exp_date));
             return false;
-        } else if (cvvno.isEmpty()) {
+        }/* else if (cvvno.isEmpty()) {
             edtTvCvv.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_cvv_no));
             return false;
@@ -357,7 +489,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             edtTvCvv.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_valid_cvv_no));
             return false;
-        } else if (zipcode.isEmpty()) {
+        }*/ else if (zipcode.isEmpty()) {
             edtTvZipCode.requestFocus();
             SnackBar.showValidationError(context, snackBarView, getString(R.string.enter_zipcode));
             return false;
@@ -412,12 +544,12 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 //                                        e.printStackTrace();
 //                                    }
                                     Applog.E("Card No===> " + cardNo);
-                                    String s= cardNo;
+                                    String s = cardNo;
                                     String s1 = s.substring(0, 4);
                                     String s2 = s.substring(4, 8);
                                     String s3 = s.substring(8, 12);
-                                    String s4 = s.substring(12,16);
-                                    String strCardNumber = s1 + " " + s2 + " " + s3 + " "+ s4;
+                                    String s4 = s.substring(12, 16);
+                                    String strCardNumber = s1 + " " + s2 + " " + s3 + " " + s4;
                                     edtTvCardNumber.setText(strCardNumber);
                                     edtTvExpDate.setText(cardsBean.getExp_month_year());
                                     edtTvZipCode.setText(cardsBean.getZipcode());

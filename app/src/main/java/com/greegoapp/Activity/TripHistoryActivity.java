@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -45,6 +46,7 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
     TripHistoryAdapter mAdapter;
     View snackBarView;
     int tripHistoryPosition;
+    TextView tvNoDataFaund;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +88,16 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
 
                             alTripHistoryList.addAll(userDetails.getData());
                             Applog.E("TripHistory size==>" + alTripHistoryList.size());
-                            setRecyclerView();
+
+                            if (alTripHistoryList.size() != 0) {
+                                setRecyclerView();
+                                tvNoDataFaund.setVisibility(View.GONE);
+                                rvTripHistory.setVisibility(View.VISIBLE);
+
+                            }else {
+                                tvNoDataFaund.setVisibility(View.VISIBLE);
+                                rvTripHistory.setVisibility(View.GONE);
+                            }
 //                            adapter.notifyDataSetChanged();
 //
                         } else {
@@ -135,10 +146,33 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
             public void onClick(View view, int position) {
                 tripHistoryPosition = position;
                 Intent in = new Intent(context, TripHistoryDetailActivity.class);
+                in.putExtra("drPic", alTripHistoryList.get(tripHistoryPosition).getProfile_pic());
+                in.putExtra("promocode", alTripHistoryList.get(tripHistoryPosition).getPromocode());
 
-                Bundle bundle=new Bundle();
-                bundle.putParcelable("tripHistoryDetails", alTripHistoryList.get(position));
-                in.putExtras(bundle);
+
+                String totalTime = alTripHistoryList.get(tripHistoryPosition).getCreated_at();
+                int totalCost = alTripHistoryList.get(tripHistoryPosition).getTotal_estimated_trip_cost();
+
+                double fromLat = alTripHistoryList.get(tripHistoryPosition).getFrom_lat();
+                double fromLong = alTripHistoryList.get(tripHistoryPosition).getFrom_lng();
+
+                double toLat = alTripHistoryList.get(tripHistoryPosition).getTo_lat();
+                double toLong = alTripHistoryList.get(tripHistoryPosition).getTo_lng();
+
+                in.putExtra("totalTime", totalTime);
+                in.putExtra("totalCost", String.valueOf(totalCost));
+
+                in.putExtra("fromLat", String.valueOf(fromLat));
+                in.putExtra("fromLnd", String.valueOf(fromLong));
+
+                in.putExtra("ToLat", String.valueOf(toLat));
+                in.putExtra("ToLng", String.valueOf(toLong));
+
+                in.putExtra("fromAdd", alTripHistoryList.get(tripHistoryPosition).getFrom_address());
+                in.putExtra("toAdd", alTripHistoryList.get(tripHistoryPosition).getTo_address());
+
+                in.putExtra("startTime", alTripHistoryList.get(tripHistoryPosition).getCreated_at());
+//                in.putExtra("drPic", alTripHistoryList.get(tripHistoryPosition).get());
 
                 startActivity(in);
 
@@ -160,8 +194,7 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
     private void bindViews() {
         rvTripHistory = binding.rvTripHistory;
         ibback = binding.ibBack;
-
-
+        tvNoDataFaund =binding.tvNoDataFaund;
     }
 
     @Override

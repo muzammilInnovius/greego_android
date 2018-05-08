@@ -20,52 +20,66 @@
         <!--</LinearLayout>-->
 
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/scale_20dp"
             android:background="@drawable/payment_tv_method_bg"
             android:orientation="horizontal"
+            android:padding="@dimen/scale_5dp"
             android:paddingLeft="@dimen/scale_1dp"
-            android:weightSum="5">
+            android:weightSum="3">
 
-            <ImageView
+            <!--   <ImageView
+                   android:id="@+id/ivCardNumber"
+                   android:layout_width="0dp"
+                   android:layout_height="@dimen/scale_20dp"
+                   android:layout_gravity="center"
+                   android:layout_weight="0.5"
+                   android:src="@mipmap/ic_un_tick" />-->
+            <RadioButton
                 android:id="@+id/ivCardNumber"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/scale_20dp"
                 android:layout_height="@dimen/scale_20dp"
                 android:layout_gravity="center"
-                android:layout_weight="0.5"
                 android:src="@mipmap/ic_un_tick" />
 
             <ImageView
                 android:id="@+id/ivCardLogo"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/scale_1dp"
+                android:layout_toRightOf="@+id/ivCardNumber"
                 android:src="@mipmap/american_flag_large" />
 
             <TextView
                 android:id="@+id/tvCardDetail"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="3"
+                android:layout_marginLeft="@dimen/scale_1dp"
+                android:layout_toLeftOf="@+id/ivDeleteCard"
+                android:layout_toRightOf="@+id/ivCardLogo"
                 android:gravity="center_vertical"
                 android:paddingLeft="@dimen/scale_15dp"
                 android:text="**** 4930"
                 android:textColor="@color/black"
                 android:textSize="@dimen/txt_14" />
 
+
+
+
             <ImageView
                 android:id="@+id/ivDeleteCard"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_width="@dimen/scale_20dp"
+                android:layout_height="@dimen/scale_20dp"
+                android:layout_alignParentRight="true"
                 android:src="@mipmap/ic_remove" />
 
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

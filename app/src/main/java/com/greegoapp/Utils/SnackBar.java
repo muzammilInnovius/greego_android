@@ -19,6 +19,7 @@ public class SnackBar {
         Snackbar snackbar = Snackbar
                 .make(view, "Please check your internet connection.", Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.WHITE);
+        snackbar.setDuration(10000);
         View snackbarView = snackbar.getView();
 //        snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.warning_bg));
@@ -53,6 +54,19 @@ public class SnackBar {
         View snackbarView = snackbar.getView();
 //        snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.success_bg));
+        snackbar.show();
+    }
+
+
+
+    public static void showDriverRequestStatus(Context context, View view, String msg) {
+        Snackbar snackbar = Snackbar
+                .make(view, msg, Snackbar.LENGTH_SHORT);
+        snackbar.setActionTextColor(Color.WHITE);
+        snackbar.setDuration(10000);
+        View snackbarView = snackbar.getView();
+//        snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
+        snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.app_bg));
         snackbar.show();
     }
 

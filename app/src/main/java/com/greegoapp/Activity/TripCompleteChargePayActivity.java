@@ -11,7 +11,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -73,6 +72,8 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
         Applog.E("tripId==>" + tripId);
         tvUserFrmAddress.setText(fromAddress);
 
+//        driverPic = "http://kroslinkstech.in/greego/storage/app/profile_pic/9Ad7LDsTSFdWUno5kQ6h3ZQHrzohKJ9zpSpODQpW.png";
+
         if (driverPic != null) {
             Glide.clear(ivDriverProPic);
             Glide.with(context)
@@ -105,7 +106,6 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
         rtgBarDriver.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                Toast.makeText(context, "rating ==> " + rating + " ratingBar => " + ratingBar, Toast.LENGTH_SHORT).show();
                 userRating = rating;
             }
         });
@@ -142,6 +142,7 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
                 @Override
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
+                    MyProgressDialog.hideProgressDialog();
 
                     Intent in = new Intent(context, HomeActivity.class);
                     startActivity(in);
@@ -178,5 +179,11 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

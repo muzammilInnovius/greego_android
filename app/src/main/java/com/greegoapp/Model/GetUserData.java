@@ -9,7 +9,7 @@ public class GetUserData implements Parcelable{
 
 
     /**
-     * data : {"id":140,"name":"vishal","email":"vishal@gmail.com","lastname":"sdsa","contact_number":"+918460521189","city":null,"profile_pic":"","promocode":null,"verified":"0","is_iphone":"0","is_agreed":"1","device_id":null,"created_at":"2018-04-21 09:31:22","updated_at":"2018-04-21 09:33:10","cards":[{"id":63,"user_id":"140","card_number":"MTExMTIyMjIzMzMzNDQ0NA==","exp_month_year":"12","zipcode":"1234","created_at":"2018-04-21 09:33:28","updated_at":"2018-04-21 09:33:28"}],"vehicles":[{"id":105,"user_id":"140","vehicle_id":"3","year":"2017","type":"0","color":"red","transmission_type":"1","selected":"0","created_at":"2018-04-21 09:33:38","updated_at":"2018-04-21 09:33:38","vehicle_name":"ac","vehicle_model":"428","vehiclemodel":{"id":3,"vehicle_manufacturer_id":"1","model":"428","updated_at":"2018-04-11 01:39:54","created_at":"2018-04-11 01:39:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 01:39:52","updated_at":"2018-04-11 01:39:52"}}}]}
+     * data : {"id":244,"name":"Priyanka","email":"priyanka.innovius@gmail.com","lastname":"patel","contact_number":"+917874412012","city":null,"state":null,"profile_pic":"http://kroslinkstech.in/greego/storage/app/profile_pic/9Ad7LDsTSFdWUno5kQ6h3ZQHrzohKJ9zpSpODQpW.png","promocode":null,"invitecode":"JDGgXQ","verified":0,"is_iphone":0,"is_agreed":1,"is_deactivated":0,"created_at":"2018-04-27 10:59:24","updated_at":"2018-05-03 06:24:19","cards":[{"id":64,"user_id":244,"card_number":"MTIzNDEyMzQxMjM0MTIzNA==","card_token":"1234","exp_month_year":"12/12","zipcode":12121,"selected":0,"created_at":"2018-05-03 06:40:05","updated_at":"2018-05-03 06:40:05"},{"id":65,"user_id":244,"card_number":"NDMyMTQzMjE0MzIxNDMyMQ==","card_token":"1234","exp_month_year":"02/2","zipcode":12345,"selected":0,"created_at":"2018-05-03 06:40:39","updated_at":"2018-05-03 06:40:39"}],"vehicles":[{"id":220,"user_id":244,"vehicle_id":1,"year":2010,"type":0,"color":"red","transmission_type":"0","selected":1,"created_at":"2018-05-02 12:38:16","updated_at":"2018-05-02 12:42:15","vehicle_name":"ac","vehicle_model":"2-Litre","vehiclemodel":{"id":1,"vehicle_manufacturer_id":1,"model":"2-Litre","updated_at":"2018-04-11 07:09:54","created_at":"2018-04-11 07:09:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 07:09:52","updated_at":"2018-04-11 07:09:52"}}},{"id":221,"user_id":244,"vehicle_id":147,"year":2002,"type":0,"color":"red","transmission_type":"0","selected":0,"created_at":"2018-05-02 12:41:36","updated_at":"2018-05-02 12:42:15","vehicle_name":"berkeley","vehicle_model":"Twosome","vehiclemodel":{"id":147,"vehicle_manufacturer_id":13,"model":"Twosome","updated_at":"2018-04-11 07:10:05","created_at":"2018-04-11 07:10:05","vmake":{"id":13,"name":"berkeley","created_at":"2018-04-11 07:10:05","updated_at":"2018-04-11 07:10:05"}}}]}
      * error_code : 0
      * message :
      */
@@ -70,24 +70,26 @@ public class GetUserData implements Parcelable{
         this.message = message;
     }
 
-    public static class DataBean implements Parcelable{
+    public static class DataBean {
         /**
-         * id : 140
-         * name : vishal
-         * email : vishal@gmail.com
-         * lastname : sdsa
-         * contact_number : +918460521189
+         * id : 244
+         * name : Priyanka
+         * email : priyanka.innovius@gmail.com
+         * lastname : patel
+         * contact_number : +917874412012
          * city : null
-         * profile_pic :
+         * state : null
+         * profile_pic : http://kroslinkstech.in/greego/storage/app/profile_pic/9Ad7LDsTSFdWUno5kQ6h3ZQHrzohKJ9zpSpODQpW.png
          * promocode : null
+         * invitecode : JDGgXQ
          * verified : 0
          * is_iphone : 0
          * is_agreed : 1
-         * device_id : null
-         * created_at : 2018-04-21 09:31:22
-         * updated_at : 2018-04-21 09:33:10
-         * cards : [{"id":63,"user_id":"140","card_number":"MTExMTIyMjIzMzMzNDQ0NA==","exp_month_year":"12","zipcode":"1234","created_at":"2018-04-21 09:33:28","updated_at":"2018-04-21 09:33:28"}]
-         * vehicles : [{"id":105,"user_id":"140","vehicle_id":"3","year":"2017","type":"0","color":"red","transmission_type":"1","selected":"0","created_at":"2018-04-21 09:33:38","updated_at":"2018-04-21 09:33:38","vehicle_name":"ac","vehicle_model":"428","vehiclemodel":{"id":3,"vehicle_manufacturer_id":"1","model":"428","updated_at":"2018-04-11 01:39:54","created_at":"2018-04-11 01:39:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 01:39:52","updated_at":"2018-04-11 01:39:52"}}}]
+         * is_deactivated : 0
+         * created_at : 2018-04-27 10:59:24
+         * updated_at : 2018-05-03 06:24:19
+         * cards : [{"id":64,"user_id":244,"card_number":"MTIzNDEyMzQxMjM0MTIzNA==","card_token":"1234","exp_month_year":"12/12","zipcode":12121,"selected":0,"created_at":"2018-05-03 06:40:05","updated_at":"2018-05-03 06:40:05"},{"id":65,"user_id":244,"card_number":"NDMyMTQzMjE0MzIxNDMyMQ==","card_token":"1234","exp_month_year":"02/2","zipcode":12345,"selected":0,"created_at":"2018-05-03 06:40:39","updated_at":"2018-05-03 06:40:39"}]
+         * vehicles : [{"id":220,"user_id":244,"vehicle_id":1,"year":2010,"type":0,"color":"red","transmission_type":"0","selected":1,"created_at":"2018-05-02 12:38:16","updated_at":"2018-05-02 12:42:15","vehicle_name":"ac","vehicle_model":"2-Litre","vehiclemodel":{"id":1,"vehicle_manufacturer_id":1,"model":"2-Litre","updated_at":"2018-04-11 07:09:54","created_at":"2018-04-11 07:09:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 07:09:52","updated_at":"2018-04-11 07:09:52"}}},{"id":221,"user_id":244,"vehicle_id":147,"year":2002,"type":0,"color":"red","transmission_type":"0","selected":0,"created_at":"2018-05-02 12:41:36","updated_at":"2018-05-02 12:42:15","vehicle_name":"berkeley","vehicle_model":"Twosome","vehiclemodel":{"id":147,"vehicle_manufacturer_id":13,"model":"Twosome","updated_at":"2018-04-11 07:10:05","created_at":"2018-04-11 07:10:05","vmake":{"id":13,"name":"berkeley","created_at":"2018-04-11 07:10:05","updated_at":"2018-04-11 07:10:05"}}}]
          */
 
         private int id;
@@ -96,44 +98,18 @@ public class GetUserData implements Parcelable{
         private String lastname;
         private String contact_number;
         private Object city;
+        private Object state;
         private String profile_pic;
         private Object promocode;
-        private String verified;
-        private String is_iphone;
-        private String is_agreed;
-        private Object device_id;
+        private String invitecode;
+        private int verified;
+        private int is_iphone;
+        private int is_agreed;
+        private int is_deactivated;
         private String created_at;
         private String updated_at;
         private List<CardsBean> cards;
         private List<VehiclesBean> vehicles;
-
-        protected DataBean(Parcel in) {
-            id = in.readInt();
-            name = in.readString();
-            email = in.readString();
-            lastname = in.readString();
-            contact_number = in.readString();
-            profile_pic = in.readString();
-            verified = in.readString();
-            is_iphone = in.readString();
-            is_agreed = in.readString();
-            created_at = in.readString();
-            updated_at = in.readString();
-            cards = in.createTypedArrayList(CardsBean.CREATOR);
-            vehicles = in.createTypedArrayList(VehiclesBean.CREATOR);
-        }
-
-        public static final Creator<DataBean> CREATOR = new Creator<DataBean>() {
-            @Override
-            public DataBean createFromParcel(Parcel in) {
-                return new DataBean(in);
-            }
-
-            @Override
-            public DataBean[] newArray(int size) {
-                return new DataBean[size];
-            }
-        };
 
         public int getId() {
             return id;
@@ -183,6 +159,14 @@ public class GetUserData implements Parcelable{
             this.city = city;
         }
 
+        public Object getState() {
+            return state;
+        }
+
+        public void setState(Object state) {
+            this.state = state;
+        }
+
         public String getProfile_pic() {
             return profile_pic;
         }
@@ -199,36 +183,44 @@ public class GetUserData implements Parcelable{
             this.promocode = promocode;
         }
 
-        public String getVerified() {
+        public String getInvitecode() {
+            return invitecode;
+        }
+
+        public void setInvitecode(String invitecode) {
+            this.invitecode = invitecode;
+        }
+
+        public int getVerified() {
             return verified;
         }
 
-        public void setVerified(String verified) {
+        public void setVerified(int verified) {
             this.verified = verified;
         }
 
-        public String getIs_iphone() {
+        public int getIs_iphone() {
             return is_iphone;
         }
 
-        public void setIs_iphone(String is_iphone) {
+        public void setIs_iphone(int is_iphone) {
             this.is_iphone = is_iphone;
         }
 
-        public String getIs_agreed() {
+        public int getIs_agreed() {
             return is_agreed;
         }
 
-        public void setIs_agreed(String is_agreed) {
+        public void setIs_agreed(int is_agreed) {
             this.is_agreed = is_agreed;
         }
 
-        public Object getDevice_id() {
-            return device_id;
+        public int getIs_deactivated() {
+            return is_deactivated;
         }
 
-        public void setDevice_id(Object device_id) {
-            this.device_id = device_id;
+        public void setIs_deactivated(int is_deactivated) {
+            this.is_deactivated = is_deactivated;
         }
 
         public String getCreated_at() {
@@ -263,68 +255,28 @@ public class GetUserData implements Parcelable{
             this.vehicles = vehicles;
         }
 
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(id);
-            dest.writeString(name);
-            dest.writeString(email);
-            dest.writeString(lastname);
-            dest.writeString(contact_number);
-            dest.writeString(profile_pic);
-            dest.writeString(verified);
-            dest.writeString(is_iphone);
-            dest.writeString(is_agreed);
-            dest.writeString(created_at);
-            dest.writeString(updated_at);
-            dest.writeTypedList(cards);
-            dest.writeTypedList(vehicles);
-        }
-
-        public static class CardsBean implements Parcelable{
+        public static class CardsBean {
             /**
-             * id : 63
-             * user_id : 140
-             * card_number : MTExMTIyMjIzMzMzNDQ0NA==
-             * exp_month_year : 12
-             * zipcode : 1234
-             * created_at : 2018-04-21 09:33:28
-             * updated_at : 2018-04-21 09:33:28
+             * id : 64
+             * user_id : 244
+             * card_number : MTIzNDEyMzQxMjM0MTIzNA==
+             * card_token : 1234
+             * exp_month_year : 12/12
+             * zipcode : 12121
+             * selected : 0
+             * created_at : 2018-05-03 06:40:05
+             * updated_at : 2018-05-03 06:40:05
              */
 
             private int id;
-            private String user_id;
+            private int user_id;
             private String card_number;
+            private String card_token;
             private String exp_month_year;
-            private String zipcode;
+            private int zipcode;
+            private int selected;
             private String created_at;
             private String updated_at;
-
-            protected CardsBean(Parcel in) {
-                id = in.readInt();
-                user_id = in.readString();
-                card_number = in.readString();
-                exp_month_year = in.readString();
-                zipcode = in.readString();
-                created_at = in.readString();
-                updated_at = in.readString();
-            }
-
-            public static final Creator<CardsBean> CREATOR = new Creator<CardsBean>() {
-                @Override
-                public CardsBean createFromParcel(Parcel in) {
-                    return new CardsBean(in);
-                }
-
-                @Override
-                public CardsBean[] newArray(int size) {
-                    return new CardsBean[size];
-                }
-            };
 
             public int getId() {
                 return id;
@@ -334,11 +286,11 @@ public class GetUserData implements Parcelable{
                 this.id = id;
             }
 
-            public String getUser_id() {
+            public int getUser_id() {
                 return user_id;
             }
 
-            public void setUser_id(String user_id) {
+            public void setUser_id(int user_id) {
                 this.user_id = user_id;
             }
 
@@ -350,6 +302,14 @@ public class GetUserData implements Parcelable{
                 this.card_number = card_number;
             }
 
+            public String getCard_token() {
+                return card_token;
+            }
+
+            public void setCard_token(String card_token) {
+                this.card_token = card_token;
+            }
+
             public String getExp_month_year() {
                 return exp_month_year;
             }
@@ -358,12 +318,20 @@ public class GetUserData implements Parcelable{
                 this.exp_month_year = exp_month_year;
             }
 
-            public String getZipcode() {
+            public int getZipcode() {
                 return zipcode;
             }
 
-            public void setZipcode(String zipcode) {
+            public void setZipcode(int zipcode) {
                 this.zipcode = zipcode;
+            }
+
+            public int getSelected() {
+                return selected;
+            }
+
+            public void setSelected(int selected) {
+                this.selected = selected;
             }
 
             public String getCreated_at() {
@@ -381,92 +349,38 @@ public class GetUserData implements Parcelable{
             public void setUpdated_at(String updated_at) {
                 this.updated_at = updated_at;
             }
-
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(Parcel dest, int flags) {
-                dest.writeInt(id);
-                dest.writeString(user_id);
-                dest.writeString(card_number);
-                dest.writeString(exp_month_year);
-                dest.writeString(zipcode);
-                dest.writeString(created_at);
-                dest.writeString(updated_at);
-            }
         }
 
-        public static class VehiclesBean implements Parcelable {
+        public static class VehiclesBean {
             /**
-             * id : 105
-             * user_id : 140
-             * vehicle_id : 3
-             * year : 2017
+             * id : 220
+             * user_id : 244
+             * vehicle_id : 1
+             * year : 2010
              * type : 0
              * color : red
-             * transmission_type : 1
-             * selected : 0
-             * created_at : 2018-04-21 09:33:38
-             * updated_at : 2018-04-21 09:33:38
+             * transmission_type : 0
+             * selected : 1
+             * created_at : 2018-05-02 12:38:16
+             * updated_at : 2018-05-02 12:42:15
              * vehicle_name : ac
-             * vehicle_model : 428
-             * vehiclemodel : {"id":3,"vehicle_manufacturer_id":"1","model":"428","updated_at":"2018-04-11 01:39:54","created_at":"2018-04-11 01:39:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 01:39:52","updated_at":"2018-04-11 01:39:52"}}
+             * vehicle_model : 2-Litre
+             * vehiclemodel : {"id":1,"vehicle_manufacturer_id":1,"model":"2-Litre","updated_at":"2018-04-11 07:09:54","created_at":"2018-04-11 07:09:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 07:09:52","updated_at":"2018-04-11 07:09:52"}}
              */
 
             private int id;
-            private String user_id;
-            private String vehicle_id;
-            private String year;
-            private String type;
+            private int user_id;
+            private int vehicle_id;
+            private int year;
+            private int type;
             private String color;
             private String transmission_type;
-            private String selected;
+            private int selected;
             private String created_at;
             private String updated_at;
             private String vehicle_name;
             private String vehicle_model;
             private VehiclemodelBean vehiclemodel;
-
-            public boolean isSelected() {
-                return isSelected;
-            }
-
-            public void setSelected(boolean selected) {
-                isSelected = selected;
-            }
-
-            private boolean isSelected = false;
-
-            protected VehiclesBean(Parcel in) {
-                id = in.readInt();
-                user_id = in.readString();
-                vehicle_id = in.readString();
-                year = in.readString();
-                type = in.readString();
-                color = in.readString();
-                transmission_type = in.readString();
-                selected = in.readString();
-                created_at = in.readString();
-                updated_at = in.readString();
-                vehicle_name = in.readString();
-                vehicle_model = in.readString();
-                vehiclemodel = in.readParcelable(VehiclemodelBean.class.getClassLoader());
-            }
-
-            public static final Creator<VehiclesBean> CREATOR = new Creator<VehiclesBean>() {
-                @Override
-                public VehiclesBean createFromParcel(Parcel in) {
-                    return new VehiclesBean(in);
-                }
-
-                @Override
-                public VehiclesBean[] newArray(int size) {
-                    return new VehiclesBean[size];
-                }
-            };
 
             public int getId() {
                 return id;
@@ -476,35 +390,35 @@ public class GetUserData implements Parcelable{
                 this.id = id;
             }
 
-            public String getUser_id() {
+            public int getUser_id() {
                 return user_id;
             }
 
-            public void setUser_id(String user_id) {
+            public void setUser_id(int user_id) {
                 this.user_id = user_id;
             }
 
-            public String getVehicle_id() {
+            public int getVehicle_id() {
                 return vehicle_id;
             }
 
-            public void setVehicle_id(String vehicle_id) {
+            public void setVehicle_id(int vehicle_id) {
                 this.vehicle_id = vehicle_id;
             }
 
-            public String getYear() {
+            public int getYear() {
                 return year;
             }
 
-            public void setYear(String year) {
+            public void setYear(int year) {
                 this.year = year;
             }
 
-            public String getType() {
+            public int getType() {
                 return type;
             }
 
-            public void setType(String type) {
+            public void setType(int type) {
                 this.type = type;
             }
 
@@ -524,11 +438,11 @@ public class GetUserData implements Parcelable{
                 this.transmission_type = transmission_type;
             }
 
-            public String getSelected() {
+            public int getSelected() {
                 return selected;
             }
 
-            public void setSelected(String selected) {
+            public void setSelected(int selected) {
                 this.selected = selected;
             }
 
@@ -572,66 +486,22 @@ public class GetUserData implements Parcelable{
                 this.vehiclemodel = vehiclemodel;
             }
 
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(Parcel dest, int flags) {
-                dest.writeInt(id);
-                dest.writeString(user_id);
-                dest.writeString(vehicle_id);
-                dest.writeString(year);
-                dest.writeString(type);
-                dest.writeString(color);
-                dest.writeString(transmission_type);
-                dest.writeString(selected);
-                dest.writeString(created_at);
-                dest.writeString(updated_at);
-                dest.writeString(vehicle_name);
-                dest.writeString(vehicle_model);
-                dest.writeParcelable(vehiclemodel, flags);
-            }
-
-
-            public static class VehiclemodelBean implements Parcelable {
+            public static class VehiclemodelBean {
                 /**
-                 * id : 3
+                 * id : 1
                  * vehicle_manufacturer_id : 1
-                 * model : 428
-                 * updated_at : 2018-04-11 01:39:54
-                 * created_at : 2018-04-11 01:39:54
-                 * vmake : {"id":1,"name":"ac","created_at":"2018-04-11 01:39:52","updated_at":"2018-04-11 01:39:52"}
+                 * model : 2-Litre
+                 * updated_at : 2018-04-11 07:09:54
+                 * created_at : 2018-04-11 07:09:54
+                 * vmake : {"id":1,"name":"ac","created_at":"2018-04-11 07:09:52","updated_at":"2018-04-11 07:09:52"}
                  */
 
                 private int id;
-                private String vehicle_manufacturer_id;
+                private int vehicle_manufacturer_id;
                 private String model;
                 private String updated_at;
                 private String created_at;
                 private VmakeBean vmake;
-
-                protected VehiclemodelBean(Parcel in) {
-                    id = in.readInt();
-                    vehicle_manufacturer_id = in.readString();
-                    model = in.readString();
-                    updated_at = in.readString();
-                    created_at = in.readString();
-                    vmake = in.readParcelable(VmakeBean.class.getClassLoader());
-                }
-
-                public static final Creator<VehiclemodelBean> CREATOR = new Creator<VehiclemodelBean>() {
-                    @Override
-                    public VehiclemodelBean createFromParcel(Parcel in) {
-                        return new VehiclemodelBean(in);
-                    }
-
-                    @Override
-                    public VehiclemodelBean[] newArray(int size) {
-                        return new VehiclemodelBean[size];
-                    }
-                };
 
                 public int getId() {
                     return id;
@@ -641,11 +511,11 @@ public class GetUserData implements Parcelable{
                     this.id = id;
                 }
 
-                public String getVehicle_manufacturer_id() {
+                public int getVehicle_manufacturer_id() {
                     return vehicle_manufacturer_id;
                 }
 
-                public void setVehicle_manufacturer_id(String vehicle_manufacturer_id) {
+                public void setVehicle_manufacturer_id(int vehicle_manufacturer_id) {
                     this.vehicle_manufacturer_id = vehicle_manufacturer_id;
                 }
 
@@ -681,52 +551,18 @@ public class GetUserData implements Parcelable{
                     this.vmake = vmake;
                 }
 
-                @Override
-                public int describeContents() {
-                    return 0;
-                }
-
-                @Override
-                public void writeToParcel(Parcel dest, int flags) {
-                    dest.writeInt(id);
-                    dest.writeString(vehicle_manufacturer_id);
-                    dest.writeString(model);
-                    dest.writeString(updated_at);
-                    dest.writeString(created_at);
-                    dest.writeParcelable(vmake, flags);
-                }
-
-                public static class VmakeBean implements Parcelable {
+                public static class VmakeBean {
                     /**
                      * id : 1
                      * name : ac
-                     * created_at : 2018-04-11 01:39:52
-                     * updated_at : 2018-04-11 01:39:52
+                     * created_at : 2018-04-11 07:09:52
+                     * updated_at : 2018-04-11 07:09:52
                      */
 
                     private int id;
                     private String name;
                     private String created_at;
                     private String updated_at;
-
-                    protected VmakeBean(Parcel in) {
-                        id = in.readInt();
-                        name = in.readString();
-                        created_at = in.readString();
-                        updated_at = in.readString();
-                    }
-
-                    public static final Creator<VmakeBean> CREATOR = new Creator<VmakeBean>() {
-                        @Override
-                        public VmakeBean createFromParcel(Parcel in) {
-                            return new VmakeBean(in);
-                        }
-
-                        @Override
-                        public VmakeBean[] newArray(int size) {
-                            return new VmakeBean[size];
-                        }
-                    };
 
                     public int getId() {
                         return id;
@@ -758,19 +594,6 @@ public class GetUserData implements Parcelable{
 
                     public void setUpdated_at(String updated_at) {
                         this.updated_at = updated_at;
-                    }
-
-                    @Override
-                    public int describeContents() {
-                        return 0;
-                    }
-
-                    @Override
-                    public void writeToParcel(Parcel dest, int flags) {
-                        dest.writeInt(id);
-                        dest.writeString(name);
-                        dest.writeString(created_at);
-                        dest.writeString(updated_at);
                     }
                 }
             }

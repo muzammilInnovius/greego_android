@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:mytextview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.constraint.ConstraintLayout
@@ -25,11 +24,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/scale_3dp"
-                android:layout_marginRight="@dimen/scale_5dp"
                 android:layout_marginTop="@dimen/scale_5dp"
                 android:background="@android:color/transparent"
                 android:padding="@dimen/scale_6dp"
-                android:src="@mipmap/ic_back"
+                android:src="@mipmap/ic_back_button"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -80,19 +78,37 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/header" />
 
-        <LinearLayout
-            android:id="@+id/llemail"
+        <!--<LinearLayout-->
+        <!--android:id="@+id/llemail"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="@dimen/scale_35dp"-->
+        <!--android:orientation="horizontal"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle">-->
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_marginTop="@dimen/scale_35dp"
+            android:id="@+id/rvTripHistory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/scale_35dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle">
+            app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rvTripHistory"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvNoDataFaund"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No trip history found."
+            android:textColor="@color/app_bg"
+            android:textSize="@dimen/txt_18"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--</LinearLayout>-->
 
 
     </android.support.constraint.ConstraintLayout>

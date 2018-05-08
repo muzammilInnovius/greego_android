@@ -31,7 +31,6 @@ public class GlobalValues {
 
     public static final String DRIVER_CANCELLED = "0";
     public static final String DRIVER_ASSIGNED = "1";
-    public static final String DRIVER_ON_WAY= "2";
     public static final String DRIVER_WAITING= "2";
     public static final String DRIVER_ONGOING= "3";
     public static final String DRIVER_COMPLETED= "4";

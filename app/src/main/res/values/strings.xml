@@ -56,6 +56,7 @@
     <string name="zipcode">Zip Code</string>
     <string name="save">Save</string>
     <string name="enter_valid_card_no">Card number should be minimum 16 characters long.</string>
+    <string name="card_not_valid">Card not valid.</string>
     <string name="enter_exp_date">Please select expire date.</string>
     <string name="enter_cvv_no">Please enter cvv number.</string>
     <string name="enter_valid_cvv_no">CVV number should be minimum 3 characters long.</string>

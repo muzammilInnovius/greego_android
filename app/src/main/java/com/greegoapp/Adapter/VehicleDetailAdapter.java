@@ -1,18 +1,20 @@
 package com.greegoapp.Adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -26,7 +28,6 @@ import com.greegoapp.Model.GetUserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
-import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -46,11 +47,11 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
     RecyclerViewItemClickListener mListener;
     Context context;
     private int lastSelectedPosition = -1;
+    int oldPosition = -1;
+    boolean isChecked;
     GetUserData.DataBean.VehiclesBean vehicleDetailModel;
     private boolean isCheck = false;
-    int position, layoutPosition;
 
-    String vehicle_select_id, vehicle_id;
 
     public VehicleDetailAdapter(Context context, ArrayList<GetUserData.DataBean.VehiclesBean> users, RecyclerViewItemClickListener mListener) {
         VehicleModelList = users;
@@ -71,71 +72,38 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
     public void onBindViewHolder(final VehicleDetailViewHolder holder, final int position) {
 
         vehicleDetailModel = VehicleModelList.get(position);
-        vehicle_id = vehicleDetailModel.getVehicle_id();
-        vehicle_select_id = vehicleDetailModel.getSelected();
 
+        final int vehicle_id = vehicleDetailModel.getVehicle_id();
+        final int vehicle_select_id = vehicleDetailModel.getSelected();
 
-        if (vehicleDetailModel != null) {
-            holder.tvYear.setText(vehicleDetailModel.getYear());
-            holder.tvMake.setText(vehicleDetailModel.getVehicle_name());
-            holder.tvColor.setText(vehicleDetailModel.getColor());
-            holder.tvModel.setText(vehicleDetailModel.getVehicle_model());
-
-            if (vehicle_select_id.matches("1")) {
-                holder.mCheckBox.setChecked(Integer.parseInt(vehicle_id) == lastSelectedPosition);
-//                lastSelectedPosition = position;
-                holder.mCheckBox.setChecked(true);
-            } else {
+         if (lastSelectedPosition == position) {
+           holder.mCheckBox.setChecked(true);
+        } else {
+            if(oldPosition == position)
+            {
+                holder.mCheckBox.setChecked(false);
+            }else
+            {
                 holder.mCheckBox.setChecked(false);
             }
         }
 
-
-//        holder.mCheckBox.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                CheckBox cb = (CheckBox) v;
-//                int clickedPos = ((Integer) cb.getTag()).intValue();
-//
-//                if (cb.isChecked()) {
-//                    if (lastChecked != null) {
-//                        lastChecked.setChecked(false);
-//                        VehicleModelList.get(lastCheckedPos).setSelected(false);
-//                        Toast.makeText(context, "1111111", Toast.LENGTH_SHORT).show();
-//                    }
-//                    Toast.makeText(context, "2222222", Toast.LENGTH_SHORT).show();
-//                    lastChecked = cb;
-//                    lastCheckedPos = clickedPos;
-//                } else
-//                    Toast.makeText(context, "333333", Toast.LENGTH_SHORT).show();
-//                    lastChecked = null;
-//
-//                VehicleModelList.get(clickedPos).setSelected(cb.isChecked());
-//                notifyDataSetChanged();
-//            }
-//        });
+        if (vehicleDetailModel != null) {
+            holder.tvYear.setText(String.valueOf(vehicleDetailModel.getYear()));
+            holder.tvMake.setText(vehicleDetailModel.getVehicle_name());
+            holder.tvColor.setText(vehicleDetailModel.getColor());
+            holder.tvModel.setText(vehicleDetailModel.getVehicle_model());
+            if (vehicle_select_id == 1 && oldPosition==-1) {
+                    oldPosition = holder.getAdapterPosition();
+                   holder.mCheckBox.setChecked(true);
+            }
+        }
     }
 
 
-//
-//        holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if(isChecked){
-//                    holder.mCheckBox.setChecked(true);
-////                    vehicleDetailModel.setSelected(true);
-//                }else {
-////                    vehicleDetailModel.setSelected(false);
-//                    holder.mCheckBox.setChecked(false);
-//                }
-//            }
-//        });
-//        holder.mCheckBox.setChecked(vehicleDetailModel.isSelected());
-
-//    }
 
 
-    private void callVehicleSelectApi(String vehicle_id) {
+    private void callVehicleSelectApi(int vehicle_id) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(WebFields.SELECT_VEHICLE.PARAM_VEHICLE_ID, vehicle_id);
@@ -145,13 +113,12 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     WebFields.BASE_URL + WebFields.SELECT_VEHICLE.MODE, jsonObject, new Response.Listener<JSONObject>() {
 
-
                 @Override
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
                     MyProgressDialog.hideProgressDialog();
-
                     notifyDataSetChanged();
+
 
                 }
             }, new Response.ErrorListener() {
@@ -186,23 +153,7 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
         }
     }
 
-    /*public void update(int po,ArrayList<GetUserData.DataBean.VehiclesBean> List){
-                 lastSelectedPosition =po;
-                VehicleModelList =List;
-        Toast.makeText(context,
-                "sele "+List,
-                Toast.LENGTH_LONG).show();
 
-        Toast.makeText(context,
-                "sele "+po,
-                Toast.LENGTH_LONG).show();
-
-
-    //             notifyDataSetChanged();
-
-
-
-    }*/
     @Override
     public int getItemCount() {
         return VehicleModelList.size();
@@ -229,106 +180,57 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
             mCheckBox = mBinding.chkVehicleSet;
             view.setOnClickListener(this);
 
-           /* mCheckBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    lastSelectedPosition = getAdapterPosition();
-                    *//*VehicleModelList.get(lastSelectedPosition).setSelected(false);*//*
-                    //      vehicleDetailModel.setSelected(lastSelectedPosition+"");
-                    callVehicleSelectApi(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
-                    VehicleModelList.get(getLayoutPosition()).setSelected(true);
-                    notifyDataSetChanged();
-                *//*    Toast.makeText(context,getLayoutPosition()+
-                            "selected offer is ",
-                            Toast.LENGTH_LONG).show();*//*
-                }
-            });*/
-//            mCheckBox.setOnClickListener(this);
+            mCheckBox.setOnClickListener(this);
             imgVwDelete.setOnClickListener(this);
 
-            mCheckBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-
-
-                    lastSelectedPosition = getAdapterPosition();
-                    mCheckBox.setChecked(Integer.parseInt(vehicle_id) == lastSelectedPosition);
-                    mCheckBox.setChecked(true);
-                    //because of this blinking problem occurs so
-                    //i have a suggestion to add notifyDataSetChanged();
-                    //   notifyItemRangeChanged(0, list.length);//blink list problem
-                    callVehicleSelectApi(vehicle_id);
-                    notifyDataSetChanged();
-
-                }
-            });
         }
 
 
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onClick(View v) {
             mListener.onClick(v, getAdapterPosition());
             switch (v.getId()) {
                 case R.id.imgVwDelete:
-                    position = getAdapterPosition();
-                    layoutPosition = getLayoutPosition();
-                    showCheckUserUpdateData("Are you sure you want to Delete vehicle?", position);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                    alertDialogBuilder.setMessage("Are you sure, You wanted to make decision");
+                            alertDialogBuilder.setPositiveButton("yes",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface arg0, int arg1) {
+                                            callDeleteVehicleAPI(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
+                                            VehicleModelList.remove(getAdapterPosition());
+                                            notifyItemRemoved(getAdapterPosition());
+                                            notifyItemRangeChanged(getAdapterPosition(), VehicleModelList.size());
+                                        }
+                                    });
+
+                    alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
 
                     break;
-//                case R.id.chkVehicleSet:
-//                    lastSelectedPosition = getAdapterPosition();
-//                    callVehicleSelectApi(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
-//                    VehicleModelList.get(getLayoutPosition()).setSelected(true);
-//                    notifyItemRangeChanged(getAdapterPosition(), VehicleModelList.size());
-//                    break;
+                case R.id.chkVehicleSet:
+
+                    lastSelectedPosition = getAdapterPosition();
+
+                    callVehicleSelectApi(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
+
+                    notifyItemRangeChanged(0, VehicleModelList.size());
+
+                    break;
             }
         }
 
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void showCheckUserUpdateData(String msg, final int position) {
-        try {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                    .setTitle("Greego").setMessage(msg);
-
-
-            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    if (ConnectivityDetector
-                            .isConnectingToInternet(context)) {
-
-                        callDeleteVehicleAPI(VehicleModelList.get(layoutPosition).getVehicle_id());
-                        VehicleModelList.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, VehicleModelList.size());
-                        dialog.dismiss();
-
-                    } else {
-                        SnackBar.showInternetError(context, snackBarView);
-                    }
-                }
-            });
-
-            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    private void callDeleteVehicleAPI(String vehicle_id) {
+    private void callDeleteVehicleAPI(int vehicle_id) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(WebFields.DELETE_VEHICLE.PARAM_VEHICLE_ID, vehicle_id);

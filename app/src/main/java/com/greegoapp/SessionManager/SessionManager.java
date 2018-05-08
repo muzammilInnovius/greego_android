@@ -240,13 +240,13 @@ public class SessionManager {
     }
 
 
-    public static void saveUserId(Context context, GetUserData vo) {
+    public static void saveUserDetails(Context context, GetUserData vo) {
         try {
             SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = preferences.edit();
             editor.putInt(AppPrefFields.PARAM_USERID, vo.getData().getId());
-
+            editor.putString(AppPrefFields.PARAM_EMAILID, vo.getData().getEmail());
             editor.apply();
         } catch (Exception e) {
             // TODO: handle exception
@@ -264,6 +264,18 @@ public class SessionManager {
             e.printStackTrace();
         }
         return userId;
+    }
+
+    public static String getEmailId(Context context) {
+        String emailId = "";
+        try {
+            SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            emailId = preferences.getString(AppPrefFields.PARAM_EMAILID, "");
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return emailId;
     }
 
     public static String getlattitude(Context context) {

@@ -68,7 +68,7 @@ public class UserDriverTripDetails implements Parcelable {
         this.message = message;
     }
 
-    public static class DataBean implements Parcelable{
+    public static class DataBean implements Parcelable {
         /**
          * id : 47
          * request_id : 55
@@ -88,6 +88,7 @@ public class UserDriverTripDetails implements Parcelable {
          * request : {"id":55,"user_id":"101","user_vehicle_id":"123","from_address":"28/2, Mahalaxmi Society, Paldi, Ahmedabad, Gujarat 380007, India","from_lat":"23.0105","from_lng":"72.5611","to_address":"LOADING TRASPORT SERVICES, Block J, Sainik Farm, New Delhi, Delhi, India","to_lat":"28.4998","to_lng":"77.2146","total_estimated_travel_time":"12","total_estimated_trip_cost":"100","request_status":"1","created_at":"2018-04-25 07:46:14","updated_at":"2018-04-25 07:46:26","user":{"id":101,"name":"John","email":"muza@gmail.com","lastname":"bxhdh","contact_number":"+919998841576","city":null,"profile_pic":null,"promocode":null,"verified":"0","is_iphone":"0","is_agreed":"1","device_id":"ep-Zoewj644:APA91bGqo0_yjeTsI9XFvgvob5JhGQdUrOue3PX1SwBSi5w1PY04l9xt30Ovqu9OjGD7Aa_OcmwgU7PDEzwB7FSFXWeCJ9GO-21mTcWGJV4HoeZciXySJv8CUgXUgZbWsBiHU-AUBwEW","created_at":"2018-04-20 10:47:07","updated_at":"2018-04-25 06:49:14"},"user_vehicle":{"id":123,"user_id":"101","vehicle_id":"2","year":"2017","type":"0","color":"red","transmission_type":"1","selected":"0","created_at":"2018-04-23 13:10:57","updated_at":"2018-04-25 06:48:07","vehiclemodel":{"id":2,"vehicle_manufacturer_id":"1","model":"427","updated_at":"2018-04-11 01:39:54","created_at":"2018-04-11 01:39:54","vmake":{"id":1,"name":"ac","created_at":"2018-04-11 01:39:52","updated_at":"2018-04-11 01:39:52"}}}}
          */
 
+
         private int id;
         private String request_id;
         private String user_id;
@@ -102,6 +103,7 @@ public class UserDriverTripDetails implements Parcelable {
         private String trip_user_rating;
         private String created_at;
         private String updated_at;
+        private DriverLocationBean driver_location;
         private DriverBean driver;
         private RequestBean request;
 
@@ -120,6 +122,7 @@ public class UserDriverTripDetails implements Parcelable {
             trip_user_rating = in.readString();
             created_at = in.readString();
             updated_at = in.readString();
+            driver_location = in.readParcelable(DriverLocationBean.class.getClassLoader());
             driver = in.readParcelable(DriverBean.class.getClassLoader());
             request = in.readParcelable(RequestBean.class.getClassLoader());
         }
@@ -248,6 +251,14 @@ public class UserDriverTripDetails implements Parcelable {
             this.updated_at = updated_at;
         }
 
+        public DriverLocationBean getDriver_location() {
+            return driver_location;
+        }
+
+        public void setDriver_location(DriverLocationBean driver) {
+            this.driver_location = driver_location;
+        }
+
         public DriverBean getDriver() {
             return driver;
         }
@@ -285,11 +296,62 @@ public class UserDriverTripDetails implements Parcelable {
             dest.writeString(trip_user_rating);
             dest.writeString(created_at);
             dest.writeString(updated_at);
+            dest.writeParcelable(driver_location, flags);
             dest.writeParcelable(driver, flags);
             dest.writeParcelable(request, flags);
         }
 
-        public static class DriverBean implements Parcelable{
+        public static class DriverLocationBean implements Parcelable {
+            protected DriverLocationBean(Parcel in) {
+                lat = in.readString();
+                lng = in.readString();
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+                dest.writeString(lat);
+                dest.writeString(lng);
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            public static final Creator<DriverLocationBean> CREATOR = new Creator<DriverLocationBean>() {
+                @Override
+                public DriverLocationBean createFromParcel(Parcel in) {
+                    return new DriverLocationBean(in);
+                }
+
+                @Override
+                public DriverLocationBean[] newArray(int size) {
+                    return new DriverLocationBean[size];
+                }
+            };
+
+            public String getLat() {
+                return lat;
+            }
+
+            public void setLat(String lat) {
+                this.lat = lat;
+            }
+
+            public String getLng() {
+                return lng;
+            }
+
+            public void setLng(String lng) {
+                this.lng = lng;
+            }
+
+            private String lat;
+            private String lng;
+
+        }
+
+        public static class DriverBean implements Parcelable {
             /**
              * id : 161
              * name : sapan
@@ -641,7 +703,7 @@ public class UserDriverTripDetails implements Parcelable {
             }
         }
 
-        public static class RequestBean implements Parcelable{
+        public static class RequestBean implements Parcelable {
             /**
              * id : 55
              * user_id : 101
@@ -862,7 +924,7 @@ public class UserDriverTripDetails implements Parcelable {
                 dest.writeParcelable(user_vehicle, flags);
             }
 
-            public static class UserBean implements Parcelable{
+            public static class UserBean implements Parcelable {
                 /**
                  * id : 101
                  * name : John
@@ -1054,7 +1116,7 @@ public class UserDriverTripDetails implements Parcelable {
                 }
             }
 
-            public static class UserVehicleBean implements Parcelable{
+            public static class UserVehicleBean implements Parcelable {
                 /**
                  * id : 123
                  * user_id : 101
@@ -1215,7 +1277,7 @@ public class UserDriverTripDetails implements Parcelable {
                     dest.writeParcelable(vehiclemodel, flags);
                 }
 
-                public static class VehiclemodelBean implements Parcelable{
+                public static class VehiclemodelBean implements Parcelable {
                     /**
                      * id : 2
                      * vehicle_manufacturer_id : 1
@@ -1316,7 +1378,7 @@ public class UserDriverTripDetails implements Parcelable {
                         dest.writeParcelable(vmake, flags);
                     }
 
-                    public static class VmakeBean implements Parcelable{
+                    public static class VmakeBean implements Parcelable {
                         /**
                          * id : 1
                          * name : ac

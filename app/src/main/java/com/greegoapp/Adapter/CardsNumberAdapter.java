@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -17,6 +18,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
+import com.greegoapp.Activity.PaymentActivity;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.ViewHolder> {
     private Context context;
     //private ArrayList<String> arrayList;
@@ -46,7 +49,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
     private int lastSelectedPosition = -1;
     RecyclerViewItemClickListener mListener;
     private boolean isSelect = true;
-
+    int oldPosition = -1;
     public CardsNumberAdapter() {
     }
 
@@ -58,10 +61,9 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        //        private RadioButton rbCardNumber;
         private TextView tvCardDetail;
         private RowCardNumberBinding mBinding;
-        private ImageView ivCardNumber;
+         RadioButton ivCardNumber;
         private RecyclerViewItemClickListener mListener;
         private ImageView ivCardLogo, ivDeleteCard;
 
@@ -77,28 +79,21 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
             ivDeleteCard.setOnClickListener(this);
             ivCardNumber.setOnClickListener(this);
 
-            ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
+          //  ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
         }
 
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.ivCardNumber:
+                    lastSelectedPosition = getAdapterPosition();
+                    PaymentActivity.cardselected = ""+alCardData.get(getLayoutPosition()).getCard_number();
+                    selectCardForUser(alCardData.get(getLayoutPosition()).getId());
 
-                    if (isSelect) {
-                        isSelect = false;
-                        ivCardNumber.setImageResource(R.mipmap.ic_tick);
-
-                        lastSelectedPosition = getAdapterPosition();
-                        selectCardForUser(alCardData.get(getLayoutPosition()).getId());
-
-                        notifyItemRangeChanged(getAdapterPosition(), alCardData.size());
-                    } else {
-                        ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
-                        isSelect = true;
-                    }
+                    notifyItemRangeChanged(0, alCardData.size());
 
                     break;
+
                 case R.id.ivDeleteCard:
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                     alertDialog.setTitle("Delete");
@@ -139,25 +134,48 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
-        if (lastSelectedPosition == position) {
+       /* if (lastSelectedPosition == position) {
             isSelect = true;
-            holder.ivCardNumber.setImageResource(R.mipmap.ic_tick);
+         //   holder.ivCardNumber.setImageResource(R.mipmap.ic_tick);
         } else {
             isSelect = false;
-            holder.ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
-        }
+     //       holder.ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
+        }*/
 
         cardDetailModel = alCardData.get(position);
         byte[] data = Base64.decode(alCardData.get(position).getCard_number(), Base64.DEFAULT);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             cardNo = new String(data, StandardCharsets.UTF_8);
         }
-
-
-
         card_id = alCardData.get(position).getId();
-        String number = setCardNumber(cardNo);
-        holder.tvCardDetail.setText(number);
+        int selected_card_id = cardDetailModel.getSelected();
+
+        if (lastSelectedPosition == position) {
+            holder.ivCardNumber.setChecked(true);
+        } else {
+            if(oldPosition == position)
+            {
+                holder.ivCardNumber.setChecked(false);
+            }else
+            {
+                holder.ivCardNumber.setChecked(false);
+            }
+        }
+        if(cardDetailModel!=null)
+        {
+
+
+            String number = setCardNumber(cardNo);
+            holder.tvCardDetail.setText(number);
+            if (selected_card_id==1 && oldPosition==-1) {
+//                selectCardNo = cardNo;
+                oldPosition = holder.getAdapterPosition();
+                holder.ivCardNumber.setChecked(true);
+
+            }
+        }
+
+
     }
 
     @Override
@@ -245,6 +263,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
                     MyProgressDialog.hideProgressDialog();
+                    notifyDataSetChanged();
                 }
             }, new Response.ErrorListener() {
 
@@ -278,6 +297,9 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
         }
 
     }
+    public void updateData(String strCard)
+    {
 
+    }
 
 }

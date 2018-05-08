@@ -140,27 +140,28 @@
                 android:textSize="@dimen/txt_12" />
 
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvRateYrDrDtl"
                 android:layout_marginBottom="@dimen/scale_5dp"
-                android:layout_marginLeft="@dimen/scale_10dp"
+                android:layout_marginLeft="@dimen/scale_5dp"
                 android:layout_marginRight="@dimen/scale_5dp"
                 android:layout_marginTop="@dimen/scale_5dp"
                 android:orientation="horizontal"
                 android:weightSum="1">
 
                 <RelativeLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/rlMain"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.96">
+                    android:layout_toLeftOf="@+id/ivDriverProPic">
 
                     <TextView
                         android:id="@+id/tvUserFrmAddress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2nd Avenues"
+                        android:text="2nd Avenues dgfgdfgdfgdfgdfgdfgdfgdfgdfgdfgfdgdfgdfgdfgdfg"
                         android:textColor="@color/black"
                         android:textSize="@dimen/txt_20"
                         android:textStyle="bold" />
@@ -171,24 +172,25 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvUserFrmAddress"
                         android:numStars="5"
-                        android:paddingTop="@dimen/scale_5dp"
+                        android:paddingTop="@dimen/scale_10dp"
                         android:shadowColor="@color/black" />
                 </RelativeLayout>
 
                 <com.greegoapp.Utils.RoundedImageView
-                    android:layout_weight="0.1"
                     android:id="@+id/ivDriverProPic"
-                    android:layout_width="@dimen/scale_60dp"
-                    android:layout_height="@dimen/scale_60dp"
+                    android:layout_centerInParent="true"
+                    android:layout_width="@dimen/scale_80dp"
+                    android:layout_height="@dimen/scale_80dp"
+                    android:layout_alignParentRight="true"
                     android:layout_gravity="center_vertical"
                     android:background="@mipmap/ic_driver_profile"
                     android:elevation="4dp"
                     android:scaleType="fitXY"
                     app:border_color="@color/app_bg"
-                    app:corner_radius="@dimen/scale_30dp"
+                    app:corner_radius="@dimen/scale_40dp"
                     app:round_background="true" />
 
-            </LinearLayout>
+            </RelativeLayout>
 
 
         </RelativeLayout>

@@ -56,8 +56,8 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
         layout = resource;
         mGoogleApiClient = googleApiClient;
         mBounds = null;
-        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_INDIA).build();
-//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_USA).build();
+//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_INDIA).build();
+        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_USA).build();
         this.mListener = (PlaceAutoCompleteInterface) mContext;
     }
 
@@ -174,14 +174,18 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
 
     @Override
     public void onBindViewHolder(PlaceViewHolder mPredictionHolder, final int i) {
-        mPredictionHolder.mAddress.setText(mResultList.get(i).description);
+        try {
+            mPredictionHolder.mAddress.setText(mResultList.get(i).description);
 
-        mPredictionHolder.mParentLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onPlaceClick(mResultList, i);
-            }
-        });
+            mPredictionHolder.mParentLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onPlaceClick(mResultList, i);
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

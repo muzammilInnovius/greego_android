@@ -16,7 +16,10 @@ import com.greegoapp.Model.TripHistoryModel;
 import com.greegoapp.R;
 import com.greegoapp.databinding.RowTripHistoryBinding;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 public class TripHistoryAdapter extends RecyclerView.Adapter<TripHistoryAdapter.TripHistoryViewHolder> {
@@ -48,14 +51,24 @@ public class TripHistoryAdapter extends RecyclerView.Adapter<TripHistoryAdapter.
 
         if (tripHistoryModel != null) {
 
-            String strTotalTime= String.valueOf(tripHistoryModel.getTotal_estimated_travel_time());
+            String strTotalTime = String.valueOf(tripHistoryModel.getTotal_estimated_travel_time());
             String strTotalCost = String.valueOf(tripHistoryModel.getTotal_estimated_trip_cost());
 
-            holder.tvTripDate.setText(tripHistoryModel.getCreated_at());
-            holder.tvTripTime.setText(strTotalTime);
-            holder.tvTripTotalCost.setText(strTotalCost);
+            String date = tripHistoryModel.getCreated_at();
+            date = date.substring(0, 16);
+            Date date1 = null;
+            try {
+                date1 = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String formatedstring = (String) android.text.format.DateFormat.format("MMM dd,yyyy, hh:mm aa", date1);
 
-            String profilePicUrl = "http://kroslinkstech.in/greego/storage/app/" +tripHistoryModel.getProfile_pic();
+            holder.tvTripDate.setText(formatedstring);
+            holder.tvTripTime.setText(strTotalTime);
+            holder.tvTripTotalCost.setText("$" + strTotalCost);
+
+            String profilePicUrl = "http://kroslinkstech.in/greego/storage/app/" + tripHistoryModel.getProfile_pic();
 
             if (profilePicUrl != null) {
                 Glide.clear(holder.ivProPicTripHistory);
