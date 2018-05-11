@@ -12,16 +12,23 @@ public class MyProgressDialog {
     private static ProgressDialog progressBar;
 
     public static void showProgressDialog(Context context) {
+        try {
         progressBar = new ProgressDialog(context);
         progressBar.setMessage("Please wait...");
         progressBar.setCancelable(false);
         progressBar.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void hideProgressDialog() {
-        if (progressBar.isShowing()) {
-            progressBar.dismiss();
+        try {
+            if (progressBar.isShowing()) {
+                progressBar.dismiss();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
     }
 }

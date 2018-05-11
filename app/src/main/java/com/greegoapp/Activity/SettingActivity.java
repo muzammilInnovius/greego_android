@@ -144,13 +144,17 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 userName = data.getStringExtra("name");
                 profilePic = data.getStringExtra("profilePic");
 
-                Glide.clear(ivProPic);
-                Glide.with(getApplicationContext())
-                        .load(profilePic)
-                        .centerCrop()
-                        .signature(new StringSignature(UUID.randomUUID().toString()))
-                        .crossFade().skipMemoryCache(true)
-                        .into(ivProPic);
+                if (profilePic != null) {
+                    Glide.clear(ivProPic);
+                    Glide.with(getApplicationContext())
+                            .load(profilePic)
+                            .centerCrop()
+                            .signature(new StringSignature(UUID.randomUUID().toString()))
+                            .crossFade().skipMemoryCache(true)
+                            .into(ivProPic);
+                }else {
+                    ivProPic.setImageResource(R.mipmap.ic_place_holder);
+                }
 
                 tvUserName.setText(userName);
                 break;

@@ -24,6 +24,7 @@ import com.greegoapp.Model.UserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -102,13 +103,88 @@ public class UserEmailActivity extends AppCompatActivity implements View.OnClick
                 break;
 
             case R.id.tvSendConfEmail:
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callSendEmailVarificationAPI();
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
                 break;
 
             case R.id.btnUpdate:
-                callEmailUpdateAPI();
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callEmailUpdateAPI();
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
                 break;
 
         }
+    }
+
+    private void callSendEmailVarificationAPI() {
+        try {
+//            emailId = edtTvUserEmail.getText().toString();
+            JSONObject jsonObject = new JSONObject();
+
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.EMAIL_VERIFY.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+//                    please verify it by clicking the activation link that has been send to your email
+                    SnackBar.showSuccess(context, snackBarView, "Verify your register email address.");
+
+//                    UserData userDetails = new Gson().fromJson(String.valueOf(response), UserData.class);
+//                    try {
+                        MyProgressDialog.hideProgressDialog();
+////
+//                        if (userDetails.getError_code() == 0) {
+//
+//                            SnackBar.showSuccess(context, snackBarView, "Email update successfully.");
+//                        } else {
+//                            MyProgressDialog.hideProgressDialog();
+//                            SnackBar.showError(context, snackBarView, response.getString("message"));
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void callEmailUpdateAPI() {

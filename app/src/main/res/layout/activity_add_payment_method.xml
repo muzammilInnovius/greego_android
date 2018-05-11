@@ -84,11 +84,20 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/scale_35dp"
             android:orientation="vertical"
+
             android:paddingBottom="@dimen/scale_30dp"
             android:weightSum="2"
             app:layout_constraintTop_toBottomOf="@+id/tvEditPaymentTitle">
+            <com.stripe.android.view.CardMultilineWidget
+                android:id="@+id/card_input_widget"
+                android:paddingLeft="@dimen/scale_15dp"
+                android:paddingRight="@dimen/scale_15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+            </com.stripe.android.view.CardMultilineWidget>
             <LinearLayout
+                android:visibility="gone"
                 android:id="@+id/llCardNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,30 +106,24 @@
                 android:paddingLeft="@dimen/scale_15dp"
                 android:weightSum="2">
 
+              <!--  <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/edtTvCardNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@mipmap/ic_flag"
+                        android:hint="@string/card_number"
+                        android:inputType="numberDecimal"
+                        android:maxLength="19" />
+
+                </android.support.design.widget.TextInputLayout>-->
                 <com.greegoapp.Utils.MYEditCard
-                    android:inputType="numberDecimal"
                     android:id="@+id/edtTvCardNumber"
                     android:layout_width="match_parent"
-                    android:maxLength="19"
                     android:layout_height="wrap_content" />
-
-
-
-                <!--<android.support.design.widget.TextInputLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent">-->
-
-                    <!--<android.support.design.widget.TextInputEditText-->
-                        <!--android:id="@+id/edtTvCardNumber"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:drawableLeft="@mipmap/ic_flag"-->
-                        <!--android:hint="@string/card_number"-->
-                        <!--android:inputType="numberDecimal"-->
-                        <!--android:maxLength="19" />-->
-
-                <!--</android.support.design.widget.TextInputLayout>-->
-
                <!-- <EditText
                     android:id="@+id/edtTvCardNumber"
                     android:layout_width="match_parent"
@@ -142,6 +145,7 @@
                  app:layout_constraintRight_toRightOf="parent"
                  app:layout_constraintTop_toBottomOf="@+id/llCardNumber" />-->
             <LinearLayout
+                android:visibility="gone"
                 android:id="@+id/llCardDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

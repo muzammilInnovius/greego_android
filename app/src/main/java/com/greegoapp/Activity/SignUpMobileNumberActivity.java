@@ -61,6 +61,7 @@ public class SignUpMobileNumberActivity extends AppCompatActivity implements Vie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up_mobile_number);
         context = SignUpMobileNumberActivity.this;
         snackBarView = findViewById(android.R.id.content);

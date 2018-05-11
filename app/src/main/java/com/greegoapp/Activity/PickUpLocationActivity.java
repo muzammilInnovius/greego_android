@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -53,8 +54,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.PlaceAutocompleteAdapter;
 import com.greegoapp.AppController.AppController;
-import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.GlobleFields.GlobalValues;
+import com.greegoapp.Model.GetPickUpTime;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -71,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.greegoapp.Activity.HomeActivity.PICK_CONTACT_REQUEST;
 
 public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, OnMapReadyCallback {
 
@@ -116,6 +119,8 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     public static boolean mapViewVisible = false;
     public static boolean passValue = false;
     String totalDuration;
+    private TextView address1;
+    boolean isFirst = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,6 +224,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         mEdtPickUpLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View arg0, boolean hasfocus) {
+
                 if (hasfocus) {
                     edtType = 0;
                     passValue = false;
@@ -231,22 +237,28 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 } else {
                     Log.e("TAG", "e1 not focused");
                 }
+
             }
         });
+
         mEdtDetstinationLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View arg0, boolean hasfocus) {
-                if (hasfocus) {
-                    edtType = 1;
-                    passValue = false;
-                    llLocationView.setVisibility(View.VISIBLE);
-                    ivDesClear.setVisibility(View.VISIBLE);
-                    if (mAdapter != null) {
-                        mAdapter.clearList();
+                if (isFirst) {
+                    if (hasfocus) {
+                        edtType = 1;
+                        passValue = false;
+                        llLocationView.setVisibility(View.VISIBLE);
+                        ivDesClear.setVisibility(View.VISIBLE);
+                        if (mAdapter != null) {
+                            mAdapter.clearList();
+                        }
+                        Log.e("TAG", "e1 focused");
+                    } else {
+                        Log.e("TAG", "e1 not focused");
                     }
-                    Log.e("TAG", "e1 focused");
                 } else {
-                    Log.e("TAG", "e1 not focused");
+                    isFirst = true;
                 }
             }
         });
@@ -271,7 +283,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         rlSetCurrentLocation = binding.rlCurrentLocation;
         btnSetLocation = binding.btnSetLocation;
         rlEditextPickup = binding.rlPick;
-
+        address1 = binding.address1;
 
         mRecyclerView.setHasFixedSize(true);
         llm = new LinearLayoutManager(mContext);
@@ -282,6 +294,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
         ivPickClear.setOnClickListener(this);
         ivDesClear.setOnClickListener(this);
         rlSetLocationMap.setOnClickListener(this);
+        address1.setOnClickListener(this);
         llLocationView.setOnClickListener(this);
         rlSetCurrentLocation.setOnClickListener(this);
         btnSetLocation.setOnClickListener(this);
@@ -300,6 +313,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+
             case R.id.iv_backTop:
                 finish();
                 break;
@@ -329,6 +343,21 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 mapViewVisible = true;
 
                 break;
+
+            case R.id.address1:
+                KeyboardUtility.hideKeyboard(context, view);
+                if (edtType == 0) {
+                    mSoucreLatLong = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    ssLocation = address;
+                    mEdtPickUpLocation.setText(ssLocation);
+                } else {
+                    mDestinationLatLong = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    ddLocation = address;
+                    mEdtDetstinationLocation.setText(ddLocation);
+                }
+                btnSetLocation.setVisibility(View.VISIBLE);
+                break;
+
             case R.id.rlCurrentLocation:
                 if (edtType == 0) {
                     mSoucreLatLong = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
@@ -339,6 +368,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                     ddLocation = address;
                     mEdtDetstinationLocation.setText(ddLocation);
                 }
+                btnSetLocation.setVisibility(View.VISIBLE);
                 break;
             case R.id.edt_pickLocation:
                 edtType = 0;
@@ -348,34 +378,45 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 break;
 
             case R.id.btnSetLocation:
-                String sou = mEdtPickUpLocation.getText().toString();
-                String des = mEdtDetstinationLocation.getText().toString();
-                String picLocAddress = mEdtPickUpLocation.getText().toString();
-                String destLocAddress = mEdtDetstinationLocation.getText().toString();
 
-
-//                myCalcTime(mSoucreLatLong.latitude,mSoucreLatLong.longitude,mDestinationLatLong.latitude,mDestinationLatLong.longitude);
-
-
-                if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
-
-                    Intent data = new Intent();
-                    data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
-                    data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
-                    data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
-                    data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
-                    data.putExtra("picLocAddress", picLocAddress);
-                    data.putExtra("destLocAddress", destLocAddress);
-                    data.putExtra("departure", 12);
-                    setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
-                    finish();
+                String picUpLoc = mEdtPickUpLocation.getText().toString();
+                String destLoc = mEdtDetstinationLocation.getText().toString();
+                if (picUpLoc.isEmpty()) {
+                    SnackBar.showError(context, snackBarView, "Please enter pick up location.");
+                } else if (destLoc.isEmpty()) {
+                    SnackBar.showError(context, snackBarView, "Please enter drop of location.");
                 } else {
-                    llLocationView.setVisibility(View.VISIBLE);
+//                    if (mSoucreLatLong.latitude != 0 && mSoucreLatLong.longitude != 0 && mDestinationLatLong.latitude != 0 && mDestinationLatLong.longitude != 0) {
+                    myCalcTime(mSoucreLatLong.latitude, mSoucreLatLong.longitude, mDestinationLatLong.latitude, mDestinationLatLong.longitude);
+//                    }
                 }
-
+//                setLocationTime();
 
                 break;
 
+        }
+    }
+
+    private void setLocationTime() {
+        String sou = mEdtPickUpLocation.getText().toString();
+        String des = mEdtDetstinationLocation.getText().toString();
+        String picLocAddress = mEdtPickUpLocation.getText().toString();
+        String destLocAddress = mEdtDetstinationLocation.getText().toString();
+
+        if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
+
+            Intent data = new Intent();
+            data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
+            data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
+            data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
+            data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
+            data.putExtra("picLocAddress", picLocAddress);
+            data.putExtra("destLocAddress", destLocAddress);
+            data.putExtra("departure", totalDuration);
+            setResult(PICK_CONTACT_REQUEST, data);
+            finish();
+        } else {
+            llLocationView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -415,30 +456,25 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                                 }
                             }
 
+                            try {
+                                String picUpLoc = mEdtPickUpLocation.getText().toString();
+                                String destLoc = mEdtDetstinationLocation.getText().toString();
+                                if (picUpLoc.isEmpty()) {
+                                    SnackBar.showError(context, snackBarView, "Please enter pick up location.");
+                                } else if (destLoc.isEmpty()) {
+                                    SnackBar.showError(context, snackBarView, "Please enter drop of location.");
+                                } else {
+//                                    if (mSoucreLatLong.latitude != 0 && mSoucreLatLong.longitude != 0 && mDestinationLatLong.latitude != 0 && mDestinationLatLong.longitude != 0) {
+                                    myCalcTime(mSoucreLatLong.latitude, mSoucreLatLong.longitude, mDestinationLatLong.latitude, mDestinationLatLong.longitude);
+//                                    }
+                                }
 
-                            String sou = mEdtPickUpLocation.getText().toString();
-                            String des = mEdtDetstinationLocation.getText().toString();
-                            String picLocAddress = mEdtPickUpLocation.getText().toString();
-                            String destLocAddress = mEdtDetstinationLocation.getText().toString();
-
-
-//               myCalcTime(mSoucreLatLong.latitude,mSoucreLatLong.longitude,mDestinationLatLong.latitude,mDestinationLatLong.longitude);
-
-                            if (sou != null && !sou.equals("null") && !sou.equals("") && des != null && !des.equals("null") && !des.equals("")) {
-
-                                Intent data = new Intent();
-                                data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
-                                data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
-                                data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
-                                data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
-                                data.putExtra("picLocAddress", picLocAddress);
-                                data.putExtra("destLocAddress", destLocAddress);
-                                data.putExtra("departure", 12);
-                                setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
-                                finish();
-                            } else {
-                                llLocationView.setVisibility(View.VISIBLE);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
+//                            setLocationTime();
+
+//
 
 
                         } else {
@@ -447,7 +483,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                     }
                 });
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
@@ -813,11 +849,10 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 
     //Calculat googgle map timining
     private void myCalcTime(double lat1, double lng1, double lat2, double lng2) {
-        /*Toast.makeText(context, "" + trip_id, Toast.LENGTH_SHORT).show();*/
-        String source = getAddress(lat1, lng1);
-        String des = getAddress(lat2, lng2);
-        String url = "" + WebFields.DIST_URL.MODE + WebFields.DIST_URL.ORIGINS + source + WebFields.DIST_URL.DESTINATION + des +
-                "&key=AIzaSyDleLMo3h7J3f6FdG8ELCuArBajMLVFxKM";
+
+        String url = "" + WebFields.DIST_URL.MODE + WebFields.DIST_URL.ORIGINS + lat1 + "," + lng1 + WebFields.DIST_URL.DESTINATION + lat2 + "," + lng2 +
+                "&mode=driving&key=AIzaSyDuLTaJL-tMzdBoTZtCQfCz4m66iEZ1eQc";
+
         try {
             JSONObject jsonObject = new JSONObject();
             Applog.E("request: " + jsonObject.toString());
@@ -828,32 +863,42 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                 @Override
                 public void onResponse(JSONObject response) {
 //                    MyProgressDialog.hideProgressDialog();
-                    GoogleResponsePojo googleResponsePojo = new Gson().fromJson(response.toString(), GoogleResponsePojo.class);
-//                    tvRemainTime.setText("" + googleResponsePojo.getRows().get(0).getElements().get(0).getDuration().getText() + " Away");
-//                    tvDropInTime.setText("" + googleResponsePojo.getRows().get(0).getElements().get(0).getDuration().getText());
 
-                    totalDuration = googleResponsePojo.getRows().get(0).getElements().get(0).getDuration().getText();
+                    GetPickUpTime pickUpTime = new Gson().fromJson(String.valueOf(response), GetPickUpTime.class);
 
-                    //Applog.d("123456",response.optJSONObject("rows").optJSONObject("elements").optJSONObject("distance").optString("text")+":"+response.optJSONObject("rows").optJSONObject("elements").optJSONObject("duration").optString("text"));
+                    totalDuration = pickUpTime.getRoutes().get(0).getLegs().get(0).getDuration().getText();
+
                     Applog.E("success: " + response.toString());
+                    Applog.E("totalDuration: " + totalDuration + " hchchchc" + totalDuration);
+
+                    String des = mEdtDetstinationLocation.getText().toString();
+                    String picLocAddress = mEdtPickUpLocation.getText().toString();
+                    String destLocAddress = mEdtDetstinationLocation.getText().toString();
+
+                    if (des != null && !des.equals("null") && !des.equals("")) {
+
+                        String sourceLat = String.valueOf(mSoucreLatLong.latitude);
+                        String sourceLng = String.valueOf(mSoucreLatLong.longitude);
+                        String destLat = String.valueOf(mDestinationLatLong.latitude);
+                        String destlng = String.valueOf(mDestinationLatLong.longitude);
 
 
-//                    String des = mEdtDetstinationLocation.getText().toString();
-//                    String picLocAddress = mEdtPickUpLocation.getText().toString();
-//                    String destLocAddress = mEdtDetstinationLocation.getText().toString();
-//
-//                    if (des != null && !des.equals("null") && !des.equals("")) {
-//                        Intent data = new Intent();
-//                        data.putExtra("sourceLat", String.valueOf(mSoucreLatLong.latitude));
-//                        data.putExtra("sourceLng", String.valueOf(mSoucreLatLong.longitude));
-//                        data.putExtra("destinationLat", String.valueOf(mDestinationLatLong.latitude));
-//                        data.putExtra("destinationLng", String.valueOf(mDestinationLatLong.longitude));
-//                        data.putExtra("picLocAddress", picLocAddress);
-//                        data.putExtra("destLocAddress", destLocAddress);
-//                        data.putExtra("departure", totalDuration);
-//                        setResult(MapHomeFragment.PICK_CONTACT_REQUEST, data);
-//                        finish();
-//                    }
+                        if (!sourceLat.isEmpty() && !sourceLng.isEmpty() && !destLat.isEmpty() &&
+                                !destlng.isEmpty() && !picLocAddress.isEmpty() && !destLocAddress.isEmpty() && !totalDuration.isEmpty()) {
+                            Intent data = new Intent();
+                            data.putExtra("sourceLat", sourceLat);
+                            data.putExtra("sourceLng", sourceLng);
+                            data.putExtra("destinationLat", destLat);
+                            data.putExtra("destinationLng", destlng);
+                            data.putExtra("picLocAddress", picLocAddress);
+                            data.putExtra("destLocAddress", destLocAddress);
+                            data.putExtra("departure", totalDuration);
+                            setResult(PICK_CONTACT_REQUEST, data);
+                            finish();
+                        } else {
+                            SnackBar.showError(context, snackBarView, "Please check all filed.");
+                        }
+                    }
                 }
 
             }, new Response.ErrorListener() {
@@ -863,7 +908,7 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
 //                    MyProgressDialog.hideProgressDialog();
                     error.getStackTrace();
                     Applog.E("Error: " + error.getMessage());
-                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                    SnackBar.showError(context, snackBarView, error.getMessage());
                 }
             }) {
                 @Override
@@ -881,116 +926,6 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
             AppController.getInstance().addToRequestQueue(jsonObjReq);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public class GoogleResponsePojo {
-
-        private List<String> destination_addresses;
-        private List<String> origin_addresses;
-        private List<Rows> rows;
-        private String status;
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public void setDestination_addresses(List<String> destination_addresses) {
-            this.destination_addresses = destination_addresses;
-        }
-
-        public void setOrigin_addresses(List<String> origin_addresses) {
-            this.origin_addresses = origin_addresses;
-        }
-
-        public void setRows(List<Rows> rows) {
-            this.rows = rows;
-        }
-
-        public List<String> getDestination_addresses() {
-            return destination_addresses;
-        }
-
-        public List<String> getOrigin_addresses() {
-            return origin_addresses;
-        }
-
-        public List<Rows> getRows() {
-            return rows;
-        }
-//getters
-    }
-
-
-    private static class Rows {
-        private List<Element> elements;
-
-        public void setElements(List<Element> elements) {
-            this.elements = elements;
-        }
-
-        public List<Element> getElements() {
-            return elements;
-        }
-//getters
-    }
-
-    private static class Element {
-        private TextValue distance;
-        private TextValue duration;
-        private String status;
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public void setDistance(TextValue distance) {
-            this.distance = distance;
-        }
-
-        public void setDuration(TextValue duration) {
-            this.duration = duration;
-        }
-
-        //getters
-
-        public TextValue getDistance() {
-            return distance;
-        }
-
-        public TextValue getDuration() {
-            return duration;
-        }
-    }
-
-    private static class TextValue {
-        private String text;
-        private String value;
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        //getters
-
-        public String getText() {
-            return text;
-        }
-
-        public String getValue() {
-            return value;
         }
     }
 

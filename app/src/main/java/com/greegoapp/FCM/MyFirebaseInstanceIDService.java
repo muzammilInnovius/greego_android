@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.greegoapp.Fragment.MapHomeFragment;
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 

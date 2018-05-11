@@ -50,6 +50,7 @@ import com.greegoapp.Model.UserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -71,8 +72,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.greegoapp.Activity.HomeActivity.HOME_SLIDER_PROFILE_UPDATE;
+import static com.greegoapp.Activity.HomeActivity.MAP_HOME_PROFILE_UPDATE;
 import static com.greegoapp.Activity.SettingActivity.SETTING_PROFILE_UPDATE;
-import static com.greegoapp.Fragment.MapHomeFragment.MAP_HOME_PROFILE_UPDATE;
 
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -115,7 +116,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 //        setHeaderbar();
         bindViews();
         setListner();
-        callUserMeApi();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callUserMeApi();
+
+        } else {
+            SnackBar.showInternetError(context, snackBarView);
+        }
+
 
     }
 
@@ -194,7 +201,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.btnUpdate:
-                callUpdateProfileAPI();
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callUpdateProfileAPI();
+
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
 //                callUpdateProAPI();
                 break;
 
@@ -386,7 +399,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 ivProPic.setImageURI(mImageUri);
                 strProPicBase64 = encodeTobase64(bitmap);
 
-                callUserProUpdate();
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callUserProUpdate();
+
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
 //
             } else if (requestCode == SELECT_CAMERA_PIC) {
 //
@@ -394,11 +413,20 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 ivProPic.setImageURI(getImageUri(photo));
                 strProPicBase64 = encodeTobase64(photo);
 
-                callUserProUpdate();
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callUserProUpdate();
+
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
             }
         } else if (requestCode == SELECT_CHOISE_VEHICLE) {
-            callUserMeApi();
-
+            if (ConnectivityDetector.isConnectingToInternet(context)) {
+                callUserMeApi();
+            } else {
+                SnackBar.showInternetError(context, snackBarView);
+            }
 
         }
     }

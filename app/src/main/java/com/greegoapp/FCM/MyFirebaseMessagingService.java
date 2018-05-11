@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_USER_TRIP;
+import static com.greegoapp.Activity.HomeActivity.REQUEST_USER_TRIP;
+
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
-    String trip_id, status = null, payment_status, totalAmount;
+    String trip_id, status = null, payment_status, totalAmount,paymentTripId;
     private NotificationUtils notificationUtils;
     Context context = this;
     ArrayList<UserDriverTripDetails.DataBean> alUserDrTripDetails;
@@ -56,10 +57,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             Log.e(TAG, "Data Payload: " + remoteMessage.getData().toString());
             String payload = remoteMessage.getData().toString();
+            String payloadPayment = remoteMessage.getData().toString();
             try {
                 if (payload.contains("status")) {
                     json = new JSONObject(remoteMessage.getData().toString());
                     payload = json.optString("status");
+
                     if (payload.contains("2")) {
                         status = "2";
                         //json = new JSONObject(remoteMessage.getData().toString());
@@ -71,12 +74,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         //  json = new JSONObject(remoteMessage.getData().toString());
                     }
                     Log.e("Payload check", " happy :): ");
-                } else if (payload.contains("payment_status")) {
-                    payment_status = json.optString("payment_status");
-                    totalAmount = json.optString("total_amount");
                 } else {
                     status = "1";
                     //json = new JSONObject(remoteMessage.getData().toString());
+                }
+
+                if (payloadPayment.contains("payment_status")) {
+                    json = new JSONObject(remoteMessage.getData().toString());
+                    payloadPayment = json.optString("payment_status");
+                    paymentTripId = json.optString("trip_id");
+                    if (payloadPayment.contains("1")) {
+                        payment_status = "1";
+                    }
+//                    payment_status = json.optString("payment_status");
+                    totalAmount = json.optString("total_amount");
+                    Log.e("payment_status =)", " happy :): ");
                 }
 
                 json = new JSONObject(remoteMessage.getData().toString());
@@ -85,7 +97,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 if (status != null) {
                     handleDataMessage(trip_id, status);
                 } else if (payment_status != null) {
-                    handlePaymentDataMessage(trip_id, payment_status,totalAmount);
+                    handlePaymentDataMessage(paymentTripId, payment_status, totalAmount);
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Exception: " + e.getMessage());
@@ -105,7 +117,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             Intent intent = new Intent();
             intent.setAction(REQUEST_USER_TRIP);
-            intent.putExtra("trip_id", trip_id);
+            intent.putExtra("payment_trip_id", trip_id);
             intent.putExtra("payment_status", payment_status);
             intent.putExtra("total_amount", totalAmount);
             sendBroadcast(intent);

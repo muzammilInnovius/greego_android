@@ -76,7 +76,7 @@ public class TripHistoryDetailActivity extends AppCompatActivity implements OnMa
             tvTripGreegoTriptime, tvTripGreegoTripAmount, tvPromotionAmount, tvTotalAmount;
 
     String strTripTravelTime, strDrPromoCode, strTripTotalCost, strStartTime, strFromAdd, strToAdd, strEndTime,
-            strTripGreegoTriptime, strTripGreegoTripAmount, strPromotionAmount, strTotalAmount, strDriverPic, strFromLat, strFromLng, strToLat, strToLng;
+            strTripGreegoTriptime, strTripGreegoTripAmount, strPromotionAmount, strTotalAmount, tripTotalTime, strDriverPic, strFromLat, strFromLng, strToLat, strToLng;
     ImageView ivDriverPic;
     Button btnGetHelp;
     Context context;
@@ -152,6 +152,7 @@ public class TripHistoryDetailActivity extends AppCompatActivity implements OnMa
         strFromAdd = getIntent().getStringExtra("fromAdd");
         strToAdd = getIntent().getStringExtra("toAdd");
         strStartTime = getIntent().getStringExtra("startTime");
+        tripTotalTime = getIntent().getStringExtra("tripTotalTime");
 
         bindViews();
         setListner();
@@ -191,7 +192,7 @@ public class TripHistoryDetailActivity extends AppCompatActivity implements OnMa
         tvStartPlace.setText(strFromAdd);
         tvEndTime.setText(formatedStartTimeDate);
         tvEndPlace.setText(strToAdd);
-        tvTripGreegoTriptime.setText(strTripTravelTime);
+        tvTripGreegoTriptime.setText(tripTotalTime +"min");
         tvTripGreegoTripAmount.setText("$" + strTripTotalCost);
         tvPromotionAmount.setText("$0.0");
         tvTotalAmount.setText("$" + strTripTotalCost);
@@ -448,11 +449,11 @@ public class TripHistoryDetailActivity extends AppCompatActivity implements OnMa
                             .title("Current Location")
                             .snippet("Home"));
 
-                marker = mGoogleMap.addMarker(new MarkerOptions()
-                        .position(dropPoint)
-                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_start_pin))
-                        .title("Drop point")
-                        .snippet("Driver"));
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(dropPoint)
+                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_start_pin))
+                            .title("Drop point")
+                            .snippet("Driver"));
                 } else {
                     Log.e("TAG", "No route found");
                 }

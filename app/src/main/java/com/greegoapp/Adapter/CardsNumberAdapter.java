@@ -26,7 +26,10 @@ import com.greegoapp.Model.GetUserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.MYEditCard;
 import com.greegoapp.Utils.MyProgressDialog;
+import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.RowCardNumberBinding;
 
@@ -65,8 +68,8 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
         private RowCardNumberBinding mBinding;
          RadioButton ivCardNumber;
         private RecyclerViewItemClickListener mListener;
-        private ImageView ivCardLogo, ivDeleteCard;
-
+        private ImageView  ivDeleteCard;
+        private MYEditCard ivCardLogo;
 
         public ViewHolder(View itemView, RecyclerViewItemClickListener mListener) {
             super(itemView);
@@ -88,6 +91,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
                 case R.id.ivCardNumber:
                     lastSelectedPosition = getAdapterPosition();
                     PaymentActivity.cardselected = ""+alCardData.get(getLayoutPosition()).getCard_number();
+
                     selectCardForUser(alCardData.get(getLayoutPosition()).getId());
 
                     notifyItemRangeChanged(0, alCardData.size());
@@ -166,6 +170,10 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
 
 
             String number = setCardNumber(cardNo);
+            holder.ivCardLogo.getCardNumber(cardNo);
+            holder.ivCardLogo.isValid(cardNo);
+            holder.ivCardLogo.getCardType();
+
             holder.tvCardDetail.setText(number);
             if (selected_card_id==1 && oldPosition==-1) {
 //                selectCardNo = cardNo;

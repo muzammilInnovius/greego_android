@@ -24,6 +24,7 @@ import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -63,6 +64,7 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
         driverPic = getIntent().getStringExtra("driverPic");
         fromAddress = getIntent().getStringExtra("fromAddress");
         tripId = getIntent().getStringExtra("tripId");
+        Applog.E("Trip id ===> " +tripId);
 
         bindViews();
         setListners();
@@ -115,7 +117,12 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnSubmit:
-                callDriverRatingAPI();
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callDriverRatingAPI();
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
                 break;
 
             case R.id.ibBack:

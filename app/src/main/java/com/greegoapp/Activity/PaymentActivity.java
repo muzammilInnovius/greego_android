@@ -30,6 +30,8 @@ import com.greegoapp.Model.GetUserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.KeyboardUtility;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -41,7 +43,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.greegoapp.Fragment.MapHomeFragment.CHANGE_CONTACT_NO;
+import static com.greegoapp.Activity.HomeActivity.CHANGE_CONTACT_NO;
+
 
 public class PaymentActivity extends AppCompatActivity implements View.OnClickListener {
     public static String cardselected;
@@ -71,7 +74,11 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
         bindViews();
         setListner();
-        callUserMeApi();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callUserMeApi();
+        } else {
+            SnackBar.showInternetError(context, snackBarView);
+        }
 //        setCardNumber();
 
         Applog.E("selectCardNo====> " + selectCardNo);
@@ -138,11 +145,12 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                         dialog.dismiss();
                     }
                 });
 
-                alert.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -152,6 +160,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 });
                 AlertDialog dialog = alert.create();
                 dialog.show();
+
+                KeyboardUtility.hideKeyboard(context,view);
                 break;
             case R.id.ibBack:
 //                callUserMeApi();
@@ -179,7 +189,12 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
               /*  cardNo = SessionManager.getCardNo(context);
 //                String strNumber = data.getStringExtra("cardNumber");
                 tvCardDetail.setText(cardNo);*/
-                callUserMeApi();
+                if (ConnectivityDetector.isConnectingToInternet(context)) {
+                    callUserMeApi();
+                } else {
+                    SnackBar.showInternetError(context, snackBarView);
+                }
+
                 break;
 
         }
@@ -190,10 +205,10 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     private void callUserMeApi() {
         try {
 
-            org.json.JSONObject jsonObject = new org.json.JSONObject();
+            JSONObject jsonObject = new org.json.JSONObject();
 
             Applog.E("request: " + jsonObject.toString());
-//            MyProgressDialog.showProgressDialog(context);
+            MyProgressDialog.showProgressDialog(context);
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     WebFields.BASE_URL + WebFields.USER_ME.MODE, jsonObject, new Response.Listener<JSONObject>() {
@@ -206,7 +221,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                     GetUserData.DataBean.CardsBean userCardDtls = new Gson().fromJson(String.valueOf(response), GetUserData.DataBean.CardsBean.class);
 
                     try {
-//                        MyProgressDialog.hideProgressDialog();
+                        MyProgressDialog.hideProgressDialog();
 //
                         if (userDetails.getError_code() == 0) {
                             cardData.clear();

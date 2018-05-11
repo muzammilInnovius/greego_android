@@ -45,6 +45,7 @@ import com.stripe.android.TokenCallback;
 import com.stripe.android.exception.AuthenticationException;
 import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
+import com.stripe.android.view.CardMultilineWidget;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
 
@@ -57,8 +58,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.greegoapp.Activity.HomeActivity.REQUEST_ADD_PAYMENT;
 import static com.greegoapp.Activity.PaymentActivity.ADD_CARD_PAYMENT_METHOD;
-import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_ADD_PAYMENT;
 
 public class AddPaymentMethodActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -82,6 +83,11 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     MYEditCard edtTvCardNumber;
 
 
+    CardMultilineWidget mCardInputWidget;
+    Card cardToSave;
+    String cvv,strExpDate;
+    int strExpMonth,strExpYear;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,14 +106,16 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 
 
     String stripPay() {
-        strCardNo = edtTvCardNumber.getText().toString();
-        String date = edtTvExpDate.getText().toString();
-        String cvvno = edtTvCvv.getText().toString();
+
+        String cvv = mCardInputWidget.getCard().getCVC();
+        int expMonth = mCardInputWidget.getCard().getExpMonth();
+        int expYear = mCardInputWidget.getCard().getExpYear();
+        strCardNo = mCardInputWidget.getCard().getNumber();
         String zipcode = edtTvZipCode.getText().toString();
 
         Stripe stripe;
 
-        Card card = new Card(strCardNo, Integer.parseInt(date.substring(0, 2)), Integer.parseInt("20" + date.substring(3)), cvvno);
+        Card card = new Card(strCardNo, expMonth, expYear, cvv);
 // Remember to validate the card object before you use it to save time.
         if (!card.validateCard()) {
             // Do not continue token creation.
@@ -119,7 +127,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 
             try {
                 MyProgressDialog.showProgressDialog(context);
-                stripe = new Stripe("pk_test_GF0y48SCqViKdCSA8LwOPFVj");
+                stripe = new Stripe(context,"pk_test_GF0y48SCqViKdCSA8LwOPFVj");
 //            googleMap.clear();
 //            customGoogleMap.clear();
                 stripe.createToken(
@@ -163,7 +171,12 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                                                 cardToken = customer.getId();
 
                                                 if (cardToken != null) {
-                                                    callSavePaymentMethodAPI();
+                                                    if (ConnectivityDetector.isConnectingToInternet(context)) {
+                                                        callSavePaymentMethodAPI();
+                                                    } else {
+                                                        SnackBar.showInternetError(context, snackBarView);
+                                                    }
+
                                                 }
 
                                         /*charge = Charge
@@ -178,11 +191,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                                         }
 
                                         protected void onPostExecute(Void result) {
-
-
                                         }
-
-                                        ;
 
                                     }.execute();
 
@@ -195,14 +204,17 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 
                             public void onError(Exception error) {
                                 // Show localized error message
+                                MyProgressDialog.hideProgressDialog();
+                                SnackBar.showError(context, snackBarView, error.getMessage());
                                 Log.e("check", "erorr" + error.getMessage());
 
                             }
                         }
+
                 );
 
 
-            } catch (AuthenticationException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -221,9 +233,9 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 //
 //
 
-        edtTvCardNumber.getCardNumber(); // Get the card number
-        edtTvCardNumber.isValid(); // Is the card number valid
-        edtTvCardNumber.getCardType();
+//        edtTvCardNumber.getCardNumber(); // Get the card number
+//        edtTvCardNumber.isValid(); // Is the card number valid
+//        edtTvCardNumber.getCardType();
         edtTvExpDate.addTextChangedListener(mDateEntryWatcher);
 
     }
@@ -274,6 +286,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         btnSavePaymentMethod = binding.btnSavePaymentMethod;
         tvEditPaymentTitle = binding.tvEditPaymentTitle;
         ibBack = binding.ibBack;
+        mCardInputWidget = binding.cardInputWidget;
     }
 
 
@@ -373,15 +386,21 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
         try {
             JSONObject jsonObject = new JSONObject();
 
-            strCardNo = edtTvCardNumber.getText().toString();
-            strCardNo = strCardNo.replace("-", "");
-            String strExpDate = edtTvExpDate.getText().toString();
             String strzipCode = edtTvZipCode.getText().toString();
+            if(mCardInputWidget.getCard()!=null) {
+                cvv = mCardInputWidget.getCard().getCVC();
+                //     int exp = ;
+                strExpMonth = mCardInputWidget.getCard().getExpMonth();
+                strExpYear = mCardInputWidget.getCard().getExpYear();
+                strExpDate = strExpMonth + "/"+strExpYear;
+                strCardNo = mCardInputWidget.getCard().getNumber();
+                cardToSave = new Card(strCardNo, strExpMonth, strExpYear, cvv);
+            }
 
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_NUMBER, strCardNo);
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_EXP_MONTH_YEAR, strExpDate);
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_ZIPCODE, strzipCode);
-            jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_TOKEN, cardToken);
+            jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_TOKEN,cardToken);
 
             Applog.E("request UpdateCard=> " + jsonObject.toString());
 //            MyProgressDialog.showProgressDialog(context);

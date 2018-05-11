@@ -105,7 +105,7 @@ public class TripHistoryModel implements Parcelable {
         private double to_lat;
         private double to_lng;
         private int total_estimated_travel_time;
-        private int total_estimated_trip_cost;
+        private float total_estimated_trip_cost;
         private String created_at;
         private String updated_at;
         private String name;
@@ -127,7 +127,7 @@ public class TripHistoryModel implements Parcelable {
             to_lat = in.readDouble();
             to_lng = in.readDouble();
             total_estimated_travel_time = in.readInt();
-            total_estimated_trip_cost = in.readInt();
+            total_estimated_trip_cost = in.readFloat();
             created_at = in.readString();
             updated_at = in.readString();
             name = in.readString();
@@ -237,11 +237,11 @@ public class TripHistoryModel implements Parcelable {
             this.total_estimated_travel_time = total_estimated_travel_time;
         }
 
-        public int getTotal_estimated_trip_cost() {
+        public float getTotal_estimated_trip_cost() {
             return total_estimated_trip_cost;
         }
 
-        public void setTotal_estimated_trip_cost(int total_estimated_trip_cost) {
+        public void setTotal_estimated_trip_cost(float total_estimated_trip_cost) {
             this.total_estimated_trip_cost = total_estimated_trip_cost;
         }
 
@@ -327,7 +327,7 @@ public class TripHistoryModel implements Parcelable {
             dest.writeDouble(to_lat);
             dest.writeDouble(to_lng);
             dest.writeInt(total_estimated_travel_time);
-            dest.writeInt(total_estimated_trip_cost);
+            dest.writeFloat(total_estimated_trip_cost);
             dest.writeString(created_at);
             dest.writeString(updated_at);
             dest.writeString(name);

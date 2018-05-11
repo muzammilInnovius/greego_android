@@ -28,7 +28,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.util.Log;
@@ -1039,7 +1038,7 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     @SuppressLint("MissingPermission")
     @Override
     public void onClick(View view) {
-        Fragment fragment = null;
+//        Fragment fragment = null;
         Intent in;
         switch (view.getId()) {
 
@@ -1168,13 +1167,13 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
 
         }
 
-        if (fragment != null) {
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.containerBody, fragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-
-        }
+//        if (fragment != null) {
+//            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//            transaction.replace(R.id.containerBody, fragment);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//
+//        }
     }
 
     // Method to share either text or URL.
@@ -1674,19 +1673,21 @@ public class MapHomeFragment extends Fragment implements OnMapReadyCallback,
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged [" + location + "]");
         lastLocation = location;
-//        if (strTripStatus.matches(GlobalValues.DRIVER_ASSIGNED)) {
-//            callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
-//        }else if(strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
-//            mGoogleMap.clear();
-//
-//
-//            pickupPoint = new LatLng(userPicUpLat, userPicUpLong);
-//            dropPoint = new LatLng(userDropOfLat, userDropOfLng);
-//
-//            Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
-////                createMarker(drvLat, drvLong, "Driver", "Show");
-//            createRoute(pickupPoint, dropPoint);
-//        }
+        if (strTripStatus != null) {
+            if (strTripStatus.matches(GlobalValues.DRIVER_ASSIGNED)) {
+                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+            } else if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
+                mGoogleMap.clear();
+
+
+                pickupPoint = new LatLng(userPicUpLat, userPicUpLong);
+                dropPoint = new LatLng(userDropOfLat, userDropOfLng);
+
+                Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
+//                createMarker(drvLat, drvLong, "Driver", "Show");
+                createRoute(pickupPoint, dropPoint);
+            }
+        }
 //        writeActualLocation(location);
 
 

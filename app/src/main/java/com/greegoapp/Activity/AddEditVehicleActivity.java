@@ -48,8 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.greegoapp.Activity.UserProfileActivity.SELECT_CHOISE_VEHICLE;
-import static com.greegoapp.Fragment.MapHomeFragment.ADD_EDIT_VEHICAL_REQUEST;
-import static com.greegoapp.Fragment.MapHomeFragment.REQUEST_ADD_VEHICLE;
+
 
 public class AddEditVehicleActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText edtTvMake, edtTvModel, edtTvYear, edtTvColor, edtTvCarType;
@@ -90,7 +89,13 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
         context = AddEditVehicleActivity.this;
         bindViews();
         //Mujju
-        callGetVehicalAPI();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callGetVehicalAPI();
+
+        } else {
+            SnackBar.showInternetError(context, snackBarView);
+        }
+
         setListners();
         getCarTypedArray();
 
@@ -280,16 +285,16 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                 break;
 
             case R.id.ibBack:
-                if (REQUEST_ADD_VEHICLE == 111) {
-                    Intent data = new Intent();
-                    setResult(REQUEST_ADD_VEHICLE, data);
-                } else if (ADD_EDIT_VEHICAL_REQUEST == 2000) {
-                    Intent data = new Intent();
-                    setResult(ADD_EDIT_VEHICAL_REQUEST, data);
-                } else if (SELECT_CHOISE_VEHICLE == 1100) {
-                    Intent data = new Intent();
-                    setResult(SELECT_CHOISE_VEHICLE, data);
-                }
+//                if (REQUEST_ADD_VEHICLE == 111) {
+//                    Intent data = new Intent();
+//                    setResult(REQUEST_ADD_VEHICLE, data);
+//                } else if (ADD_EDIT_VEHICAL_REQUEST == 2000) {
+//                    Intent data = new Intent();
+//                    setResult(ADD_EDIT_VEHICAL_REQUEST, data);
+//                } else if (SELECT_CHOISE_VEHICLE == 1100) {
+//                    Intent data = new Intent();
+//                    setResult(SELECT_CHOISE_VEHICLE, data);
+//                }
                 finish();
                 break;
             case R.id.edtTvYear:
@@ -416,47 +421,47 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     if (vehicleData.getError_code() == 0) {
 
 
-                        if (REQUEST_ADD_VEHICLE == 111) {
-                            Intent data = new Intent();
-                            data.putExtra("manufacture", strManufactur);
-                            data.putExtra("model", strVehicle);
-                            data.putExtra("year", strYear);
-                            data.putExtra("color", strColor);
-
-                            vehicleUpdate.setManufacture(strManufactur);
-                            vehicleUpdate.setModel(strVehicle);
-                            vehicleUpdate.setYear(Integer.parseInt(strYear));
-                            vehicleUpdate.setColor(strColor);
-                            SessionManager.saveVehical(context,vehicleUpdate);
-
-                            setResult(REQUEST_ADD_VEHICLE, data);
-                        } else if (ADD_EDIT_VEHICAL_REQUEST == 2000) {
-                            Intent data = new Intent();
-                            data.putExtra("manufacture", strManufactur);
-                            data.putExtra("model", strVehicle);
-                            data.putExtra("year", strYear);
-                            data.putExtra("color", strColor);
-
-                            vehicleUpdate.setManufacture(strManufactur);
-                            vehicleUpdate.setModel(strVehicle);
-                            vehicleUpdate.setYear(Integer.parseInt(strYear));
-                            vehicleUpdate.setColor(strColor);
-                            SessionManager.saveVehical(context,vehicleUpdate);
-                            setResult(ADD_EDIT_VEHICAL_REQUEST, data);
-                        } else if (SELECT_CHOISE_VEHICLE == 1100) {
-                            Intent data = new Intent();
-                            data.putExtra("manufacture", strManufactur);
-                            data.putExtra("model", strVehicle);
-                            data.putExtra("year", strYear);
-                            data.putExtra("color", strColor);
-
-                            vehicleUpdate.setManufacture(strManufactur);
-                            vehicleUpdate.setModel(strVehicle);
-                            vehicleUpdate.setYear(Integer.parseInt(strYear));
-                            vehicleUpdate.setColor(strColor);
-                            SessionManager.saveVehical(context,vehicleUpdate);
-                            setResult(SELECT_CHOISE_VEHICLE, data);
-                        }
+//                        if (REQUEST_ADD_VEHICLE == 111) {
+//                            Intent data = new Intent();
+//                            data.putExtra("manufacture", strManufactur);
+//                            data.putExtra("model", strVehicle);
+//                            data.putExtra("year", strYear);
+//                            data.putExtra("color", strColor);
+//
+//                            vehicleUpdate.setManufacture(strManufactur);
+//                            vehicleUpdate.setModel(strVehicle);
+//                            vehicleUpdate.setYear(Integer.parseInt(strYear));
+//                            vehicleUpdate.setColor(strColor);
+//                            SessionManager.saveVehical(context,vehicleUpdate);
+//
+//                            setResult(REQUEST_ADD_VEHICLE, data);
+//                        } else if (ADD_EDIT_VEHICAL_REQUEST == 2000) {
+//                            Intent data = new Intent();
+//                            data.putExtra("manufacture", strManufactur);
+//                            data.putExtra("model", strVehicle);
+//                            data.putExtra("year", strYear);
+//                            data.putExtra("color", strColor);
+//
+//                            vehicleUpdate.setManufacture(strManufactur);
+//                            vehicleUpdate.setModel(strVehicle);
+//                            vehicleUpdate.setYear(Integer.parseInt(strYear));
+//                            vehicleUpdate.setColor(strColor);
+//                            SessionManager.saveVehical(context,vehicleUpdate);
+//                            setResult(ADD_EDIT_VEHICAL_REQUEST, data);
+//                        } else if (SELECT_CHOISE_VEHICLE == 1100) {
+//                            Intent data = new Intent();
+//                            data.putExtra("manufacture", strManufactur);
+//                            data.putExtra("model", strVehicle);
+//                            data.putExtra("year", strYear);
+//                            data.putExtra("color", strColor);
+//
+//                            vehicleUpdate.setManufacture(strManufactur);
+//                            vehicleUpdate.setModel(strVehicle);
+//                            vehicleUpdate.setYear(Integer.parseInt(strYear));
+//                            vehicleUpdate.setColor(strColor);
+//                            SessionManager.saveVehical(context,vehicleUpdate);
+//                            setResult(SELECT_CHOISE_VEHICLE, data);
+//                        }
 
                         SnackBar.showSuccess(context, snackBarView, "Vehicle Update.");
                         finish();
@@ -684,7 +689,13 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     spinnerMake.setSelection(0);
                     spinnerModel.setSelection(0);
 //                    edtTvModel.setText("Choose vehicle model");
-                    callVehicalModelApi(questionDatum.getId());
+                    if (ConnectivityDetector.isConnectingToInternet(context)) {
+                        callVehicalModelApi(questionDatum.getId());
+
+                    } else {
+                        SnackBar.showInternetError(context, snackBarView);
+                    }
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

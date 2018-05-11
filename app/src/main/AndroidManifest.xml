@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -89,7 +90,7 @@
         <!--Innovius id key:AIzaSyCgtckieZat_3oUIcNIW2Wv782coeHctzw -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCgtckieZat_3oUIcNIW2Wv782coeHctzw" />
+            android:value="AIzaSyCTrxbYVywgkAucxesBR94U5okFlj5_RNo" />
 
         <!--Lattest api key-->
         <!--AIzaSyDleLMo3h7J3f6FdG8ELCuArBajMLVFxKM-->
@@ -149,11 +150,14 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <service android:name=".FCM.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+
+
 
         <activity
             android:name=".FCM.NotificationActivity"
@@ -176,6 +180,17 @@
             android:name=".Activity.TripCompleteChargePayActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
+
+        <receiver
+            android:name=".Utils.ConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.PROVIDER_CHANGED"/>
+                
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

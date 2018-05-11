@@ -19,14 +19,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.greegoapp.Fragment.MapHomeFragment;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.ConnectivityDetector;
+import com.greegoapp.Utils.SnackBar;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -50,6 +51,7 @@ public class SplashActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
     LocationManager locationManager;
     String provider;
+    private View snackBarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splace_screen);
         context = SplashActivity.this;
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        snackBarView = findViewById(android.R.id.content);
 
         provider = locationManager.getBestProvider(new Criteria(), false);
 
@@ -85,7 +88,8 @@ public class SplashActivity extends AppCompatActivity {
             }
 //            CheckGpsStatus();
         } else {
-            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
+            SnackBar.showInternetError(context,snackBarView);
+//            Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
         }
 
     }

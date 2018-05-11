@@ -158,9 +158,16 @@ public class WebFields {
 
 
     public static final class DIST_URL{
-        public static final String MODE="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&";
-        public static final String ORIGINS="origins=";
-        public static final String DESTINATION="&destinations=";
-        public static final String KEY="&key=AIzaSyDleLMo3h7J3f6FdG8ELCuArBajMLVFxKM";
+//        https://maps.googleapis.com/maps/api/directions/json?origin=\(origin)&destination=\(destination)&mode=driving&key=AIzaSyDuLTaJL-tMzdBoTZtCQfCz4m66iEZ1eQc
+//        public static final String MODE="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&";
+        public static final String MODE="https://maps.googleapis.com/maps/api/directions/json?";
+        public static final String ORIGINS="origin=";
+        public static final String DESTINATION="&destination=";
+    }
+
+//    http://kroslinkstech.in/greego/public/api/user/verify/email
+
+    public static final class EMAIL_VERIFY{
+        public static final String MODE="user/verify/email";
     }
 }

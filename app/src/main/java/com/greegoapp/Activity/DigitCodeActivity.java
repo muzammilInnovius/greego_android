@@ -137,7 +137,12 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 timer();
 
                 if (registerFCMKey != null) {
-                    callMobileNumberAPI();
+                    if (ConnectivityDetector.isConnectingToInternet(context)) {
+                        callMobileNumberAPI();
+                    } else {
+                        SnackBar.showInternetError(context, snackBarView);
+                    }
+
                 }else {
                     SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
                 }
@@ -312,7 +317,13 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         String mobileNo = SessionManager.getMobileNo(context);
         strOtpCode = pinVwOtpCode.getText().toString();
 
-        callUserMeApi();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callUserMeApi();
+        } else {
+            SnackBar.showInternetError(context, snackBarView);
+        }
+
+
 
 //        if (sendOtp != 0) {
 //            String newOtp = "" + sendOtp;

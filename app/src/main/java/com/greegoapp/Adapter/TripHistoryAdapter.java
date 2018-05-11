@@ -65,7 +65,7 @@ public class TripHistoryAdapter extends RecyclerView.Adapter<TripHistoryAdapter.
             String formatedstring = (String) android.text.format.DateFormat.format("MMM dd,yyyy, hh:mm aa", date1);
 
             holder.tvTripDate.setText(formatedstring);
-            holder.tvTripTime.setText(strTotalTime);
+            holder.tvTripTime.setText(strTotalTime +"min");
             holder.tvTripTotalCost.setText("$" + strTotalCost);
 
             String profilePicUrl = "http://kroslinkstech.in/greego/storage/app/" + tripHistoryModel.getProfile_pic();

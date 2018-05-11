@@ -26,6 +26,7 @@ import com.greegoapp.Model.TripHistoryModel;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
+import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
@@ -34,6 +35,7 @@ import com.greegoapp.databinding.ActivityTripHistoryBinding;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +63,11 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
         bindViews();
         setListner();
 
-        callUserTripHistoryAPI();
+        if (ConnectivityDetector.isConnectingToInternet(context)) {
+            callUserTripHistoryAPI();
+        } else {
+            SnackBar.showInternetError(context, snackBarView);
+        }
 
     }
 
@@ -94,7 +100,7 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
                                 tvNoDataFaund.setVisibility(View.GONE);
                                 rvTripHistory.setVisibility(View.VISIBLE);
 
-                            }else {
+                            } else {
                                 tvNoDataFaund.setVisibility(View.VISIBLE);
                                 rvTripHistory.setVisibility(View.GONE);
                             }
@@ -151,13 +157,16 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
 
 
                 String totalTime = alTripHistoryList.get(tripHistoryPosition).getCreated_at();
-                int totalCost = alTripHistoryList.get(tripHistoryPosition).getTotal_estimated_trip_cost();
+                float totalCost = alTripHistoryList.get(tripHistoryPosition).getTotal_estimated_trip_cost();
+
 
                 double fromLat = alTripHistoryList.get(tripHistoryPosition).getFrom_lat();
                 double fromLong = alTripHistoryList.get(tripHistoryPosition).getFrom_lng();
 
                 double toLat = alTripHistoryList.get(tripHistoryPosition).getTo_lat();
                 double toLong = alTripHistoryList.get(tripHistoryPosition).getTo_lng();
+
+                String tripTotalTime = "" + alTripHistoryList.get(tripHistoryPosition).getTotal_estimated_travel_time();
 
                 in.putExtra("totalTime", totalTime);
                 in.putExtra("totalCost", String.valueOf(totalCost));
@@ -172,13 +181,14 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
                 in.putExtra("toAdd", alTripHistoryList.get(tripHistoryPosition).getTo_address());
 
                 in.putExtra("startTime", alTripHistoryList.get(tripHistoryPosition).getCreated_at());
-//                in.putExtra("drPic", alTripHistoryList.get(tripHistoryPosition).get());
+                in.putExtra("tripTotalTime", tripTotalTime);
 
                 startActivity(in);
 
             }
         };
 
+        Collections.reverse(alTripHistoryList);
         Applog.E("TripHistory size after set==>" + alTripHistoryList.size());
         mAdapter = new TripHistoryAdapter(context, alTripHistoryList, mListener);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
@@ -194,7 +204,7 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
     private void bindViews() {
         rvTripHistory = binding.rvTripHistory;
         ibback = binding.ibBack;
-        tvNoDataFaund =binding.tvNoDataFaund;
+        tvNoDataFaund = binding.tvNoDataFaund;
     }
 
     @Override

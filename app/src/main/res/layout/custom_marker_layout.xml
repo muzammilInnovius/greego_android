@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/ivMarker"
+        android:layout_width="@dimen/scale_40dp"
+        android:layout_height="@dimen/scale_30dp"
+        android:src="@mipmap/map_pic_time" />
+
+    <TextView
+        android:id="@+id/tvMarkerTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/scale_4dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="12 mins"
+        android:textColor="#ce8223"
+        android:textSize="@dimen/txt_5"
+        android:textStyle="bold" />
+
+</RelativeLayout>
