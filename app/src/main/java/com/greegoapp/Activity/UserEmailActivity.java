@@ -72,7 +72,7 @@ public class UserEmailActivity extends AppCompatActivity implements View.OnClick
     private void setListners() {
         ibBack.setOnClickListener(this);
         imgVwCancel.setOnClickListener(this);
-        btnUpdate.setOnClickListener(this);
+//        btnUpdate.setOnClickListener(this);
         tvSendConfEmail.setOnClickListener(this);
     }
 
@@ -112,11 +112,11 @@ public class UserEmailActivity extends AppCompatActivity implements View.OnClick
                 break;
 
             case R.id.btnUpdate:
-                if (ConnectivityDetector.isConnectingToInternet(context)) {
-                    callEmailUpdateAPI();
-                } else {
-                    SnackBar.showInternetError(context, snackBarView);
-                }
+//                if (ConnectivityDetector.isConnectingToInternet(context)) {
+//                    callEmailUpdateAPI();
+//                } else {
+//                    SnackBar.showInternetError(context, snackBarView);
+//                }
 
                 break;
 

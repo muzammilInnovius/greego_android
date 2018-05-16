@@ -148,7 +148,7 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 }
 
                 pinVwOtpCode.setText("");
-                KeyboardUtility.showKeyboard(context, pinVwOtpCode);
+                KeyboardUtility.hideKeyboard(context, view);
                 break;
             /*    edtTvDigit1.setText("");
                 edtTvDigit2.setText("");
@@ -177,6 +177,10 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
 
 
                 //  SnackBar.showValidationError(context,view,"In Progress");
+                break;
+
+            case R.id.pinVwDigitCode:
+                KeyboardUtility.showKeyboard(context, pinVwOtpCode);
                 break;
         }
     }
@@ -317,23 +321,23 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         String mobileNo = SessionManager.getMobileNo(context);
         strOtpCode = pinVwOtpCode.getText().toString();
 
-        if (ConnectivityDetector.isConnectingToInternet(context)) {
-            callUserMeApi();
-        } else {
-            SnackBar.showInternetError(context, snackBarView);
-        }
-
-
-
-//        if (sendOtp != 0) {
-//            String newOtp = "" + sendOtp;
-//            if (strOtpCode.matches(newOtp)) {
-//                callUserMeApi();
-//
-//            } else {
-//                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
-//            }
+//        if (ConnectivityDetector.isConnectingToInternet(context)) {
+//            callUserMeApi();
+//        } else {
+//            SnackBar.showInternetError(context, snackBarView);
 //        }
+
+
+
+        if (sendOtp != 0) {
+            String newOtp = "" + sendOtp;
+            if (strOtpCode.matches(newOtp)) {
+                callUserMeApi();
+
+            } else {
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.otp_resend_wng));
+            }
+        }
 
     }
 

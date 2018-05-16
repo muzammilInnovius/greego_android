@@ -43,7 +43,6 @@
                     android:id="@+id/mgooleMap"
                     android:name="com.google.android.gms.maps.MapFragment"
                     android:layout_width="match_parent"
-                    tools:ignore="MissingPrefix"
                     map:uiCompass="true"
                     map:uiRotateGestures="true"
                     map:uiScrollGestures="true"
@@ -802,7 +801,6 @@
 
 
                         </RelativeLayout>
-
 
                     </LinearLayout>
 

@@ -10,9 +10,14 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -23,6 +28,7 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.CardsNumberAdapter;
+import com.greegoapp.Adapter.VehicleDetailAdapter;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
@@ -43,6 +49,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL;
 import static com.greegoapp.Activity.HomeActivity.CHANGE_CONTACT_NO;
 
 
@@ -60,8 +67,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     //priyanka(27/4)
     private RecyclerView rvCards;
     public static CardsNumberAdapter adapter;
-    private ArrayList<GetUserData.DataBean.CardsBean> cardData;
-    private RecyclerViewItemClickListener itemClickListener;
+    private ArrayList<GetUserData.DataBean.CardsBean> alCardData;
     SwipeRefreshLayout swiper;
 
     @Override
@@ -71,9 +77,11 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
         snackBarView = findViewById(android.R.id.content);
         context = PaymentActivity.this;
+        alCardData = new ArrayList<>();
 
         bindViews();
         setListner();
+
         if (ConnectivityDetector.isConnectingToInternet(context)) {
             callUserMeApi();
         } else {
@@ -83,10 +91,33 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
         Applog.E("selectCardNo====> " + selectCardNo);
 
+        ViewParent parent = rvCards.getParent();
+        parent.clearChildFocus(rvCards);
+
+//        rvCards.setOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
+//                super.onScrollStateChanged(recyclerView, scrollState);
+//
+//                if (SCROLL_STATE_TOUCH_SCROLL == scrollState) {
+//                    View currentFocus = getCurrentFocus();
+//                    if (currentFocus != null) {
+//                        currentFocus.clearFocus();
+//                    }
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//            }
+//        });
+
     }
 
     private void setCardNumber() {
-        cardNo = SessionManager.getCardNo(context);
+//        cardNo = SessionManager.getCardNo(context);
 
         int length = cardNo.length();
         if (length > 0) {
@@ -116,14 +147,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         ibBack = binding.ibBack;
         //    tvCardDetail = binding.tvCardDetail;
         rvCards = binding.rvCards;
-        cardData = new java.util.ArrayList<>();
 
-        itemClickListener = new RecyclerViewItemClickListener() {
-            @Override
-            public void onClick(View view, int position) {
 
-            }
-        };
     }
 
 
@@ -224,8 +249,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                         MyProgressDialog.hideProgressDialog();
 //
                         if (userDetails.getError_code() == 0) {
-                            cardData.clear();
-                            cardData.addAll(userDetails.getData().getCards());
+                            alCardData.clear();
+                            alCardData.addAll(userDetails.getData().getCards());
 //                            adapter.notifyDataSetChanged();
 
                             if (userDetails.getData() == null) {
@@ -233,18 +258,22 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                                 SnackBar.showError(context, snackBarView, "No cards found");
                             }
 
-                            adapter = new CardsNumberAdapter(PaymentActivity.this, cardData, itemClickListener);
-                            rvCards.setAdapter(adapter);
-                            rvCards.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true));
+                            setRecyclerView();
+
+//
+//                            adapter = new CardsNumberAdapter(context, alCardData, itemClickListener);
+//                            rvCards.setAdapter(adapter);
+//                            rvCards.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+//                                    LinearLayoutManager.VERTICAL, true));
 
 
-                            if (userCardDtls != null) {
-
-                                if (userCardDtls.getSelected() == 1) {
-
-                                    selectCardNo = userCardDtls.getCard_number();
-                                }
-                            }
+//                            if (userCardDtls != null) {
+//
+//                                if (userCardDtls.getSelected() == 1) {
+//
+//                                    selectCardNo = userCardDtls.getCard_number();
+//                                }
+//                            }
 
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -290,6 +319,30 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         {
             e.printStackTrace();
         }
+
+    }
+
+    private void setRecyclerView() {
+        RecyclerViewItemClickListener mListener = new RecyclerViewItemClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+//                Fragment fragment = new TripHistoryDetailFragment();
+//                FragmentManager fragmentManager = UserProfileActivity.this.getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.containerBody, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
+
+            }
+        };
+
+
+        adapter = new CardsNumberAdapter(context, alCardData, mListener);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+        rvCards.setLayoutManager(mLayoutManager);
+        rvCards.setItemAnimator(new DefaultItemAnimator());
+        rvCards.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
     }
 

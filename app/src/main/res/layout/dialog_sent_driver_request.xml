@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_unable_request"
+        android:padding="@dimen/scale_20dp">
+
+        <RelativeLayout
+            android:id="@+id/rlRequest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
+                android:text="Are you sure you want to Request?"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_16" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
+                android:text="Are you sure you want to Request?"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_16" />
+
+
+            <TextView
+                android:id="@+id/tvRequest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
+                android:text="Are you sure you want to Request?"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_16" />
+
+
+            <RelativeLayout
+                android:id="@+id/rlFrom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvRequest"
+                android:layout_marginTop="@dimen/scale_5dp">
+
+
+                <TextView
+                    android:id="@+id/from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="From"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_14" />
+
+
+                <TextView
+                    android:id="@+id/tvFromAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/scale_1dp"
+                    android:layout_toRightOf="@+id/from"
+                    android:text=""
+                    android:textColor="@color/app_bg"
+                    android:textSize="@dimen/txt_14" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rlFrom"
+                android:layout_marginTop="@dimen/scale_1dp">
+
+
+                <TextView
+                    android:id="@+id/to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="To"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/txt_14" />
+
+
+                <TextView
+                    android:id="@+id/tvToAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/scale_1dp"
+                    android:layout_toRightOf="@+id/to"
+                    android:text=""
+                    android:textColor="@color/app_bg"
+                    android:textSize="@dimen/txt_14" />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rlRequest">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="@dimen/scale_95dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_15dp"
+                android:background="@drawable/help_button_bg"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:textColor="@color/app_bg" />
+
+            <Button
+                android:id="@+id/btnSent"
+                android:layout_width="@dimen/scale_95dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/scale_15dp"
+                android:background="@drawable/help_button_bg"
+                android:text="Ok"
+                android:textAllCaps="false"
+                android:textColor="@color/app_bg" />
+
+        </LinearLayout>
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

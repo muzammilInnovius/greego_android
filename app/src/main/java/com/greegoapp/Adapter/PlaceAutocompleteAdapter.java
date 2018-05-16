@@ -56,8 +56,8 @@ public class PlaceAutocompleteAdapter extends RecyclerView.Adapter<PlaceAutocomp
         layout = resource;
         mGoogleApiClient = googleApiClient;
         mBounds = null;
+//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_INDIA).build();
         mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_USA).build();
-//        mPlaceFilter = new AutocompleteFilter.Builder().setCountry(GlobalValues.COUNTRY_USA).build();
         this.mListener = (PlaceAutoCompleteInterface) mContext;
     }
 

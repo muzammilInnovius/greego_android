@@ -176,12 +176,12 @@ public class TripHistoryDetailActivity extends AppCompatActivity implements OnMa
         //Start Time and End Time
         String startTimeDate = strTripTravelTime;
         startTimeDate = startTimeDate.substring(11, 16);
-        Date startTimeDate1 = null;
-        try {
-            startTimeDate1 = new SimpleDateFormat("hh:mm").parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        Date startTimeDate1 = null;
+//        try {
+//            startTimeDate1 = new SimpleDateFormat("hh:mm").parse(date);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
         String formatedStartTimeDate = (String) android.text.format.DateFormat.format("hh:mm aa", date1);
 
 

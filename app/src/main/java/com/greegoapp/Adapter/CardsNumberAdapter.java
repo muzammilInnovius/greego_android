@@ -26,10 +26,8 @@ import com.greegoapp.Model.GetUserData;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
-import com.greegoapp.Utils.ConnectivityDetector;
 import com.greegoapp.Utils.MYEditCard;
 import com.greegoapp.Utils.MyProgressDialog;
-import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.RowCardNumberBinding;
 
@@ -43,7 +41,6 @@ import java.util.Map;
 
 public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.ViewHolder> {
     private Context context;
-    //private ArrayList<String> arrayList;
     private String cardNo;
     GetUserData.DataBean.CardsBean cardDetailModel;
     private ArrayList<GetUserData.DataBean.CardsBean> alCardData;
@@ -53,6 +50,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
     RecyclerViewItemClickListener mListener;
     private boolean isSelect = true;
     int oldPosition = -1;
+
     public CardsNumberAdapter() {
     }
 
@@ -60,15 +58,29 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
         this.context = context;
         this.alCardData = cardData;
         this.mListener = mListener;
+
+
+        if (getItemCount() == 1) {
+            lastSelectedPosition = 0;
+            callSelectCardForUser(alCardData.get(0).getId());
+        }
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        RowCardNumberBinding binding = DataBindingUtil.inflate(inflater, R.layout.row_card_number, parent, false);
+        return new ViewHolder(binding.getRoot(), mListener);
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView tvCardDetail;
         private RowCardNumberBinding mBinding;
-         RadioButton ivCardNumber;
+        RadioButton ivCardNumber;
         private RecyclerViewItemClickListener mListener;
-        private ImageView  ivDeleteCard;
+        private ImageView ivDeleteCard;
         private MYEditCard ivCardLogo;
 
         public ViewHolder(View itemView, RecyclerViewItemClickListener mListener) {
@@ -82,7 +94,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
             ivDeleteCard.setOnClickListener(this);
             ivCardNumber.setOnClickListener(this);
 
-          //  ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
+            //  ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
         }
 
         @Override
@@ -90,9 +102,9 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
             switch (view.getId()) {
                 case R.id.ivCardNumber:
                     lastSelectedPosition = getAdapterPosition();
-                    PaymentActivity.cardselected = ""+alCardData.get(getLayoutPosition()).getCard_number();
+                    PaymentActivity.cardselected = "" + alCardData.get(getLayoutPosition()).getCard_number();
 
-                    selectCardForUser(alCardData.get(getLayoutPosition()).getId());
+                    callSelectCardForUser(alCardData.get(getLayoutPosition()).getId());
 
                     notifyItemRangeChanged(0, alCardData.size());
 
@@ -105,10 +117,22 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
                     // Setting Positive "Yes" Button
                     alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            deleteCardDetails(card_id);
-                            alCardData.remove(getAdapterPosition());
-                            notifyItemRemoved(getAdapterPosition());
-                            notifyItemRangeChanged(getAdapterPosition(), alCardData.size());
+                            try {
+                                callDeleteCardDetails(alCardData.get(getLayoutPosition()).getId());
+
+                                alCardData.remove(getAdapterPosition());
+                                notifyItemRemoved(getAdapterPosition());
+                                if (getAdapterPosition() != 0) {
+                                    notifyItemRangeChanged(getAdapterPosition(), alCardData.size());
+                                }
+                                else {
+                                    notifyDataSetChanged();
+                                }
+
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
 
@@ -123,28 +147,13 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
             }
         }
 
-
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        RowCardNumberBinding binding = DataBindingUtil.inflate(inflater, R.layout.row_card_number, parent, false);
-        return new ViewHolder(binding.getRoot(), mListener);
-    }
 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-
-       /* if (lastSelectedPosition == position) {
-            isSelect = true;
-         //   holder.ivCardNumber.setImageResource(R.mipmap.ic_tick);
-        } else {
-            isSelect = false;
-     //       holder.ivCardNumber.setImageResource(R.mipmap.ic_un_tick);
-        }*/
 
         cardDetailModel = alCardData.get(position);
         byte[] data = Base64.decode(alCardData.get(position).getCard_number(), Base64.DEFAULT);
@@ -157,33 +166,25 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
         if (lastSelectedPosition == position) {
             holder.ivCardNumber.setChecked(true);
         } else {
-            if(oldPosition == position)
-            {
+            if (oldPosition == position) {
                 holder.ivCardNumber.setChecked(false);
-            }else
-            {
+            } else {
                 holder.ivCardNumber.setChecked(false);
             }
         }
-        if(cardDetailModel!=null)
-        {
-
-
+        if (cardDetailModel != null) {
             String number = setCardNumber(cardNo);
             holder.ivCardLogo.getCardNumber(cardNo);
             holder.ivCardLogo.isValid(cardNo);
             holder.ivCardLogo.getCardType();
 
             holder.tvCardDetail.setText(number);
-            if (selected_card_id==1 && oldPosition==-1) {
-//                selectCardNo = cardNo;
+            if (selected_card_id == 1 && oldPosition == -1) {
                 oldPosition = holder.getAdapterPosition();
                 holder.ivCardNumber.setChecked(true);
 
             }
         }
-
-
     }
 
     @Override
@@ -208,7 +209,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
     }
 
 
-    private void deleteCardDetails(int id) {
+    private void callDeleteCardDetails(int id) {
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -257,7 +258,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
 
     }
 
-    private void selectCardForUser(int id) {
+    private void callSelectCardForUser(int id) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(WebFields.SELECT_DELETE_CARD.PARAM_CARD_ID, String.valueOf(id));
@@ -305,8 +306,8 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
         }
 
     }
-    public void updateData(String strCard)
-    {
+
+    public void updateData(String strCard) {
 
     }
 

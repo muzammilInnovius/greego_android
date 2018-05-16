@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -92,8 +93,6 @@ import com.greegoapp.Adapter.DrawerLayoutAdapter;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.FCM.NotificationUtils;
 import com.greegoapp.GlobleFields.GlobalValues;
-import com.greegoapp.Interface.BackPressedFragment;
-import com.greegoapp.Interface.CallFragmentInterface;
 import com.greegoapp.Model.GetPickUpTime;
 import com.greegoapp.Model.GetTripRate;
 import com.greegoapp.Model.GetUserData;
@@ -118,7 +117,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -155,6 +159,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FragmentManager fragmentManager;
 
     Dialog dialog;
+    ProgressDialog proDialog;
 
     //pp
     public static final int MY_PERMISSION_REQUEST = 1;
@@ -212,7 +217,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private Location mylocation;
     Geocoder geocoder;
-    List<Address> addresses;
+    List<LatLng> addresses;
 
     private Location lastLocation;
     LatLng latLng;
@@ -224,8 +229,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     RelativeLayout rlVwUpdateMain, rlUpdate, rlUpdateData;
     TextView txtVwProfile, txtVwVehicleName, txtVwpayment, txtVwUpdate, txtVwCount;
     RelativeLayout rlProfile, rlVehicleNo, rlPaymentNo;
-    CallFragmentInterface callMyFragment;
-    BackPressedFragment backPressed;
 
     // pragnesh
     private List<LatLng> routeList;
@@ -255,7 +258,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     float base_fee, time_fee, mile_fee, trip_price, over_mile_fee, tripCost;
     String duration, duration1;
     Button btnRequest;
-    String duratioTime;
+    String duratioTime, durationTimeCalculate;
+    int durationOnlyMin;
 
     //Mujju 19_4_18
 //    ArrayList<UserNearDriverList> alUserNearDriver;
@@ -296,7 +300,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isNetworkAvaiableUIActive = false; // Flag to indicate which view is showing
     final private static int NETWORK_CHECK_INTERVAL = 5000; // Sleep interval between checking network
 
-    TextView tvMarkerTime;
+    TextView tvMarkerTime, tvLegal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -519,7 +523,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     in.putExtra("driverPic", driverPicUrl);
                     in.putExtra("fromAddress", strTripToAddress);
                     in.putExtra("tripId", paymentTripId);
-                    Applog.E("Trip id ===> " + paymentTripId);
+                    in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(in);
                     finish();
                     SnackBar.showSuccess(context, snackBarView, "Payment successfully.");
@@ -587,6 +593,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 statusPickuplocationRout = 0;
                 createRoute(pickupPoint, dropPoint);
 
+                zoomRoute(mGoogleMap, pickupPoint, dropPoint);
+
                 llVehical.setVisibility(View.GONE);
                 txtAddress.setVisibility(View.GONE);
                 llCostDesign.setVisibility(View.GONE);
@@ -642,12 +650,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void addCameraToDriverAssignMap(LatLng pickupPoint) {
+    private void zoomRoute(GoogleMap googleMap, LatLng pickupPoint, LatLng dropPoint) {
+        if (googleMap == null || pickupPoint == null || dropPoint == null) return;
 
-        CameraPosition cameraPosition = new CameraPosition.Builder().
-                target(pickupPoint).bearing(360).
-                zoom(20f).tilt(40).build();
-        mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+//        for (LatLng latLngPoint : pickupPoint)
+        boundsBuilder.include(pickupPoint);
+
+        int routePadding = 100;
+        LatLngBounds latLngBounds = boundsBuilder.build();
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, routePadding));
     }
 
 
@@ -762,8 +775,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         double drvLong = Double.parseDouble(alUserNearDriverDtls.get(i).getLng());
 //                        mGoogleMap.clear();
 //                        createMarker(drvLat, drvLong, "Driver", "Show");
-                        if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
-                            pickupPoint = new LatLng(Double.parseDouble(toLat), Double.parseDouble(toLong));
+                        if (strTripStatus != null) {
+                            if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
+                                pickupPoint = new LatLng(Double.parseDouble(toLat), Double.parseDouble(toLong));
+                            }
                         }
                         dropPoint = new LatLng(drvLat, drvLong);
 
@@ -851,6 +866,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
                     MyProgressDialog.hideProgressDialog();
+
                     Intent mIntent = new Intent(context, HomeActivity.class);
                     startActivity(mIntent);
                     finish();
@@ -1101,7 +1117,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPause() {
         super.onPause();
-
+        unregisterReceiver(myReceiver);
 
         if (mGoogleApiClient.isConnected())
             mGoogleApiClient.disconnect();
@@ -1169,7 +1185,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         if (Build.VERSION.SDK_INT < 23) {
             mGoogleMap.setMyLocationEnabled(true);
-            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("1"));
+//            View locationButton = ((View) mapView.findViewById(Integer.parseInt("2")).getParent()).findViewById(Integer.parseInt("0"));
             RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 // position on right bottom
             rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -1184,7 +1201,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             if (checkAndRequestPermissions()) {
                 mGoogleMap.setMyLocationEnabled(true);
-                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("1"));
                 RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 // position on right bottom
                 rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -1199,6 +1216,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+        mGoogleMap.setTrafficEnabled(false);
 
         mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
         mGoogleMap.getUiSettings().setCompassEnabled(false);
@@ -1333,22 +1351,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             trip_price = base_fee + (time * time_fee) + (10 * mile_fee) + ((dis - 10) * over_mile_fee);
         }
         return trip_price;
-    }
-
-
-    public LinearLayout getCostDesignLayout() {
-
-        return llCostDesign;
-    }
-
-    public LinearLayout getDriverPersDetailsMainLayout() {
-
-        return llDriverPersDetailsMain;
-    }
-
-    public RelativeLayout getOnTripLayout() {
-
-        return rlOnTripUser;
     }
 
 
@@ -1544,7 +1546,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     callTripRateAPI(statCode);
 
                 } else {
-                   SnackBar.showInternetError(context,snackBarView);
+                    SnackBar.showInternetError(context, snackBarView);
                 }
 
             } else {
@@ -1626,7 +1628,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     public String getAddress(double latitude, double longitude) {
         StringBuilder result = new StringBuilder();
 
@@ -1658,6 +1659,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("result---" + result.toString());
 
 //                autoComplete_location.setText(result.toString()); // Here is you AutoCompleteTextView where you want to set your string address (You can remove it if you not need it)
+            } else {
+//                Toast.makeText(context, "Please wait rout draw", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1666,13 +1669,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return result.toString();
     }
 
-
-    private void createRoute(LatLng pickupPoint, LatLng dropPoint) {
-        String url = getMapsApiDirectionsUrl(this.pickupPoint, this.dropPoint);
-        ReadTask downloadTask = new ReadTask();
-        // Start downloading json data from Google Directions API
-        downloadTask.execute(url);
-    }
 
     private void startAnim() {
         if (mGoogleMap != null) {
@@ -1712,6 +1708,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+    private void createRoute(LatLng pickupPoint, LatLng dropPoint) {
+        String url = getMapsApiDirectionsUrl(this.pickupPoint, this.dropPoint);
+        ReadTask downloadTask = new ReadTask();
+        // Start downloading json data from Google Directions API
+        downloadTask.execute(url);
+        Applog.E("===========> " + url);
+    }
+
     private class ReadTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -1721,7 +1726,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 MapHttpConnection http = new MapHttpConnection();
                 data = http.readUrl(url[0]);
-
 
             } catch (Exception e) {
                 // TODO: handle exception
@@ -1742,6 +1746,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    int hours;
 
     public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
         @Override
@@ -1764,13 +1770,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             return routes;
         }
 
+        String timeFormat;
+
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
 //            ArrayList<LatLng> points = null;
             PolylineOptions polyLineOptions = null;
-            try {
 
+            try {
                 if (routes.size() > 0) {
+
+                    proDialog.hide();
+
                     for (int i = 0; i < routes.size(); i++) {
                         routeList = new ArrayList<LatLng>();
                         polyLineOptions = new PolylineOptions();
@@ -1792,7 +1803,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     mGoogleMap.clear();
+                    mGoogleMap.setPadding(10, 200, 10, 100);
                     mGoogleMap.addPolyline(polyLineOptions);
+
+//                    Toast.makeText(context, "Please wait rout draw few min", Toast.LENGTH_LONG).show();
 
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(pickupPoint);
@@ -1856,11 +1870,39 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ImageView ivMarker = (ImageView) customMarker.findViewById(R.id.ivMarker);
                     tvMarkerTime.setText(duratioTime);
 
+
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(pickupPoint)
                             .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(context, customMarker)))
                             .title("Current Location")
                             .snippet("Home"));
+
+
+                    try {
+
+                        String durationTime1 = duratioTime;
+                        durationTime1 = durationTime1.replace("hour", ":");
+                        durationTime1 = durationTime1.replace("min", "");
+                        durationTime1 = durationTime1.replace("s", "");
+
+
+                        if (durationTime1.contains(":")) {
+                            hours = Integer.parseInt(durationTime1.substring(0, durationTime1.indexOf(":")).trim());
+                        }
+                        int minutes = Integer.parseInt(durationTime1.substring(durationTime1.indexOf(":") + 1).trim());
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("kk:mm");
+                        calendar.add(Calendar.MINUTE, minutes);
+                        calendar.add(Calendar.HOUR, hours);
+                        durationTimeCalculate = simpleDateFormat.format(calendar.getTime());
+
+                        final Date dateObj = simpleDateFormat.parse(durationTimeCalculate);
+                        timeFormat = new SimpleDateFormat("K:mm aa").format(dateObj);
+                        tvMarkerTime.setText(timeFormat);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
 
                     mGoogleMap.addMarker(new MarkerOptions()
                             .position(dropPoint)
@@ -1868,58 +1910,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             .title("Drop Location")
                             .snippet("Driver"));
                 } else {
+                    proDialog.hide();
                     if (statusPickuplocationRout == 1) {
                         SnackBar.showError(context, snackBarView, "No route found");
+                    } else {
+
                     }
                     Log.e("TAG", "No route found");
                 }
 
 
-                if (alUserList != null) {
-                    for (GetUserData.DataBean.CardsBean cardData : alUserSubDetails) {
-
-                        if (cardData != null) {
-
-//                            for (int i = 0; i < alUserSubDetails.size(); i++) {
-
-                            if (cardData.getSelected() == 1) {
-
-                                byte[] data = Base64.decode(cardData.getCard_number(), Base64.DEFAULT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    cardNo = new String(data, StandardCharsets.UTF_8);
-
-//                                edtCardDetail.setSelected(false);
-//                                edtCardDetail.setFocusable(false);
-//                                edtCardDetail.setFocusableInTouchMode(false);
-//                                String cn=cardNo.substring(11,15);
-                                    String s = cardNo;
-
-                                    String s4 = s.substring(12, 16);
-                                    String strCardNumber = "**** **** **** " + s4;
-                                    if (strCardNumber != null) {
-                                        edtCardDetail.getCardNumber(cardNo);
-                                        edtCardDetail.isValid(cardNo);
-                                        edtCardDetail.setText(strCardNumber);
-
-                                        imgVwYrCard.getCardNumber(cardNo);
-                                        imgVwYrCard.isValid(cardNo);
-
-                                        edtCardDetail.getCardType();
-                                    } else {
-                                        SnackBar.showError(context, snackBarView, "Please select card first.");
-                                    }
-                                }
-                            }
-//                            }
-
-
-                        }
-                    }
-                }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
         }
     }
@@ -2257,6 +2266,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setListners() {
+        tvLegal.setOnClickListener(this);
         ivProPicHome.setOnClickListener(this);
         ivPro.setOnClickListener(this);
         tvDrawUsername.setOnClickListener(this);
@@ -2331,7 +2341,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void bindView() {
-
+        tvLegal = binding.tvLegal;
         navHeader = binding.navHeader;
         drawer_layout = binding.drawerLayout;
         ivProPicHome = binding.ivProPicHome;
@@ -2433,6 +2443,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.tvLegal:
+                in = new Intent(HomeActivity.this, TermsCondiActivity.class);
+                startActivity(in);
+                break;
             case R.id.btnBackHome:
                 dialog.dismiss();
                 break;
@@ -2482,8 +2496,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnRequest:
                 String selectCard = edtCardDetail.getText().toString();
 
-                if (selectCard != null) {
-                    callUserRrequestAPI();
+                if (!selectCard.isEmpty()) {
+                    showRequestAccepterAlert();
+
                 } else {
                     SnackBar.showError(context, snackBarView, "Please select card first.");
                 }
@@ -2590,6 +2605,45 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         }
+    }
+
+    private void showRequestAccepterAlert() {
+        dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.dialog_sent_driver_request);
+
+        Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
+        Button btnSent = (Button) dialog.findViewById(R.id.btnSent);
+
+        TextView tvToAddress = (TextView) dialog.findViewById(R.id.tvToAddress);
+        TextView tvFromAddress = (TextView) dialog.findViewById(R.id.tvFromAddress);
+
+
+        tvToAddress.setText(destLocAddress);
+        tvFromAddress.setText(picLocAddress);
+
+        btnSent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callUserRrequestAPI();
+                dialog.dismiss();
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent in2 = new Intent(context, HomeActivity.class);
+//                startActivity(in2);
+//                finish();
+                dialog.dismiss();
+            }
+        });
+
+
+        dialog.show();
+
     }
 
     private void callRegisterUpdateComplete() {
@@ -2856,7 +2910,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 destLocAddress = data.getStringExtra("destLocAddress");
                 duratioTime = data.getStringExtra("departure");
 
-                Applog.E("duratioTime==>" + duratioTime);
+                durationOnlyMin = Integer.parseInt(duratioTime.substring(0, 2).trim());
 
                 llVehical.setVisibility(View.GONE);
                 txtAddress.setVisibility(View.GONE);
@@ -2873,9 +2927,57 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     SnackBar.showError(context, snackBarView, "Drop Point location not found.");
                 } else {
                     statusPickuplocationRout = 1;
+                    proDialog = new ProgressDialog(HomeActivity.this);
+                    proDialog.setMessage("Drawing the route, please wait!");
+                    proDialog.setIndeterminate(false);
+                    proDialog.setCancelable(false);
+                    proDialog.show();
+
                     createRoute(pickupPoint, dropPoint);
                 }
 
+
+                if (alUserList != null) {
+                    for (GetUserData.DataBean.CardsBean cardData : alUserSubDetails) {
+
+                        if (cardData != null) {
+
+//                            for (int i = 0; i < alUserSubDetails.size(); i++) {
+
+                            if (cardData.getSelected() == 1) {
+
+                                byte[] byteData = Base64.decode(cardData.getCard_number(), Base64.DEFAULT);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                    cardNo = new String(byteData, StandardCharsets.UTF_8);
+
+//                                edtCardDetail.setSelected(false);
+//                                edtCardDetail.setFocusable(false);
+//                                edtCardDetail.setFocusableInTouchMode(false);
+//                                String cn=cardNo.substring(11,15);
+                                    String s = cardNo;
+
+                                    String s4 = s.substring(12, 16);
+                                    String strCardNumber = "**** **** **** " + s4;
+                                    if (strCardNumber != null) {
+                                        edtCardDetail.getCardNumber(cardNo);
+                                        edtCardDetail.isValid(cardNo);
+                                        edtCardDetail.setText(strCardNumber);
+
+                                        imgVwYrCard.getCardNumber(cardNo);
+                                        imgVwYrCard.isValid(cardNo);
+
+                                        edtCardDetail.getCardType();
+                                    } else {
+                                        SnackBar.showError(context, snackBarView, "Please select card first.");
+                                    }
+                                }
+                            }
+//                            }
+
+
+                        }
+                    }
+                }
 
             }
         } else if (requestCode == ADD_EDIT_VEHICAL_REQUEST) {
@@ -3188,9 +3290,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
 
-
                     userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.DataBean.class);
                     GetUserData userDetail = new Gson().fromJson(String.valueOf(response), GetUserData.class);
+
                     try {
                         MyProgressDialog.hideProgressDialog();
                         alUserList = new ArrayList<>();
@@ -3256,6 +3358,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             //getIs_agreed = 0 new user
 
 //
+                        } else if (userDetail.getError_code() == 1) {
+                            logout();
                         } else {
                             MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));
@@ -3295,6 +3399,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
+    }
+
+    private void logout() {
+        SessionManager.clearAppSession(context);
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void CheckGpsStatus() {

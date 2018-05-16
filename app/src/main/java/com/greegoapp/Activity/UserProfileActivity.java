@@ -62,11 +62,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -166,7 +162,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         btnUpdate = binding.btnUpdate;
         tvAdd = binding.tvAdd;
     }
-
 
 
     @Override
@@ -376,7 +371,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -531,10 +525,17 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         return result;
     }
 
+    String path;
     public Uri getImageUri(Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null);
+
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return Uri.parse(path);
     }
 
@@ -738,13 +739,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             Intent data = new Intent();
 //            String userName = edtTvProfileFname.getText().toString();
 //            data.putExtra("name", userName);
-            callMyFragment.callUpdateVehicalMethod(alVehicleDetail);
             setResult(HOME_SLIDER_PROFILE_UPDATE, data);
-        } else if (MAP_HOME_PROFILE_UPDATE == 1002) {
-            Intent data = new Intent();
-            String userName = edtTvProfileFname.getText().toString();
-            data.putExtra("name", userName);
-            setResult(MAP_HOME_PROFILE_UPDATE, data);
         } else if (SETTING_PROFILE_UPDATE == 1001) {
             Intent data = new Intent();
             String userName = edtTvProfileFname.getText().toString();
@@ -757,8 +752,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 //    public static void adapterChange() {
 //        adapter.notifyDataSetChanged();
 //    }
-
-
 
 
 }

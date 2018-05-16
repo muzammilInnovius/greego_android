@@ -91,7 +91,7 @@ public class SignUpUserNameActivity extends AppCompatActivity implements View.On
         in.putExtra("lName", strLName);
         in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
-        overridePendingTransition(R.anim.trans_right_out, R.anim.trans_left_in);
+        overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
         finish();
     }
 

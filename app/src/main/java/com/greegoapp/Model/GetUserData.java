@@ -108,6 +108,7 @@ public class GetUserData implements Parcelable{
         private int is_deactivated;
         private String created_at;
         private String updated_at;
+        private int email_verified;
         private List<CardsBean> cards;
         private List<VehiclesBean> vehicles;
 
@@ -149,6 +150,14 @@ public class GetUserData implements Parcelable{
 
         public void setContact_number(String contact_number) {
             this.contact_number = contact_number;
+        }
+
+        public int getEmail_verified() {
+            return email_verified;
+        }
+
+        public void setEmail_verified(int email_verified) {
+            this.email_verified = email_verified;
         }
 
         public Object getCity() {

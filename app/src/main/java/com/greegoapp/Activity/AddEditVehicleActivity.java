@@ -241,11 +241,9 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
     }
 
     int transmissionType;
-    boolean autoType;
-    boolean manualType;
+    boolean autoType,manualType;
 
     @Override
-
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.edtTvMake:
@@ -319,28 +317,36 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     tvAutoMatic.setTextColor(getResources().getColor(R.color.app_bg));
                     tvManual.setTextColor(getResources().getColor(R.color.hint_color));
                     autoType = false;
+                    manualType = true;
                 } else {
-                    imgVwAutomaticSelect.setVisibility(View.VISIBLE);
-                    imgVwManualSelect.setVisibility(View.GONE);
+                    imgVwAutomaticSelect.setVisibility(View.GONE);
+                    imgVwManualSelect.setVisibility(View.VISIBLE);
                     autoType = true;
+                    manualType = false;
                     tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
                     tvManual.setTextColor(getResources().getColor(R.color.app_bg));
 
                 }
                 break;
             case R.id.tvManual:
-                if (autoType) {
+                if (manualType) {
                     imgVwAutomaticSelect.setVisibility(View.GONE);
                     imgVwManualSelect.setVisibility(View.VISIBLE);
+
                     tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
                     tvManual.setTextColor(getResources().getColor(R.color.app_bg));
-                    autoType = false;
+
+                    autoType = true;
+                    manualType = false;
                 } else {
-                    imgVwAutomaticSelect.setVisibility(View.GONE);
-                    imgVwManualSelect.setVisibility(View.VISIBLE);
+                    imgVwAutomaticSelect.setVisibility(View.VISIBLE);
+                    imgVwManualSelect.setVisibility(View.GONE);
+
                     autoType = false;
-                    tvManual.setTextColor(getResources().getColor(R.color.app_bg));
-                    tvAutoMatic.setTextColor(getResources().getColor(R.color.hint_color));
+                    manualType = true;
+                    tvAutoMatic.setTextColor(getResources().getColor(R.color.app_bg));
+                    tvManual.setTextColor(getResources().getColor(R.color.hint_color));
+
                 }
                 break;
 

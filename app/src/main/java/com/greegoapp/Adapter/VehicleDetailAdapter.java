@@ -2,19 +2,15 @@ package com.greegoapp.Adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -29,7 +25,6 @@ import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.MyProgressDialog;
-import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.RowVehicleDetailBinding;
 
@@ -41,7 +36,7 @@ import java.util.Map;
 
 public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdapter.VehicleDetailViewHolder> {
 
-    private ArrayList<GetUserData.DataBean.VehiclesBean> VehicleModelList;
+    private ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleModelList;
     private View snackBarView;
 
     RecyclerViewItemClickListener mListener;
@@ -54,9 +49,14 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
 
 
     public VehicleDetailAdapter(Context context, ArrayList<GetUserData.DataBean.VehiclesBean> users, RecyclerViewItemClickListener mListener) {
-        VehicleModelList = users;
+        alVehicleModelList = users;
         this.context = context;
         this.mListener = mListener;
+
+        if (getItemCount() == 1) {
+            lastSelectedPosition = 0;
+            callVehicleSelectApi(alVehicleModelList.get(0).getVehicle_id());
+        }
     }
 
 
@@ -64,43 +64,112 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
     public VehicleDetailViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         RowVehicleDetailBinding binding = DataBindingUtil.inflate(inflater, R.layout.row_vehicle_detail, parent, false);
+
         return new VehicleDetailViewHolder(binding.getRoot(), mListener);
+    }
+
+    public class VehicleDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private RowVehicleDetailBinding mBinding;
+
+        private TextView tvYear, tvModel, tvMake, tvColor;
+        RecyclerViewItemClickListener mListener;
+        ImageView imgVwDelete;
+        RadioButton mCheckBox;
+
+        public VehicleDetailViewHolder(View view, RecyclerViewItemClickListener mListener) {
+            super(view);
+            this.mListener = mListener;
+            mBinding = DataBindingUtil.bind(view);
+            tvYear = mBinding.tvYear;
+            tvModel = mBinding.tvModel;
+            tvMake = mBinding.tvMake;
+            tvColor = mBinding.tvColor;
+            imgVwDelete = mBinding.imgVwDelete;
+            mCheckBox = mBinding.chkVehicleSet;
+            view.setOnClickListener(this);
+
+            mCheckBox.setOnClickListener(this);
+            imgVwDelete.setOnClickListener(this);
+
+
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            mListener.onClick(v, getAdapterPosition());
+            switch (v.getId()) {
+                case R.id.imgVwDelete:
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                    alertDialogBuilder.setMessage("Are you sure, You wanted to make decision");
+                    alertDialogBuilder.setPositiveButton("yes",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    callDeleteVehicleAPI(alVehicleModelList.get(getLayoutPosition()).getVehicle_id());
+                                    alVehicleModelList.remove(getAdapterPosition());
+                                    notifyItemRemoved(getAdapterPosition());
+                                    notifyItemRangeChanged(getAdapterPosition(), alVehicleModelList.size());
+                                }
+                            });
+
+                    alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+
+                    break;
+                case R.id.chkVehicleSet:
+
+                    lastSelectedPosition = getAdapterPosition();
+
+                    callVehicleSelectApi(alVehicleModelList.get(getLayoutPosition()).getVehicle_id());
+
+                    notifyItemRangeChanged(0, alVehicleModelList.size());
+
+                    break;
+            }
+        }
+
     }
 
 
     @Override
     public void onBindViewHolder(final VehicleDetailViewHolder holder, final int position) {
 
-        vehicleDetailModel = VehicleModelList.get(position);
+        vehicleDetailModel = alVehicleModelList.get(position);
 
         final int vehicle_id = vehicleDetailModel.getVehicle_id();
         final int vehicle_select_id = vehicleDetailModel.getSelected();
 
-         if (lastSelectedPosition == position) {
-           holder.mCheckBox.setChecked(true);
+        if (lastSelectedPosition == position) {
+            holder.mCheckBox.setChecked(true);
         } else {
-            if(oldPosition == position)
-            {
+            if (oldPosition == position) {
                 holder.mCheckBox.setChecked(false);
-            }else
-            {
+            } else {
                 holder.mCheckBox.setChecked(false);
             }
         }
+
 
         if (vehicleDetailModel != null) {
             holder.tvYear.setText(String.valueOf(vehicleDetailModel.getYear()));
             holder.tvMake.setText(vehicleDetailModel.getVehicle_name());
             holder.tvColor.setText(vehicleDetailModel.getColor());
             holder.tvModel.setText(vehicleDetailModel.getVehicle_model());
-            if (vehicle_select_id == 1 && oldPosition==-1) {
-                    oldPosition = holder.getAdapterPosition();
-                   holder.mCheckBox.setChecked(true);
+            if (vehicle_select_id == 1 && oldPosition == -1) {
+                oldPosition = holder.getAdapterPosition();
+                holder.mCheckBox.setChecked(true);
             }
         }
     }
-
-
 
 
     private void callVehicleSelectApi(int vehicle_id) {
@@ -153,82 +222,11 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
         }
     }
 
-
     @Override
     public int getItemCount() {
-        return VehicleModelList.size();
+        return alVehicleModelList.size();
     }
 
-    public class VehicleDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private RowVehicleDetailBinding mBinding;
-
-        private TextView tvYear, tvModel, tvMake, tvColor;
-        RecyclerViewItemClickListener mListener;
-        ImageView imgVwDelete;
-        RadioButton mCheckBox;
-
-        public VehicleDetailViewHolder(View view, RecyclerViewItemClickListener mListener) {
-            super(view);
-            this.mListener = mListener;
-            mBinding = DataBindingUtil.bind(view);
-            tvYear = mBinding.tvYear;
-            tvModel = mBinding.tvModel;
-            tvMake = mBinding.tvMake;
-            tvColor = mBinding.tvColor;
-            imgVwDelete = mBinding.imgVwDelete;
-            mCheckBox = mBinding.chkVehicleSet;
-            view.setOnClickListener(this);
-
-            mCheckBox.setOnClickListener(this);
-            imgVwDelete.setOnClickListener(this);
-
-
-        }
-
-
-        @Override
-        public void onClick(View v) {
-            mListener.onClick(v, getAdapterPosition());
-            switch (v.getId()) {
-                case R.id.imgVwDelete:
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                    alertDialogBuilder.setMessage("Are you sure, You wanted to make decision");
-                            alertDialogBuilder.setPositiveButton("yes",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface arg0, int arg1) {
-                                            callDeleteVehicleAPI(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
-                                            VehicleModelList.remove(getAdapterPosition());
-                                            notifyItemRemoved(getAdapterPosition());
-                                            notifyItemRangeChanged(getAdapterPosition(), VehicleModelList.size());
-                                        }
-                                    });
-
-                    alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-
-
-                    break;
-                case R.id.chkVehicleSet:
-
-                    lastSelectedPosition = getAdapterPosition();
-
-                    callVehicleSelectApi(VehicleModelList.get(getLayoutPosition()).getVehicle_id());
-
-                    notifyItemRangeChanged(0, VehicleModelList.size());
-
-                    break;
-            }
-        }
-
-    }
 
     private void callDeleteVehicleAPI(int vehicle_id) {
         try {

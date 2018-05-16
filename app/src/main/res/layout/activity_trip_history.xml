@@ -78,37 +78,39 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/header" />
 
-        <!--<LinearLayout-->
-        <!--android:id="@+id/llemail"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="@dimen/scale_35dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle">-->
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_marginTop="@dimen/scale_35dp"
-            android:id="@+id/rvTripHistory"
+        <RelativeLayout
+            android:id="@+id/llemail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/scale_35dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/tvTripHistoryTitle">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvTripHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/scale_30dp"
+                android:padding="@dimen/scale_2dp"
+                android:scrollbars="none" />
 
 
-        <TextView
-            android:id="@+id/tvNoDataFaund"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No trip history found."
-            android:textColor="@color/app_bg"
-            android:textSize="@dimen/txt_18"
-            android:textStyle="bold"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tvNoDataFaund"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No trip history found."
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_18"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <!--</LinearLayout>-->
+        </RelativeLayout>
 
 
     </android.support.constraint.ConstraintLayout>

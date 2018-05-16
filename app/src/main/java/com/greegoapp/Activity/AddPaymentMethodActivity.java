@@ -42,7 +42,6 @@ import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivityAddPaymentMethodBinding;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
-import com.stripe.android.exception.AuthenticationException;
 import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
 import com.stripe.android.view.CardMultilineWidget;
@@ -85,8 +84,8 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 
     CardMultilineWidget mCardInputWidget;
     Card cardToSave;
-    String cvv,strExpDate;
-    int strExpMonth,strExpYear;
+    String cvv, strExpDate;
+    int strExpMonth, strExpYear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,38 +105,38 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 
 
     String stripPay() {
+        try {
+            String cvv = mCardInputWidget.getCard().getCVC();
+            int expMonth = mCardInputWidget.getCard().getExpMonth();
+            int expYear = mCardInputWidget.getCard().getExpYear();
+            strCardNo = mCardInputWidget.getCard().getNumber();
+            String zipcode = edtTvZipCode.getText().toString();
 
-        String cvv = mCardInputWidget.getCard().getCVC();
-        int expMonth = mCardInputWidget.getCard().getExpMonth();
-        int expYear = mCardInputWidget.getCard().getExpYear();
-        strCardNo = mCardInputWidget.getCard().getNumber();
-        String zipcode = edtTvZipCode.getText().toString();
+            Stripe stripe;
 
-        Stripe stripe;
-
-        Card card = new Card(strCardNo, expMonth, expYear, cvv);
+            Card card = new Card(strCardNo, expMonth, expYear, cvv);
 // Remember to validate the card object before you use it to save time.
-        if (!card.validateCard()) {
-            // Do not continue token creation.
-            edtTvCardNumber.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.card_not_valid));
+            if (!card.validateCard()) {
+                // Do not continue token creation.
+                edtTvCardNumber.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.card_not_valid));
 //            Toast.makeText(this, "card not valid", Toast.LENGTH_SHORT).show();
-        } else {
+            } else {
 
 
-            try {
-                MyProgressDialog.showProgressDialog(context);
-                stripe = new Stripe(context,"pk_test_GF0y48SCqViKdCSA8LwOPFVj");
+                try {
+                    MyProgressDialog.showProgressDialog(context);
+                    stripe = new Stripe(context, "pk_test_GF0y48SCqViKdCSA8LwOPFVj");
 //            googleMap.clear();
 //            customGoogleMap.clear();
-                stripe.createToken(
-                        card,
-                        new TokenCallback() {
-                            @SuppressLint("StaticFieldLeak")
-                            public void onSuccess(final Token token) {
+                    stripe.createToken(
+                            card,
+                            new TokenCallback() {
+                                @SuppressLint("StaticFieldLeak")
+                                public void onSuccess(final Token token) {
 
-                                Log.e("check token", ":::::" + token.getId());
-                                Log.e("check token all data", ":::::" + token);
+                                    Log.e("check token", ":::::" + token.getId());
+                                    Log.e("check token all data", ":::::" + token);
 
 
 //                                final Map<String, Object> parames = new HashMap<>();
@@ -146,80 +145,84 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 //                                parames.put("description", "ajit payment");
 //                                parames.put("source", token.getId());
 
-                                try {
-                                    new AsyncTask<Void, Void, Void>() {
+                                    try {
+                                        new AsyncTask<Void, Void, Void>() {
 
-                                        Charge charge;
+                                            Charge charge;
 
-                                        @Override
-                                        protected Void doInBackground(
-                                                Void... params) {
-                                            try {
+                                            @Override
+                                            protected Void doInBackground(
+                                                    Void... params) {
+                                                try {
 
-                                                com.stripe.Stripe.apiKey = "sk_test_BXg8CAB9wtNTm1lNBe3HMK2X";
-
-
-                                                Map<String, Object> chargeParams = new HashMap<>();
-                                                chargeParams.put("source", token.getId());
-                                                chargeParams.put("email", "paying.user@example.com");
-
-                                                Customer customer = Customer.create(chargeParams);
-
-                                                Log.e("aj", customer.getId());
+                                                    com.stripe.Stripe.apiKey = "sk_test_BXg8CAB9wtNTm1lNBe3HMK2X";
 
 
-                                                cardToken = customer.getId();
+                                                    Map<String, Object> chargeParams = new HashMap<>();
+                                                    chargeParams.put("source", token.getId());
+                                                    chargeParams.put("email", "paying.user@example.com");
 
-                                                if (cardToken != null) {
-                                                    if (ConnectivityDetector.isConnectingToInternet(context)) {
-                                                        callSavePaymentMethodAPI();
-                                                    } else {
-                                                        SnackBar.showInternetError(context, snackBarView);
+                                                    Customer customer = Customer.create(chargeParams);
+
+                                                    Log.e("aj", customer.getId());
+
+
+                                                    cardToken = customer.getId();
+
+                                                    if (cardToken != null) {
+                                                        if (ConnectivityDetector.isConnectingToInternet(context)) {
+                                                            callSavePaymentMethodAPI();
+                                                        } else {
+                                                            SnackBar.showInternetError(context, snackBarView);
+                                                        }
+
                                                     }
-
-                                                }
 
                                         /*charge = Charge
                                                 .create(parames);
 */
 
-                                            } catch (Exception e) {
-                                                // TODO Auto-generated catch block
-                                                e.printStackTrace();
+                                                } catch (Exception e) {
+                                                    // TODO Auto-generated catch block
+                                                    e.printStackTrace();
+                                                }
+                                                return null;
                                             }
-                                            return null;
-                                        }
 
-                                        protected void onPostExecute(Void result) {
-                                        }
+                                            protected void onPostExecute(Void result) {
+                                            }
 
-                                    }.execute();
+                                        }.execute();
 
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
                                 }
 
+                                public void onError(Exception error) {
+                                    // Show localized error message
+                                    MyProgressDialog.hideProgressDialog();
+                                    SnackBar.showError(context, snackBarView, error.getMessage());
+                                    Log.e("check", "erorr" + error.getMessage());
 
+                                }
                             }
 
-                            public void onError(Exception error) {
-                                // Show localized error message
-                                MyProgressDialog.hideProgressDialog();
-                                SnackBar.showError(context, snackBarView, error.getMessage());
-                                Log.e("check", "erorr" + error.getMessage());
-
-                            }
-                        }
-
-                );
+                    );
 
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        return cardToken;
+            return cardToken;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void setListner() {
@@ -237,7 +240,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
 //        edtTvCardNumber.isValid(); // Is the card number valid
 //        edtTvCardNumber.getCardType();
         edtTvExpDate.addTextChangedListener(mDateEntryWatcher);
-
     }
 
 
@@ -387,12 +389,12 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             JSONObject jsonObject = new JSONObject();
 
             String strzipCode = edtTvZipCode.getText().toString();
-            if(mCardInputWidget.getCard()!=null) {
+            if (mCardInputWidget.getCard() != null) {
                 cvv = mCardInputWidget.getCard().getCVC();
                 //     int exp = ;
                 strExpMonth = mCardInputWidget.getCard().getExpMonth();
                 strExpYear = mCardInputWidget.getCard().getExpYear();
-                strExpDate = strExpMonth + "/"+strExpYear;
+                strExpDate = strExpMonth + "/" + strExpYear;
                 strCardNo = mCardInputWidget.getCard().getNumber();
                 cardToSave = new Card(strCardNo, strExpMonth, strExpYear, cvv);
             }
@@ -400,7 +402,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_NUMBER, strCardNo);
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_EXP_MONTH_YEAR, strExpDate);
             jsonObject.put(WebFields.UPDATE_CARD.PARAM_ZIPCODE, strzipCode);
-            jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_TOKEN,cardToken);
+            jsonObject.put(WebFields.UPDATE_CARD.PARAM_CARD_TOKEN, cardToken);
 
             Applog.E("request UpdateCard=> " + jsonObject.toString());
 //            MyProgressDialog.showProgressDialog(context);
@@ -412,32 +414,38 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
                     try {
-                        CardData cardDetails = new Gson().fromJson(String.valueOf(response), CardData.class);
-                        MyProgressDialog.hideProgressDialog();
 
-                        if (cardDetails.getError_code() == 0) {
-                            SessionManager.setIsUserLoggedin(context, true);
-                            Applog.E("UserDetails" + cardDetails);
-                            String card_number = cardDetails.getData().getCard_number();
+                        if (response.getString("error_code").toString().matches("0")) {
 
-                            SessionManager.saveCardDetails(context, cardDetails);
+                            CardData cardDetails = new Gson().fromJson(String.valueOf(response), CardData.class);
+                            MyProgressDialog.hideProgressDialog();
 
-                            if (REQUEST_ADD_PAYMENT == 110) {
-                                Intent data = new Intent();
-                                setResult(REQUEST_ADD_PAYMENT, data);
-                            } else if (ADD_CARD_PAYMENT_METHOD == 1001) {
-                                Intent data = new Intent();
-                                data.putExtra("cardNumber", card_number);
-                                setResult(ADD_CARD_PAYMENT_METHOD, data);
-                            }
+                            if (cardDetails.getError_code() == 0) {
+                                SessionManager.setIsUserLoggedin(context, true);
+                                Applog.E("UserDetails" + cardDetails);
+//                                String card_number = cardDetails.getData().get(0).getCard_number();
+
+                                SessionManager.saveCardDetails(context, cardDetails);
+
+                                if (REQUEST_ADD_PAYMENT == 110) {
+                                    Intent data = new Intent();
+                                    setResult(REQUEST_ADD_PAYMENT, data);
+                                } else if (ADD_CARD_PAYMENT_METHOD == 1001) {
+                                    Intent data = new Intent();
+                                    setResult(ADD_CARD_PAYMENT_METHOD, data);
+                                }
 
 
 //                            callUserMeApi();
-                            finish();
+                                finish();
 
 
-                            SnackBar.showSuccess(context, snackBarView, "Add card successfully.");
-                        } else {
+                                SnackBar.showSuccess(context, snackBarView, "Add card successfully.");
+                            } else {
+                                MyProgressDialog.hideProgressDialog();
+                                SnackBar.showError(context, snackBarView, response.getString("message"));
+                            }
+                        }else {
                             MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));
                         }
@@ -445,7 +453,7 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                         e.printStackTrace();
                     }
 
-                    CardData cardDetails = new Gson().fromJson(String.valueOf(response), CardData.class);
+
                 }
             }, new Response.ErrorListener() {
 

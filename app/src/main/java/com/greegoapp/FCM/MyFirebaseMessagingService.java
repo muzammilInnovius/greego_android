@@ -146,14 +146,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
             // app is in foreground, broadcast the push message
-            Applog.e("==>2=>", "PushNotification" + tripId);
+            Applog.e("==>back                    2=>", "PushNotification" + tripId);
 
             Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
             pushNotification.putExtra("message", tripId);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(pushNotification);
 
+
 //            MyProgressDialog.hideProgressDialog();
-            Applog.e("==>", "PushNotification");
+            Applog.e("=back===>", "PushNotification");
             // play notification sound
             NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
             notificationUtils.playNotificationSound();

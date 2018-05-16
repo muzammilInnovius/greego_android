@@ -387,8 +387,11 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
                     SnackBar.showError(context, snackBarView, "Please enter drop of location.");
                 } else {
 //                    if (mSoucreLatLong.latitude != 0 && mSoucreLatLong.longitude != 0 && mDestinationLatLong.latitude != 0 && mDestinationLatLong.longitude != 0) {
+                   try{
                     myCalcTime(mSoucreLatLong.latitude, mSoucreLatLong.longitude, mDestinationLatLong.latitude, mDestinationLatLong.longitude);
-//                    }
+                    }catch (Exception e){
+                       e.printStackTrace();
+                   }
                 }
 //                setLocationTime();
 

@@ -126,9 +126,10 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
                 break;
 
             case R.id.ibBack:
-                Intent in = new Intent(context, HomeActivity.class);
-                startActivity(in);
-                finish();
+                Intent intent = new Intent(context, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+//                finish();
                 break;
         }
     }
@@ -150,10 +151,11 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
                 public void onResponse(JSONObject response) {
                     Applog.E("success: " + response.toString());
                     MyProgressDialog.hideProgressDialog();
-
-                    Intent in = new Intent(context, HomeActivity.class);
-                    startActivity(in);
-                    finish();
+//
+                    Intent intent = new Intent(context, HomeActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+//                    finish();
 
                 }
             }, new Response.ErrorListener() {

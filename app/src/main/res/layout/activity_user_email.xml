@@ -180,6 +180,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/scale_15dp"
+                    android:layout_centerHorizontal="true"
                     android:text="@string/tv_confirm_email"
                     android:textColor="@color/black"
                     android:textSize="@dimen/txt_12"
@@ -209,6 +210,7 @@
                     android:layout_marginTop="@dimen/scale_5dp"
                     android:background="@drawable/button"
                     android:text="Update"
+                    android:visibility="gone"
                     android:textColor="@color/white"
                     android:textSize="@dimen/txt_14"
                     android:textStyle="bold" />

@@ -24,7 +24,7 @@ import com.greegoapp.Utils.Applog;
 import com.greegoapp.Utils.MyProgressDialog;
 import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
-import com.greegoapp.databinding.ActivityHelpBinding;
+import com.greegoapp.databinding.ActivityTermsCondiBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,27 +32,30 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HelpActivity extends AppCompatActivity implements View.OnClickListener {
-    ActivityHelpBinding binding;
+public class TermsCondiActivity extends AppCompatActivity implements View.OnClickListener {
+
+
+    ActivityTermsCondiBinding binding;
     Context context;
     private View snackBarView;
     ImageButton ibBack;
-    TextView tvHelpContition;
+    TextView tvtermCond;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_help);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_terms_condi);
+
 
         snackBarView = findViewById(android.R.id.content);
-        context = HelpActivity.this;
+        context = TermsCondiActivity.this;
 
         bindViews();
         setListner();
-        callHelpAPI();
+        callTermsCondiAPI();
     }
 
-    private void callHelpAPI() {
+    private void callTermsCondiAPI() {
         try {
             JSONObject jsonObject = new JSONObject();
 
@@ -70,7 +73,7 @@ public class HelpActivity extends AppCompatActivity implements View.OnClickListe
                         if (userDetail.getError_code() == 0) {
                             Applog.E("success: " + response.toString());
                             MyProgressDialog.hideProgressDialog();
-                            tvHelpContition.setText(Html.fromHtml(userDetail.getData().getLost_found()));
+                            tvtermCond.setText(Html.fromHtml(userDetail.getData().getTerms_conditions()));
 
                         } else {
                             MyProgressDialog.hideProgressDialog();
@@ -111,7 +114,9 @@ public class HelpActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
+
 
     private void setListner() {
         ibBack.setOnClickListener(this);
@@ -119,7 +124,7 @@ public class HelpActivity extends AppCompatActivity implements View.OnClickListe
 
     private void bindViews() {
         ibBack = binding.ibBack;
-        tvHelpContition = binding.tvHelpContition;
+        tvtermCond = binding.tvtermCond;
 
     }
 

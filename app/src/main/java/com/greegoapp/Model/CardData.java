@@ -4,7 +4,7 @@ public class CardData {
 
 
     /**
-     * data : {"user_id":2,"card_number":"1111222233334444","exp_month_year":"12","zipcode":"1234","updated_at":"2018-04-17 13:23:16","created_at":"2018-04-17 13:23:16","id":9}
+     * data : {"user_id":7,"card_number":"4242424242424242","card_token":"cus_CrK7kkxX56UfcJ","exp_month_year":"6/2018","zipcode":"12345","updated_at":"2018-05-14 13:21:39","created_at":"2018-05-14 13:21:39","id":65}
      * error_code : 0
      * message : User Card Saved
      */
@@ -39,17 +39,19 @@ public class CardData {
 
     public static class DataBean {
         /**
-         * user_id : 2
-         * card_number : 1111222233334444
-         * exp_month_year : 12
-         * zipcode : 1234
-         * updated_at : 2018-04-17 13:23:16
-         * created_at : 2018-04-17 13:23:16
-         * id : 9
+         * user_id : 7
+         * card_number : 4242424242424242
+         * card_token : cus_CrK7kkxX56UfcJ
+         * exp_month_year : 6/2018
+         * zipcode : 12345
+         * updated_at : 2018-05-14 13:21:39
+         * created_at : 2018-05-14 13:21:39
+         * id : 65
          */
 
         private int user_id;
         private String card_number;
+        private String card_token;
         private String exp_month_year;
         private String zipcode;
         private String updated_at;
@@ -70,6 +72,14 @@ public class CardData {
 
         public void setCard_number(String card_number) {
             this.card_number = card_number;
+        }
+
+        public String getCard_token() {
+            return card_token;
+        }
+
+        public void setCard_token(String card_token) {
+            this.card_token = card_token;
         }
 
         public String getExp_month_year() {

@@ -63,7 +63,7 @@ public class SnackBar {
         Snackbar snackbar = Snackbar
                 .make(view, msg, Snackbar.LENGTH_SHORT);
         snackbar.setActionTextColor(Color.WHITE);
-        snackbar.setDuration(10000);
+        snackbar.setDuration(25000);
         View snackbarView = snackbar.getView();
 //        snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.app_bg));

@@ -53,12 +53,13 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     ImageButton ibback;
     RelativeLayout rl_name, rl_phone, rl_email, rl_btnlogout;
     View snackBarView;
-    TextView tvUserName, tvUserEmail, tvUserPhone, tvJoinDate;
+    TextView tvUserName, tvUserEmail, tvUserPhone, tvJoinDate, tvEmailVerify;
     GetUserData userDetails;
     ImageView ivProPic;
     public static final int SETTING_PROFILE_UPDATE = 1001;
     public static final int SETTING_EMAIL_UPDATE = 1011;
-    String userName, profilePic, emailId,mobileNo,lastName;
+    String userName, profilePic, emailId, mobileNo, lastName;
+    int emailVerify;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +100,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         tvUserPhone = binding.tvUserPhone;
         ivProPic = binding.ivProPic;
         tvJoinDate = binding.tvJoinDate;
+        tvEmailVerify = binding.tvEmailVerify;
     }
 
     Intent in;
@@ -113,12 +115,6 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.rlName:
                 in = new Intent(SettingActivity.this, UserProfileActivity.class);
                 startActivityForResult(in, SETTING_PROFILE_UPDATE);
-//                Fragment fragment = new UserProfileFragment();
-//                FragmentManager fragmentManager = getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                fragmentTransaction.replace(R.id.containerBody, fragment);
-//                fragmentTransaction.addToBackStack(null);
-//                fragmentTransaction.commit();
                 break;
             case R.id.rlEmail:
                 in = new Intent(SettingActivity.this, UserEmailActivity.class);
@@ -152,7 +148,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                             .signature(new StringSignature(UUID.randomUUID().toString()))
                             .crossFade().skipMemoryCache(true)
                             .into(ivProPic);
-                }else {
+                } else {
                     ivProPic.setImageResource(R.mipmap.ic_place_holder);
                 }
 
@@ -221,7 +217,6 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                     userDetails = new Gson().fromJson(String.valueOf(response), GetUserData.class);
                     try {
                         MyProgressDialog.hideProgressDialog();
-//
                         if (userDetails.getError_code() == 0) {
 
                             Applog.E("UserUpdate==>Dg==>" + userDetails);
@@ -237,7 +232,13 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                             mobileNo = userDetails.getData().getContact_number();
 
                             profilePic = userDetails.getData().getProfile_pic();
-//                            ivProPic.setImageURI(Uri.parse(profilePic));
+                            emailVerify = userDetails.getData().getEmail_verified();
+
+                            if (emailVerify != 0){
+                                tvEmailVerify.setText("Verified");
+                            }else {
+                                tvEmailVerify.setText("Unverified");
+                            }
 
                             profilePic = userDetails.getData().getProfile_pic();
                             if (profilePic != null) {
@@ -257,12 +258,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                             tvUserEmail.setText(emailId);
                             tvUserPhone.setText(mobileNo);
                             tvJoinDate.setText(formatedstring);
-//                            SessionManager.saveUserData(context, userDetails);
-//                            SnackBar.showSuccess(context, snackBarView, response.getString("message"));
-//
-                            //getIs_agreed = 0 new user
 
-//
                         } else {
                             MyProgressDialog.hideProgressDialog();
                             SnackBar.showError(context, snackBarView, response.getString("message"));

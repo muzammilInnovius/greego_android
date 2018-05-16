@@ -52,7 +52,7 @@ public class WebFields {
         public static final String PARAM_CARD_NUMBER = "card_number";
         public static final String PARAM_EXP_MONTH_YEAR = "exp_month_year";
         public static final String PARAM_ZIPCODE = "zipcode";
-        public static final String PARAM_CARD_TOKEN ="card_token";
+        public static final String PARAM_CARD_TOKEN = "card_token";
 
     }
 
@@ -82,7 +82,7 @@ public class WebFields {
     }
 
     public static final class TRIP {
-        public static final String MODE = "user/get/rates";
+        public static final String MODE = "get/rates";
         public static final String PARAM_STATE = "state";
     }
 
@@ -142,32 +142,36 @@ public class WebFields {
 
 //    https://www.kroslinkstech.in/greego/public/api/user/add/driverrating
 
-    public static final class DRIVER_RATING{
+    public static final class DRIVER_RATING {
         public static final String MODE = "user/add/driverrating";
 
-        public static final String PARAM_RATING= "rating";
-        public static final String PARAM_TRIP_ID= "trip_id";
+        public static final String PARAM_RATING = "rating";
+        public static final String PARAM_TRIP_ID = "trip_id";
     }
 
 
-    public static final class GET_TRIP_HISTORY{
+    public static final class GET_TRIP_HISTORY {
         public static final String MODE = "user/get/triphistory";
 
-        public static final String PARAM_USER_ID= "user_id";
+        public static final String PARAM_USER_ID = "user_id";
     }
 
 
-    public static final class DIST_URL{
-//        https://maps.googleapis.com/maps/api/directions/json?origin=\(origin)&destination=\(destination)&mode=driving&key=AIzaSyDuLTaJL-tMzdBoTZtCQfCz4m66iEZ1eQc
+    public static final class DIST_URL {
+        //        https://maps.googleapis.com/maps/api/directions/json?origin=\(origin)&destination=\(destination)&mode=driving&key=AIzaSyDuLTaJL-tMzdBoTZtCQfCz4m66iEZ1eQc
 //        public static final String MODE="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&";
-        public static final String MODE="https://maps.googleapis.com/maps/api/directions/json?";
-        public static final String ORIGINS="origin=";
-        public static final String DESTINATION="&destination=";
+        public static final String MODE = "https://maps.googleapis.com/maps/api/directions/json?";
+        public static final String ORIGINS = "origin=";
+        public static final String DESTINATION = "&destination=";
     }
 
 //    http://kroslinkstech.in/greego/public/api/user/verify/email
 
-    public static final class EMAIL_VERIFY{
-        public static final String MODE="user/verify/email";
+    public static final class EMAIL_VERIFY {
+        public static final String MODE = "user/verify/email";
+    }
+
+    public static final class TERMS_CONDITION {
+        public static final String MODE = "get/texts";
     }
 }
