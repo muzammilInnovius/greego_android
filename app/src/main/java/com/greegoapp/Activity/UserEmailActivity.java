@@ -123,6 +123,16 @@ public class UserEmailActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent data = new Intent();
+        String userName = edtTvUserEmail.getText().toString();
+        data.putExtra("email", userName);
+        setResult(SETTING_EMAIL_UPDATE, data);
+        finish();
+    }
+
     private void callSendEmailVarificationAPI() {
         try {
 //            emailId = edtTvUserEmail.getText().toString();

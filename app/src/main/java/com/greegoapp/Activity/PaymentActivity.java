@@ -14,10 +14,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -28,7 +25,6 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.CardsNumberAdapter;
-import com.greegoapp.Adapter.VehicleDetailAdapter;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Interface.RecyclerViewItemClickListener;
@@ -49,7 +45,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL;
+import static com.greegoapp.Activity.HomeActivity.SLIDER_PAYMENT_METHOD;
 import static com.greegoapp.Activity.HomeActivity.CHANGE_CONTACT_NO;
 
 
@@ -186,7 +182,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 AlertDialog dialog = alert.create();
                 dialog.show();
 
-                KeyboardUtility.hideKeyboard(context,view);
+                KeyboardUtility.hideKeyboard(context, view);
                 break;
             case R.id.ibBack:
 //                callUserMeApi();
@@ -194,6 +190,9 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                     Intent data = new Intent();
                     data.putExtra("changeCardNo", cardselected);
                     setResult(CHANGE_CONTACT_NO, data);
+                } else if (SLIDER_PAYMENT_METHOD == 20001) {
+                    Intent data = new Intent();
+                    setResult(SLIDER_PAYMENT_METHOD, data);
                 }
                 finish();
                 break;

@@ -51,6 +51,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.PlaceAutocompleteAdapter;
 import com.greegoapp.AppController.AppController;
@@ -75,7 +76,9 @@ import java.util.Map;
 
 import static com.greegoapp.Activity.HomeActivity.PICK_CONTACT_REQUEST;
 
-public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, OnMapReadyCallback {
+public class PickUpLocationActivity extends AppCompatActivity implements PlaceAutocompleteAdapter.PlaceAutoCompleteInterface,
+        View.OnClickListener, GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks, LocationListener, OnMapReadyCallback {
 
     private static final String TAG = PickUpLocationActivity.class.getName();
     ActivityPickUpLocationBinding binding;
@@ -506,47 +509,50 @@ public class PickUpLocationActivity extends AppCompatActivity implements PlaceAu
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady()");
         mGoogleMap = googleMap;
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        if (Build.VERSION.SDK_INT < 23) {
-            mGoogleMap.setMyLocationEnabled(true);
-            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-            RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-// position on right bottom
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
-            rlp.addRule(RelativeLayout.ALIGN_END, 0);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            rlp.setMargins(0, 0, 30, 40);
-        } else {
-            if (checkAndRequestPermissions()) {
-                mGoogleMap.setMyLocationEnabled(true);
-                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-                RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-// position on right bottom
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
-                rlp.addRule(RelativeLayout.ALIGN_END, 0);
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                rlp.setMargins(0, 0, 30, 40);
-            }
-        }
-
-        mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-        mGoogleMap.getUiSettings().setCompassEnabled(false);
-        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mGoogleMap.getUiSettings().setRotateGesturesEnabled(true);
-        mGoogleMap.getUiSettings().setScrollGesturesEnabled(true);
-        mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
-        mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
-        mGoogleMap.setTrafficEnabled(false);
+//        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        MapStyleOptions mapStyle = MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json);
+        mGoogleMap.setMapStyle(mapStyle);
+//
+//        if (Build.VERSION.SDK_INT < 23) {
+//            mGoogleMap.setMyLocationEnabled(true);
+//            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+//            RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+//// position on right bottom
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+//
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
+//            rlp.addRule(RelativeLayout.ALIGN_END, 0);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//            rlp.setMargins(0, 0, 30, 40);
+//        } else {
+//            if (checkAndRequestPermissions()) {
+//                mGoogleMap.setMyLocationEnabled(true);
+//                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+//                RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+//// position on right bottom
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+//
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
+//                rlp.addRule(RelativeLayout.ALIGN_END, 0);
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//                rlp.setMargins(0, 0, 30, 40);
+//            }
+//        }
+//
+//        mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+//        mGoogleMap.getUiSettings().setCompassEnabled(false);
+//        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+//        mGoogleMap.getUiSettings().setRotateGesturesEnabled(true);
+//        mGoogleMap.getUiSettings().setScrollGesturesEnabled(true);
+//        mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
+//        mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
+//        mGoogleMap.setTrafficEnabled(false);
 
 
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {

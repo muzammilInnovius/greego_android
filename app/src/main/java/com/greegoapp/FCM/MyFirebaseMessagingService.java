@@ -33,7 +33,7 @@ import static com.greegoapp.Activity.HomeActivity.REQUEST_USER_TRIP;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
-    String trip_id, status = null, payment_status, totalAmount,paymentTripId;
+    String trip_id, status = null, payment_status, totalAmount, paymentTripId,trip_amount;
     private NotificationUtils notificationUtils;
     Context context = this;
     ArrayList<UserDriverTripDetails.DataBean> alUserDrTripDetails;
@@ -48,7 +48,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            Log.e(TAG, "Notification Body: " + remoteMessage.getNotification().getBody());
             Applog.e("==>1=>", "PushNotification" + remoteMessage.getNotification().getBody());
             handleNotification(remoteMessage.getNotification().getBody());
         }
@@ -93,12 +92,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                 json = new JSONObject(remoteMessage.getData().toString());
                 trip_id = json.optString("trip_id");
+                trip_amount = json.optString("trip_amount");
 
                 if (status != null) {
-                    handleDataMessage(trip_id, status);
-                } else if (payment_status != null) {
-                    handlePaymentDataMessage(paymentTripId, payment_status, totalAmount);
+                    handleDataMessage(trip_id, status,trip_amount);
                 }
+//                else if (payment_status != null) {
+//                    handlePaymentDataMessage(paymentTripId, payment_status, totalAmount);
+//                }
             } catch (Exception e) {
                 Log.e(TAG, "Exception: " + e.getMessage());
             }
@@ -107,11 +108,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void handlePaymentDataMessage(String trip_id, String payment_status, String totalAmount) {
-        NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
 
         Applog.e("==>3=>", "PushNotification" + json.toString());
 
         if (payment_status.equals("1")) {
+
+            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+            notificationUtils.playNotificationSound();
+
             String data = json.toString();
             data = data.substring(data.indexOf(":") + 1, data.length() - 1);
 
@@ -122,8 +126,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             intent.putExtra("total_amount", totalAmount);
             sendBroadcast(intent);
 
-        } else {
 
+        }else {
+            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+            notificationUtils.playNotificationSound();
         }
 
         try {
@@ -131,10 +137,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
                 Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+
+                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
                 notificationUtils.playNotificationSound();
-            } else {
+
+            }else {
+                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
                 notificationUtils.playNotificationSound();
             }
+
         } catch (Exception e) {
             Log.e(TAG, "Json Exception: " + e.getMessage());
         }
@@ -146,7 +157,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
             // app is in foreground, broadcast the push message
-            Applog.e("==>back                    2=>", "PushNotification" + tripId);
+            Applog.e("==>back 2=>", "PushNotification" + tripId);
+            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+            notificationUtils.playNotificationSound();
 
             Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
             pushNotification.putExtra("message", tripId);
@@ -156,20 +169,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //            MyProgressDialog.hideProgressDialog();
             Applog.e("=back===>", "PushNotification");
             // play notification sound
-            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
-            notificationUtils.playNotificationSound();
 
             SessionManager.saveTripId(this, tripId);
 
 
         } else {
+            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+            notificationUtils.playNotificationSound();
+
+            Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
+            pushNotification.putExtra("message", tripId);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+
             // If the app is in background, firebase itself handles the notification
         }
     }
 
 
-    private void handleDataMessage(String trip_id, String status) {
-        NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+    private void handleDataMessage(String trip_id, String status,String trip_amount) {
 
         Applog.e("==>3=>", "PushNotification" + json.toString());
 
@@ -177,21 +194,34 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String data = json.toString();
             data = data.substring(data.indexOf(":") + 1, data.length() - 1);
 
+            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+            notificationUtils.playNotificationSound();
+
             callUserTripDetailsAPI(trip_id);
+
         } else {
+
+            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+            notificationUtils.playNotificationSound();
+
             Intent intent = new Intent();
             intent.setAction(REQUEST_USER_TRIP);
+            intent.putExtra("trip_id", trip_id);
             intent.putExtra("tripStatus", status);
+            intent.putExtra("trip_amount", trip_amount);
             sendBroadcast(intent);
         }
 
         try {
-
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
+
                 Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+
+                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
                 notificationUtils.playNotificationSound();
-            } else {
+            }else {
+                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
                 notificationUtils.playNotificationSound();
             }
         } catch (Exception e) {
@@ -251,6 +281,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                         Intent intent = new Intent();
                         intent.setAction(REQUEST_USER_TRIP);
+                        intent.putExtra("trip_id", trip_id);
                         intent.putExtra("tripStatus", status);
                         intent.putParcelableArrayListExtra("driverAllData", alUserDrTripDetails);
                         sendBroadcast(intent);

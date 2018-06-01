@@ -33,7 +33,7 @@ public class GlobalValues {
     public static final String DRIVER_ASSIGNED = "1";
     public static final String DRIVER_WAITING= "2";
     public static final String DRIVER_ONGOING= "3";
-    public static final String DRIVER_COMPLETED= "4";
+    public static final String DRIVER_TRIP_COMPLETED = "4";
 
 
 

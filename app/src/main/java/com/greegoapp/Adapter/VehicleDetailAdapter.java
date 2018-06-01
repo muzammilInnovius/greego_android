@@ -102,7 +102,7 @@ public class VehicleDetailAdapter extends RecyclerView.Adapter<VehicleDetailAdap
             switch (v.getId()) {
                 case R.id.imgVwDelete:
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                    alertDialogBuilder.setMessage("Are you sure, You wanted to make decision");
+                    alertDialogBuilder.setMessage("Are you sure, You wanted to delete vehicle ?");
                     alertDialogBuilder.setPositiveButton("yes",
                             new DialogInterface.OnClickListener() {
                                 @Override

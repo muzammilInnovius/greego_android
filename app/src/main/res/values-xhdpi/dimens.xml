@@ -91,6 +91,8 @@
     <dimen name="scale_210dp">214dp</dimen>
     <dimen name="scale_225dp">229dp</dimen>
     <dimen name="scale_150dp_rad">77dp</dimen>
+    <dimen name="scale_300dp">304dp</dimen>
+    <dimen name="scale_326dp">330dp</dimen>
     <dimen name="scale_336dp">340dp</dimen>
     
     <dimen name="scale_250dp">244dp</dimen>

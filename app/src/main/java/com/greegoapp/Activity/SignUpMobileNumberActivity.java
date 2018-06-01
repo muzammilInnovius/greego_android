@@ -1,6 +1,5 @@
 package com.greegoapp.Activity;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -35,7 +34,6 @@ import com.greegoapp.Utils.SnackBar;
 import com.greegoapp.Utils.WebFields;
 import com.greegoapp.databinding.ActivitySignUpMobileNumberBinding;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class SignUpMobileNumberActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {

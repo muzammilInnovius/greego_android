@@ -61,9 +61,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/scale_2dp"
+                android:layout_toLeftOf="@+id/imgVwDelete"
                 android:layout_toRightOf="@+id/tvMake"
                 android:layout_weight="1"
-                android:text="@string/vehicle_color"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="White"
                 android:textColor="@color/black"
                 android:textSize="@dimen/scale_15dp" />
 
@@ -73,8 +76,8 @@
                 android:layout_height="@dimen/scale_20dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/scale_20dp"
-                android:layout_marginRight="@dimen/scale_10dp"
+                android:layout_marginLeft="@dimen/scale_2dp"
+                android:layout_marginRight="@dimen/scale_1dp"
                 mytextview:srcCompat="@mipmap/ic_remove" />
         </RelativeLayout>
 

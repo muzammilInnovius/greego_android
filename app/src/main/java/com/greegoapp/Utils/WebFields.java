@@ -6,7 +6,11 @@ public class WebFields {
 //    public static final String BASE_URL = "http://innoviussoftware.com/greego/public/api/";
 
     //    Live URl
-    public static final String BASE_URL = "https://www.kroslinkstech.in/greego/public/api/";
+//    public static final String BASE_URL = "https://www.kroslinkstech.in/greego/public/api/";
+
+//    Client live url(Amazon)
+    public static final String BASE_URL = "http://54.144.110.21/api/";
+
 
     public static final String USERID = "userId";
     public static final String STATUS = "status";
@@ -111,18 +115,21 @@ public class WebFields {
 
     public static final class GET_USER_TRIP_DETAILS {
         public static final String MODE = "user/get/tripdetails";
+
         public static final String PARAM_TRIP_ID = "trip_id";
         public static final String PARAM_TRIP_STATUS = "STATUS";
     }
 
     public static final class DELETE_VEHICLE {
         public static final String MODE = "user/delete/vehicle";
+
         public static final String PARAM_VEHICLE_ID = "vehicle_id";
     }
 
 
     public static final class PROFILE_UPDATE {
         public static final String MODE = "user/add/profile_pic_base64";
+
         public static final String PARAM_IMAGE = "image";
     }
 
@@ -161,6 +168,7 @@ public class WebFields {
         //        https://maps.googleapis.com/maps/api/directions/json?origin=\(origin)&destination=\(destination)&mode=driving&key=AIzaSyDuLTaJL-tMzdBoTZtCQfCz4m66iEZ1eQc
 //        public static final String MODE="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&";
         public static final String MODE = "https://maps.googleapis.com/maps/api/directions/json?";
+
         public static final String ORIGINS = "origin=";
         public static final String DESTINATION = "&destination=";
     }
@@ -174,4 +182,16 @@ public class WebFields {
     public static final class TERMS_CONDITION {
         public static final String MODE = "get/texts";
     }
+
+
+
+    public static final class TIP_UPDATE{
+        public static final String MODE = "user/get/tipupdate";
+
+        public static final String TRIP_ID = "trip_id";
+        public static final String TIP_AMOUNT= "tip_amount";
+    }
+
+
+
 }

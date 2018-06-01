@@ -1,6 +1,7 @@
 package com.greegoapp.Activity;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -9,9 +10,12 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -112,12 +116,6 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         ibFinish = binding.ibFinish;
         tvCntWthDriver = binding.tvCntWthDriver;
         txtTimer = binding.txtTimer;
-       /* edtTvDigit1 = binding.edtTvDigit1;
-        edtTvDigit2 = binding.edtTvDigit2;
-        edtTvDigit3 = binding.edtTvDigit3;
-        edtTvDigit4 = binding.edtTvDigit4;
-        edtTvDigit5 = binding.edtTvDigit5;
-        edtTvDigit6 = binding.edtTvDigit6;*/
 
     }
 
@@ -150,19 +148,8 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 pinVwOtpCode.setText("");
                 KeyboardUtility.hideKeyboard(context, view);
                 break;
-            /*    edtTvDigit1.setText("");
-                edtTvDigit2.setText("");
-                edtTvDigit3.setText("");
-                edtTvDigit4.setText("");
-                edtTvDigit5.setText("");
-                edtTvDigit6.setText("");*/
 
             case R.id.ibFinish:
-//                KeyboardUtility.hideKeyboard(context, view);
-//                Intent in = new Intent(context, HomeActivity.class);
-//                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(in);
-//                overridePendingTransition(R.anim.trans_right_in, R.anim.trans_left_out);
 
                 if (isValid()) {
                     if (ConnectivityDetector
@@ -176,7 +163,6 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
                 }
 
 
-                //  SnackBar.showValidationError(context,view,"In Progress");
                 break;
 
             case R.id.pinVwDigitCode:
@@ -454,5 +440,6 @@ public class DigitCodeActivity extends AppCompatActivity implements View.OnClick
         }
         return code;
     }
+
 
 }

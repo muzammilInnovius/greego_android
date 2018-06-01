@@ -16,6 +16,10 @@ public class UserDriverTripDetails implements Parcelable {
     private int error_code;
     private String message;
 
+    public  UserDriverTripDetails(){
+
+    }
+
     protected UserDriverTripDetails(Parcel in) {
         error_code = in.readInt();
         message = in.readString();
@@ -107,7 +111,11 @@ public class UserDriverTripDetails implements Parcelable {
         private DriverBean driver;
         private RequestBean request;
 
-        protected DataBean(Parcel in) {
+        public DataBean(){
+
+        }
+
+        public DataBean(Parcel in) {
             id = in.readInt();
             request_id = in.readString();
             user_id = in.readString();
@@ -301,7 +309,14 @@ public class UserDriverTripDetails implements Parcelable {
             dest.writeParcelable(request, flags);
         }
 
+
+
         public static class DriverLocationBean implements Parcelable {
+
+            public DriverLocationBean(){
+
+            }
+
             protected DriverLocationBean(Parcel in) {
                 lat = in.readString();
                 lng = in.readString();
@@ -409,6 +424,10 @@ public class UserDriverTripDetails implements Parcelable {
             private String device_id;
             private String created_at;
             private String updated_at;
+
+            public DriverBean(){
+
+            }
 
             protected DriverBean(Parcel in) {
                 id = in.readInt();
@@ -739,6 +758,10 @@ public class UserDriverTripDetails implements Parcelable {
             private String updated_at;
             private UserBean user;
             private UserVehicleBean user_vehicle;
+
+            public RequestBean(){
+
+            }
 
             protected RequestBean(Parcel in) {
                 id = in.readInt();

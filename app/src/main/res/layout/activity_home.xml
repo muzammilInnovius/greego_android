@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:map="http://schemas.android.com/apk/res-auto">
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,6 +15,7 @@
             android:layout_height="match_parent">
 
             <RelativeLayout
+                android:id="@+id/rlMain"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -43,20 +44,20 @@
                     android:id="@+id/mgooleMap"
                     android:name="com.google.android.gms.maps.MapFragment"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     map:uiCompass="true"
                     map:uiRotateGestures="true"
                     map:uiScrollGestures="true"
                     map:uiTiltGestures="true"
                     map:uiZoomControls="true"
-                    map:uiZoomGestures="true"
-                    android:layout_height="match_parent" />
+                    map:uiZoomGestures="true" />
 
                 <!--<include layout="@layout/home_screen_data"/>-->
 
                 <RelativeLayout
-                    tools:context="com.greegoapp.Activity.HomeActivity"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    tools:context="com.greegoapp.Activity.HomeActivity">
 
 
                     <ImageView
@@ -68,28 +69,52 @@
                         android:visibility="invisible" />
 
 
-                    <TextView
-                        android:id="@+id/txtAddress"
-                        android:layout_width="match_parent"
+                    <RelativeLayout
+                        android:id="@+id/rlAddNrByDr"
+                        android:layout_width="wrap_content"
                         android:layout_height="?actionBarSize"
                         android:layout_alignParentTop="true"
                         android:layout_marginLeft="@dimen/scale_10dp"
                         android:layout_marginRight="@dimen/scale_10dp"
-                        android:layout_marginTop="@dimen/scale_85dp"
-                        android:background="@drawable/edt_box"
-                        android:drawableLeft="@mipmap/home"
-                        android:drawablePadding="2dip"
-                        android:ellipsize="end"
-                        android:gravity="center|center_horizontal"
-                        android:paddingLeft="@dimen/scale_8dp"
-                        android:singleLine="true"
-                        android:text="@string/wheredogo"
-                        android:textColor="@color/edt_textColor" />
+                        android:layout_marginTop="@dimen/scale_85dp">
+
+                        <TextView
+                            android:id="@+id/txtAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/edt_box"
+                            android:drawableLeft="@mipmap/home"
+                            android:drawablePadding="2dip"
+                            android:ellipsize="end"
+                            android:gravity="center|center_horizontal"
+                            android:paddingLeft="@dimen/scale_8dp"
+                            android:singleLine="true"
+                            android:text="@string/wheredogo"
+                            android:textColor="@color/edt_textColor" />
+
+                        <TextView
+                            android:id="@+id/txtNoNearByDriver"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentTop="true"
+                            android:background="@drawable/edt_box"
+                            android:drawablePadding="2dip"
+                            android:ellipsize="end"
+                            android:gravity="center|center_horizontal"
+                            android:paddingLeft="@dimen/scale_8dp"
+                            android:singleLine="true"
+                            android:text="No near by driver found."
+                            android:textColor="@color/app_bg"
+                            android:textSize="@dimen/txt_14"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </RelativeLayout>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/txtAddress"
+                        android:layout_below="@+id/rlAddNrByDr"
                         android:layout_marginLeft="@dimen/scale_50dp"
                         android:layout_marginRight="@dimen/scale_50dp"
                         android:layout_marginTop="1dp">
@@ -301,6 +326,27 @@
 
                     </RelativeLayout>
 
+
+                    <!--<RelativeLayout-->
+                    <!--android:layout_marginBottom="@dimen/scale_1dp"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_above="@+id/llVehical"-->
+                    <!--android:layout_marginLeft="@dimen/scale_15dp"-->
+                    <!--android:layout_marginRight="@dimen/scale_15dp"-->
+                    <!--android:background="@color/app_bg">-->
+
+                    <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:padding="@dimen/scale_5dp"-->
+                    <!--android:text="No near by driver found."-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/txt_14" />-->
+
+                    <!--</RelativeLayout>-->
+
                     <!--Vehical designing-->
                     <LinearLayout
                         android:id="@+id/llVehical"
@@ -369,8 +415,8 @@
                                 android:layout_weight="0.9"
                                 android:gravity="center"
                                 android:maxLines="1"
-                                android:text=""
                                 android:singleLine="true"
+                                android:text=""
                                 android:textColor="@color/vehical_bg"
                                 android:textSize="@dimen/txt_14"
                                 android:textStyle="bold" />
@@ -424,6 +470,7 @@
                         android:layout_alignParentBottom="true"
                         android:layout_margin="@dimen/scale_20dp"
                         android:background="@drawable/edit_vehicle_bg"
+                        android:clickable="true"
                         android:orientation="vertical"
                         android:visibility="gone">
 
@@ -466,18 +513,18 @@
                                 android:textStyle="bold" />
 
                             <!--<TextView-->
-                                <!--android:id="@+id/edtCardDetail"-->
-                                <!--android:layout_width="wrap_content"-->
-                                <!--android:layout_height="wrap_content"-->
-                                <!--android:layout_below="@+id/txtJustpayment"-->
-                                <!--android:layout_marginTop="@dimen/scale_6dp"-->
-                                <!--android:background="@drawable/edt_boxpickup"-->
-                                <!--android:drawableLeft="@mipmap/ic_visa"-->
-                                <!--android:drawablePadding="@dimen/scale_15dp"-->
-                                <!--android:hint="Select card"-->
-                                <!--android:padding="@dimen/scale_4dp"-->
-                                <!--android:text=""-->
-                                <!--android:textColorHint="@color/hint_color" />-->
+                            <!--android:id="@+id/edtCardDetail"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_below="@+id/txtJustpayment"-->
+                            <!--android:layout_marginTop="@dimen/scale_6dp"-->
+                            <!--android:background="@drawable/edt_boxpickup"-->
+                            <!--android:drawableLeft="@mipmap/ic_visa"-->
+                            <!--android:drawablePadding="@dimen/scale_15dp"-->
+                            <!--android:hint="Select card"-->
+                            <!--android:padding="@dimen/scale_4dp"-->
+                            <!--android:text=""-->
+                            <!--android:textColorHint="@color/hint_color" />-->
 
                             <com.greegoapp.Utils.MYEditCard
                                 android:id="@+id/edtCardDetail"
@@ -486,9 +533,9 @@
                                 android:layout_below="@+id/txtJustpayment"
                                 android:layout_marginTop="@dimen/scale_6dp"
                                 android:background="@null"
-                                android:hint="Select card"
                                 android:clickable="false"
-                                android:editable="false" />
+                                android:editable="false"
+                                android:hint="Select card" />
 
 
                             <Button
@@ -516,6 +563,7 @@
                         android:layout_alignParentBottom="true"
                         android:layout_marginLeft="@dimen/scale_2dp"
                         android:layout_marginRight="@dimen/scale_2dp"
+                        android:clickable="true"
                         android:orientation="vertical"
                         android:visibility="gone">
 
@@ -745,14 +793,13 @@
                                 android:layout_marginTop="@dimen/scale_1dp">
 
 
-
                                 <com.greegoapp.Utils.MYEditCard
                                     android:id="@+id/imgVwYrCard"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
                                     android:background="@null"
-                                    android:drawableLeft="@mipmap/ic_visa"
-                                   android:layout_centerVertical="true" />
+                                    android:drawableLeft="@mipmap/ic_visa" />
 
                                 <LinearLayout
                                     android:layout_width="wrap_content"
@@ -810,6 +857,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/scale_25dp"
+                        android:clickable="true"
                         android:visibility="invisible">
 
 
@@ -843,7 +891,7 @@
                                 android:layout_centerVertical="true"
                                 android:layout_marginRight="@dimen/scale_25dp"
                                 android:layout_marginTop="@dimen/scale_35dp"
-                                android:text="5 min"
+                                android:text=""
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/txt_14" />
 
@@ -931,17 +979,15 @@
 
             </RelativeLayout>
 
-
             <!--<FrameLayout-->
             <!--android:layout_width="@dimen/scale_250dp"-->
             <!--android:layout_height=""></FrameLayout>-->
             <!--android:layout_gravity="start"-->
             <RelativeLayout
-
-                android:layout_gravity="start"
                 android:id="@+id/drawerlist"
                 android:layout_width="@dimen/scale_250dp"
                 android:layout_height="match_parent"
+                android:layout_gravity="start"
                 android:background="@color/white">
 
                 <RelativeLayout
@@ -1019,7 +1065,6 @@
                         android:id="@+id/view"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-
                         android:layout_centerHorizontal="true"
                         android:background="@color/app_bg" />
 

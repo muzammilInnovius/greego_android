@@ -19,6 +19,7 @@
                 android:layout_height="@dimen/scale_40dp"
                 android:background="@color/transparent"
                 android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -83,7 +84,7 @@
                 android:id="@+id/tvAgreementTitleDesc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/scale_5dp"
+                android:layout_marginTop="@dimen/scale_2dp"
                 android:text="@string/desc_agreement"
                 android:textAlignment="center"
                 android:textColor="@color/hint_color"
@@ -92,38 +93,43 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvAgreementTitle" />
 
-
-            <LinearLayout
-                android:id="@+id/lluname"
+            <RelativeLayout
+                android:layout_marginTop="@dimen/scale_10dp"
+                android:id="@+id/rluname"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/scale_250dp"
-                android:layout_marginBottom="@dimen/scale_5dp"
                 android:layout_marginLeft="@dimen/scale_20dp"
                 android:layout_marginRight="@dimen/scale_20dp"
-                android:layout_marginTop="@dimen/scale_20dp"
-                android:orientation="horizontal"
-                android:weightSum="2"
                 app:layout_constraintTop_toBottomOf="@+id/tvAgreementTitleDesc">
 
                 <android.support.v4.widget.NestedScrollView
-                    android:id="@+id/svAgreement"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/scrollView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbarThumbVertical="@color/app_bg"
                     android:scrollbars="vertical">
 
-                    <TextView
-                        android:id="@+id/tvAgreementDetail"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/lluname"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:background="@null"
-                        android:gravity="center_vertical"
-                        android:hint="@string/agreement_detail"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/txt_14" />
+                        android:layout_marginLeft="@dimen/scale_10dp"
+                        android:layout_marginRight="@dimen/scale_10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvAgreementDetail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@null"
+                            android:gravity="center_vertical"
+                            android:hint="@string/agreement_detail"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/txt_12" />
+                    </LinearLayout>
                 </android.support.v4.widget.NestedScrollView>
-            </LinearLayout>
+            </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/llcheckedagreement"
@@ -133,8 +139,8 @@
                 android:layout_marginRight="@dimen/scale_20dp"
                 android:orientation="horizontal"
                 android:padding="@dimen/scale_2dp"
-                android:weightSum="2"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.818"
                 app:layout_constraintLeft_toRightOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/ibFinish">
 

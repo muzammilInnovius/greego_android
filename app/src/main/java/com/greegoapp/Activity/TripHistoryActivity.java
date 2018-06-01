@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -205,6 +206,10 @@ public class TripHistoryActivity extends AppCompatActivity implements View.OnCli
         rvTripHistory = binding.rvTripHistory;
         ibback = binding.ibBack;
         tvNoDataFaund = binding.tvNoDataFaund;
+
+//        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsTools);
+//        collapsingToolbarLayout.setTitle("Trip History");
+//        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
     }
 
     @Override

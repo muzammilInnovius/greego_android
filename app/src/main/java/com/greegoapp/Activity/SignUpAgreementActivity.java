@@ -3,17 +3,17 @@ package com.greegoapp.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -23,8 +23,8 @@ import com.google.gson.Gson;
 import com.greegoapp.AppController.AppController;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.GetUserData;
+import com.greegoapp.Model.TermsCondition;
 import com.greegoapp.Model.UserData;
-import com.greegoapp.Model.VerifyOtp;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -50,9 +50,11 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
     ImageButton ibBack;
     ImageButton ibFinish;
     private View snackBarView;
-    RelativeLayout relativeLayout;
+    RelativeLayout rlAgreement;
     String strEmail, strFName, strLName;
     boolean isChecked;
+    TextView tvAgreementDetail;
+//    ScrollView scrool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,7 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
         snackBarView = findViewById(android.R.id.content);
         bindView();
         setListners();
-
+        callTermsCondiAPI();
     }
 
     private void setListners() {
@@ -76,10 +78,10 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if (scrollY > oldScrollY) {
-                    relativeLayout.setVisibility(View.VISIBLE);
+                    rlAgreement.setVisibility(View.VISIBLE);
                     //.hide();
                 } else {
-                    relativeLayout.setVisibility(View.INVISIBLE
+                    rlAgreement.setVisibility(View.INVISIBLE
                     );
                     // fab.show();
                 }
@@ -87,14 +89,17 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
         });
         ibFinish.setOnClickListener(this);
         ibBack.setOnClickListener(this);
+        scrollView.setOnClickListener(this);
+        tvAgreementDetail.setOnClickListener(this);
     }
 
     private void bindView() {
-        scrollView = binding.svAgreement;
+        scrollView = binding.scrollView;
         cbChecked = binding.cbAgreement;
         ibBack = binding.ibBack;
-        relativeLayout = binding.rlAgreement;
+        rlAgreement = binding.rlAgreement;
         ibFinish = binding.ibFinish;
+        tvAgreementDetail = binding.tvAgreementDetail;
     }
 
     @Override
@@ -121,8 +126,76 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
                     }
                 }
                 break;
+//            case R.id.scroll:
+//                rlAgreement.setVisibility(View.VISIBLE);
+//                break;
+            case R.id.tvAgreementDetail:
+                rlAgreement.setVisibility(View.VISIBLE);
+                break;
         }
     }
+
+    private void callTermsCondiAPI() {
+        try {
+
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                    WebFields.BASE_URL + WebFields.TERMS_CONDITION.MODE, null, new Response.Listener<JSONObject>() {
+
+
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    TermsCondition userDetail = new Gson().fromJson(String.valueOf(response), TermsCondition.class);
+                    try {
+                        if (userDetail.getError_code() == 0) {
+                            Applog.E("success: " + response.toString());
+                            MyProgressDialog.hideProgressDialog();
+                            tvAgreementDetail.setText(Html.fromHtml(userDetail.getData().getTerms_conditions().trim()));
+
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, response.getString("message"));
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     private void callAcceptAgreementAPI() {
         try {
@@ -204,7 +277,6 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
 
     }
 
-
     private void callUserMeApi() {
         try {
             JSONObject jsonObject = new JSONObject();
@@ -274,7 +346,6 @@ public class SignUpAgreementActivity extends AppCompatActivity implements View.O
         }
 
     }
-
 
     public boolean isValid() {
         //   boolean cbchecked=false;

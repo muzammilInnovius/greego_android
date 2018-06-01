@@ -62,6 +62,7 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
 
         if (getItemCount() == 1) {
             lastSelectedPosition = 0;
+            PaymentActivity.cardselected = "" + alCardData.get(lastSelectedPosition).getCard_number();
             callSelectCardForUser(alCardData.get(0).getId());
         }
     }
@@ -122,12 +123,12 @@ public class CardsNumberAdapter extends RecyclerView.Adapter<CardsNumberAdapter.
 
                                 alCardData.remove(getAdapterPosition());
                                 notifyItemRemoved(getAdapterPosition());
-                                if (getAdapterPosition() != 0) {
+//                                if (getAdapterPosition() != 0) {
                                     notifyItemRangeChanged(getAdapterPosition(), alCardData.size());
-                                }
-                                else {
-                                    notifyDataSetChanged();
-                                }
+//                                }
+//                                else {
+//                                    notifyDataSetChanged();
+//                                }
 
 
                             } catch (Exception e) {

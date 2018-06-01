@@ -221,6 +221,12 @@
                         android:textColor="@color/app_bg"
                         android:textSize="@dimen/txt_12" />
 
+                    <DatePicker
+                        android:id="@+id/datePicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"></DatePicker>
+
                     <EditText
                         android:id="@+id/edtTvYear"
                         android:layout_width="match_parent"
@@ -233,6 +239,8 @@
                         android:imeOptions="actionNext"
                         android:inputType="numberDecimal"
                         android:maxLength="4"
+                        android:singleLine="true"
+                        android:maxLines="1"
                         android:padding="@dimen/scale_2dp"
                         android:textAllCaps="true"
                         android:textColor="@color/app_bg"
@@ -462,9 +470,9 @@
                     app:layout_constraintTop_toBottomOf="@+id/rlManual" />
 
                 <TextView
-                    android:clickable="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="false"
                     android:padding="@dimen/scale_2dp"
                     app:layout_constraintTop_toBottomOf="@+id/viewManual" />
 
@@ -478,12 +486,12 @@
             android:id="@+id/btnSaveVehicle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/scale_40dp"
+            android:layout_marginBottom="2dp"
             android:layout_marginLeft="@dimen/scale_20dp"
             android:layout_marginRight="@dimen/scale_20dp"
             android:background="@drawable/button"
             android:text="Save Vehicle"
             android:textAllCaps="false"
-            android:layout_marginBottom="2dp"
             android:textColor="@color/white"
             android:textSize="@dimen/txt_14"
             app:layout_constraintBottom_toBottomOf="parent"

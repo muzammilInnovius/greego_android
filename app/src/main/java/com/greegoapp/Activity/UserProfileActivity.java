@@ -651,7 +651,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-
     private void callUpdateProfileAPI() {
         try {
             JSONObject jsonObject = new JSONObject();
@@ -731,7 +730,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -743,6 +741,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         } else if (SETTING_PROFILE_UPDATE == 1001) {
             Intent data = new Intent();
             String userName = edtTvProfileFname.getText().toString();
+            data.putExtra("profilePic", profilePicUrl);
             data.putExtra("name", userName);
             setResult(SETTING_PROFILE_UPDATE, data);
         }

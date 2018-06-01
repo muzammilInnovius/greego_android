@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/scale_10dp"
+    android:background="@color/white">
+
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/scale_10dp"
+        android:text="Greego Driver Tip"
+        android:textColor="@color/app_bg"
+        android:textSize="@dimen/txt_20"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvTotalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/scale_5dp"
+        android:text=""
+        android:textColor="@color/app_bg"
+        android:textSize="@dimen/txt_20"
+        android:textStyle="bold" />
+
+
+    <LinearLayout
+        android:id="@+id/llTip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTotalAmount"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/scale_20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/rl10PerTip"
+            android:layout_width="@dimen/scale_45dp"
+            android:layout_height="@dimen/scale_45dp"
+            android:layout_margin="@dimen/scale_5dp"
+            android:background="@drawable/round_white_bg">
+
+            <TextView
+                android:id="@+id/tv10PerTip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="10%"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_16"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/rl15PerTip"
+            android:layout_width="@dimen/scale_45dp"
+            android:layout_height="@dimen/scale_45dp"
+            android:layout_marginLeft="@dimen/scale_25dp"
+            android:background="@drawable/round_white_bg">
+
+            <TextView
+                android:id="@+id/tv15PerTip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="15%"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_16"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/rl20PerTip"
+            android:layout_width="@dimen/scale_45dp"
+            android:layout_height="@dimen/scale_45dp"
+            android:layout_marginLeft="@dimen/scale_25dp"
+            android:background="@drawable/round_white_bg">
+
+            <TextView
+                android:id="@+id/tv20PerTip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="20%"
+                android:textColor="@color/app_bg"
+                android:textSize="@dimen/txt_16"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llTip"
+        android:layout_marginLeft="@dimen/scale_10dp"
+        android:layout_marginRight="@dimen/scale_10dp">
+
+        <TextView
+            android:id="@+id/tcCustomTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="Custom Tips $ "
+            android:textColor="@color/app_bg"
+            android:textSize="@dimen/txt_16" />
+
+
+        <EditText
+            android:id="@+id/edtTvAddTip"
+            android:layout_width="@dimen/scale_50dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/tcCustomTip"
+            android:hint="0.0"
+            android:inputType="phone" />
+
+        <CheckBox
+            android:id="@+id/chkNoTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/scale_5dp"
+            android:text="No Tip"
+            android:textSize="@dimen/txt_16" />
+
+
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/btnSubmitTip"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/scale_40dp"
+        android:layout_below="@+id/rr"
+        android:layout_marginBottom="@dimen/scale_10dp"
+        android:layout_marginLeft="@dimen/scale_40dp"
+        android:layout_marginRight="@dimen/scale_40dp"
+        android:layout_marginTop="@dimen/scale_5dp"
+        android:background="@drawable/button"
+        android:text="Submit"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

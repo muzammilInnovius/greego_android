@@ -36,6 +36,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -49,6 +50,9 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -85,19 +89,21 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.greegoapp.Adapter.DrawerLayoutAdapter;
 import com.greegoapp.AppController.AppController;
-import com.greegoapp.FCM.NotificationUtils;
+import com.greegoapp.FCM.Config;
 import com.greegoapp.GlobleFields.GlobalValues;
 import com.greegoapp.Model.GetPickUpTime;
 import com.greegoapp.Model.GetTripRate;
 import com.greegoapp.Model.GetUserData;
 import com.greegoapp.Model.UserDriverTripDetails;
 import com.greegoapp.Model.UserNearDriverList;
+import com.greegoapp.Model.UserTripStatus;
 import com.greegoapp.R;
 import com.greegoapp.SessionManager.SessionManager;
 import com.greegoapp.Utils.Applog;
@@ -118,8 +124,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -143,7 +147,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     Context context;
     private View snackBarView;
 
-    private RelativeLayout navHeader;
+    private RelativeLayout navHeader, rlMain;
     private ImageView ivPro, ivProPicHome;
     private DrawerLayoutAdapter drawerLayoutAdapter;
     private DrawerLayout drawer_layout;
@@ -172,13 +176,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<GetUserData> alUserList = new ArrayList<>();
     String userName, profilePic;
 
-    //    MapHomeFragment fragmentPro = null;
     View view;
 
-
-    //changes
-
-    /*  Google Map  */
     private GoogleMap mGoogleMap;
     View mapView;
     MapFragment mFragment;
@@ -205,10 +204,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public static final int ADD_EDIT_VEHICAL_REQUEST = 2000;  // The request code
     public static final int CHANGE_CONTACT_NO = 2001;
+
     private long TURN_ANIMATION_DURATION = 500;
     public static final int COMPLETE_UPDATE_USER_DETAILS = 0007;
     public static final String REQUEST_USER_TRIP = "1250";
     boolean GpsStatus;
+
+
+    public static final int SLIDER_PAYMENT_METHOD = 20001;
+    public static final int SLIDER_TRIP_HISTORY = 20002;
+    public static final int SLIDER_FREE_TRIP = 20003;
+    public static final int SLIDER_HELP = 20004;
+    public static final int SLIDER_SETTING = 20005;
 
     private LocationRequest locationRequest;
     // Defined in mili seconds.
@@ -259,10 +266,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     String duration, duration1;
     Button btnRequest;
     String duratioTime, durationTimeCalculate;
-    int durationOnlyMin;
+    String durationOnlyMin;
 
     //Mujju 19_4_18
-//    ArrayList<UserNearDriverList> alUserNearDriver;
     ArrayList<UserNearDriverList.DataBean> alUserNearDriverDtls;
     ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail = new ArrayList<>();
 
@@ -300,7 +306,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isNetworkAvaiableUIActive = false; // Flag to indicate which view is showing
     final private static int NETWORK_CHECK_INTERVAL = 5000; // Sleep interval between checking network
 
-    TextView tvMarkerTime, tvLegal;
+    TextView tvMarkerTime, tvLegal, txtNoNearByDriver;
+    ArrayList<UserDriverTripDetails.DataBean> alUserDrTripDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -318,15 +325,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         snackBarView = findViewById(android.R.id.content);
         manager = getFragmentManager();
 
-//        if (ConnectivityDetector.isConnectingToInternet(context)) {
-//
-//        }else {
-//            checkInternetConnection();
-//        }
         bindView();
-//        setHeaderbar();
         setListners();
-
 
         if (ConnectivityDetector.isConnectingToInternet(context)) {
             if (Build.VERSION.SDK_INT < 23) {
@@ -350,7 +350,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 }
             }
-            CheckGpsStatus();
+
+            if (!isGPSEnable()) {
+                CheckGpsStatus();
+            } else {
+                //   if (!mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.connect();
+                // }
+                initilizeMap();
+            }
+
         } else {
             SnackBar.showInternetError(context, snackBarView);
         }
@@ -363,43 +372,216 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             SnackBar.showInternetError(context, snackBarView);
         }
 
-
         slideMenu();
+
         drawerlist.requestDisallowInterceptTouchEvent(true);
         navHeader.requestDisallowInterceptTouchEvent(true);
 
+        remainingTripStatus("" + getIntent().getStringExtra("messageTrip"), getIntent().getStringExtra("trip_id")
+                , getIntent().getStringExtra("tripAmount"));
+//        remainingPaymentStatus("" + getIntent().getStringExtra("messagePayment"), getIntent().getStringExtra("trip_id"));
+
+
+        try {
+
+            String tripId = SessionManager.getTripId(context);
+            String tripStatus = SessionManager.getTripStatus(context);
+
+            Applog.E("tripId===>" + tripId + "tripStatus===>" + tripStatus);
+//            remainingTripStatus(tripId,tripStatus);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void checkInternetConnection() {
-        SnackBar.showInternetError(context, snackBarView);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder
-//                .setTitle("Greego")
-//                .setMessage("Please check internet connection.")
-//                .setCancelable(false)
-//
-//                .setPositiveButton("", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        dialog.cancel();
-//                    }
-//                });
-//
-//        dialog = builder.create();
-//
-////        if (ConnectivityDetector.isConnectingToInternet(context)) {
-////            dialog.show();
-////        } else {
-////            dialog.dismiss();
-////        }
+    private void remainingPaymentStatus(String messagePaymen, String strTripId) {
+
+        if (paymentStatus != null) {
+            if (paymentStatus.matches("1")) {
+                Intent in = new Intent(context, TripCompleteChargePayActivity.class);
+                in.putExtra("totalCost", tripTotalAmount);
+                in.putExtra("driverName", strTripDriverName);
+                in.putExtra("driverPic", driverPicUrl);
+                in.putExtra("fromAddress", strTripToAddress);
+                in.putExtra("tripId", paymentTripId);
+                in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(in);
+                finish();
+                SnackBar.showSuccess(context, snackBarView, "Payment successfully.");
+            }
+        }
 
     }
-//Changes................
+
+    public void remainingTripStatus(String tripStatus, String strTripId, String trip_amount) {
+
+        if (tripStatus != null) {
+
+            if (tripStatus.matches(GlobalValues.DRIVER_CANCELLED)) {
+                SnackBar.showDriverRequestStatus(context, snackBarView, "Request cancel.");
+            } else if (tripStatus.matches(GlobalValues.DRIVER_ASSIGNED)) {
+//                callUserTripDetailsAPI(SessionManager.getTripId(context));
+                SessionManager.getUserTripDtl(context);
+                SessionManager.getDriverTripDtl(context);
+                SessionManager.getUserDrTripLocDtl(context);
+                SessionManager.getUserRequestTripDtl(context);
+
+                txtAddress.setVisibility(View.GONE);
+
+                setGetNotifDriverTripDetails();
+            }
+
+            //Driver Waiting
+            else if (tripStatus.matches(GlobalValues.DRIVER_WAITING)) {
+
+                SessionManager.getUserTripDtl(context);
+                SessionManager.getDriverTripDtl(context);
+                SessionManager.getUserDrTripLocDtl(context);
+                SessionManager.getUserRequestTripDtl(context);
+
+                setGetNotifDriverTripDetails();
+
+                llVehical.setVisibility(View.GONE);
+                txtAddress.setVisibility(View.GONE);
+                llCostDesign.setVisibility(View.GONE);
+                llDriverPersDetailsMain.setVisibility(View.VISIBLE);
+
+                SnackBar.showDriverRequestStatus(context, snackBarView, "Driver waiting.");
+            }
+            //Driver On Going
+            else if (tripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
+                setRemaningDriverOnGoingTripDetails();
+                SnackBar.showDriverRequestStatus(context, snackBarView, "Driver on going.");
+            }
+            //Trip completed
+            else if (tripStatus.matches(GlobalValues.DRIVER_TRIP_COMPLETED)) {
+                showAddTrip(trip_amount, strTripId);
+                SnackBar.showDriverRequestStatus(context, snackBarView, "Trip completed.");
+            }
+        }
+
+    }
+
+    private void setGetNotifDriverTripDetails() {
+        try {
+//        mGoogleMap.clear();
+//            userRequestId = SessionManager.getUserTripDtl(context)  .getRequest_id();
+//            driver_id = SessionManager.getUserTripDtl(context)  .getDriver_id();
+
+            userPicUpLat = Double.parseDouble(SessionManager.getUserRequestTripDtl(context).getFrom_lat().trim());
+            userPicUpLong = Double.parseDouble(SessionManager.getUserRequestTripDtl(context).getFrom_lng().trim());
+
+            double drvLat = Double.parseDouble(SessionManager.getUserDrTripLocDtl(context).getLat().trim());
+            double drvLong = Double.parseDouble(SessionManager.getUserDrTripLocDtl(context).getLng().trim());
+
+            userDropOfLat = Double.parseDouble(SessionManager.getUserRequestTripDtl(context).getTo_lat().trim());
+            userDropOfLng = Double.parseDouble(SessionManager.getUserRequestTripDtl(context).getTo_lng().trim());
+
+            driverStatus = true;
+
+            pickupPoint = new LatLng(userPicUpLat, userPicUpLong);
+            dropPoint = new LatLng(drvLat, drvLong);
+
+            statusPickuplocationRout = 0;
+            createRoute(pickupPoint, dropPoint);
+
+            zoomRoute(mGoogleMap, pickupPoint, dropPoint);
+
+            llVehical.setVisibility(View.GONE);
+            txtAddress.setVisibility(View.GONE);
+            llCostDesign.setVisibility(View.GONE);
+            llDriverPersDetailsMain.setVisibility(View.VISIBLE);
+
+            try {
+                cardNo = SessionManager.getCardNo(context);
+
+                String strCardNo = cardNo.substring(12, 16);
+                tvUserCardNo.setText(strCardNo);
+            } catch (Exception e) {
+                Log.e("Error", e.toString());
+            }
+
+            totalTripAmount = SessionManager.getUserRequestTripDtl(context).getTotal_estimated_trip_cost();
+            driverPicUrl = SessionManager.getDriverTripDtl(context).getProfile_pic();
+
+            if (driverPicUrl != null) {
+                Glide.clear(ivDriverPro);
+                Glide.with(context)
+                        .load(driverPicUrl)
+                        .centerCrop()
+                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                        .crossFade().skipMemoryCache(true)
+                        .into(ivDriverPro);
+
+            } else {
+                ivDriverPro.setImageResource(R.mipmap.ic_place_holder);
+            }
+
+            strTripDriverName = SessionManager.getDriverTripDtl(context).getName().trim();
+            strTripDriverContactNo = SessionManager.getDriverTripDtl(context).getContact_number().trim();
+            strTripFromAddress = SessionManager.getUserRequestTripDtl(context).getFrom_address().trim();
+            strTripToAddress = SessionManager.getUserRequestTripDtl(context).getTo_address().trim();
+
+            tvTripTotalCost.setText(SessionManager.getUserTripDtl(context).getTotal_trip_amount().trim());
+            tvAvanueAddress.setText(SessionManager.getUserTripDtl(context).getRequest().getTo_address().trim());
+
+            tvAcceptDriverName.setText(SessionManager.getUserTripDtl(context).getTotal_trip_amount().trim());
+            tvPromoCode.setText(SessionManager.getDriverTripDtl(context).getPromocode().trim());
+            strDriverContact = SessionManager.getDriverTripDtl(context).getContact_number().trim();
+
+            SnackBar.showDriverRequestStatus(context, snackBarView, "Driver Assigned.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void setRemaningDriverOnGoingTripDetails() {
+        try {
+            tvOnTripTime.setText(SessionManager.getUserTripDtl(context).getActual_trip_travel_time());
+            tvOnTripDrName.setText(SessionManager.getDriverTripDtl(context).getName().toString());
+            tvOnTripDrCode.setText(SessionManager.getDriverTripDtl(context).getPromocode().toString());
+
+            userPicUpLat = Double.parseDouble(SessionManager.getUserRequestTripDtl(context).getFrom_lat());
+            userPicUpLong = Double.parseDouble(SessionManager.getUserRequestTripDtl(context).getFrom_lng());
+
+            userDropOfLat = Double.parseDouble(SessionManager.getUserDrTripLocDtl(context).getLat());
+            userDropOfLng = Double.parseDouble(SessionManager.getUserDrTripLocDtl(context).getLng());
+
+            pickupPoint = new LatLng(userPicUpLat, userPicUpLong);
+            dropPoint = new LatLng(userDropOfLat, userDropOfLng);
+
+            Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
+            statusPickuplocationRout = 0;
+            createRoute(pickupPoint, dropPoint);
+
+            llVehical.setVisibility(View.GONE);
+            txtAddress.setVisibility(View.GONE);
+            llCostDesign.setVisibility(View.GONE);
+            llDriverPersDetailsMain.setVisibility(View.GONE);
+            rlOnTripUser.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    boolean flagSelectVehical = false, flagSelectCard = false;
 
     private void setVehicleData() {
         if (alVehicleDetail.size() != 0) {
+            boolean flag = false;
 
             for (GetUserData.DataBean.VehiclesBean vehicalData : alVehicleDetail) {
                 if (vehicalData.getSelected() == 1) {
+                    flag = true;
+                    flagSelectVehical = flag;
+
                     vehicalId = vehicalData.getVehicle_id();
                     strManufacur = vehicalData.getVehicle_name();
                     strModel = vehicalData.getVehicle_model();
@@ -409,8 +591,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     imgSetting.setImageResource(R.mipmap.ellipse_6);
                     tvEditVehicle.setText(strVehicalData);
+                } else {
+                    imgSetting.setImageResource(android.R.color.transparent);
+                    tvEditVehicle.setText("");
                 }
             }
+            Applog.E("vehical size check===>" + alVehicleDetail.size());
+
+            if (flag == false) {
+                if (alVehicleDetail.size() == 2) {
+                    flagSelectVehical = flag;
+                    callVehicleSelectApi(alVehicleDetail.get(0).getVehicle_id());
+                }
+            } else {
+                MyProgressDialog.hideProgressDialog();
+            }
+
         } else {
             imgSetting.setImageResource(android.R.color.transparent);
             tvEditVehicle.setText("");
@@ -421,15 +617,109 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void updateVehicalData(ArrayList<GetUserData.DataBean.VehiclesBean> alVehicleDetail) {
-        try {
-            alVehicleDetail.addAll(alVehicleDetail);
-            setVehicleData();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void setCardData() {
+        if (alUserList != null) {
+
+            boolean flagCard = false;
+
+            for (GetUserData.DataBean.CardsBean cardData : alUserSubDetails) {
+
+                if (cardData != null) {
+
+                    if (cardData.getSelected() == 1) {
+                        flagCard = true;
+
+                        byte[] byteData = Base64.decode(cardData.getCard_number(), Base64.DEFAULT);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            cardNo = new String(byteData, StandardCharsets.UTF_8);
+                            String s = cardNo;
+                            String s4 = s.substring(12, 16);
+                            String strCardNumber = "**** **** **** " + s4;
+                            if (strCardNumber != null) {
+                                edtCardDetail.getCardNumber(cardNo);
+                                edtCardDetail.isValid(cardNo);
+                                edtCardDetail.setText(strCardNumber);
+
+                                imgVwYrCard.getCardNumber(cardNo);
+                                imgVwYrCard.isValid(cardNo);
+
+                                edtCardDetail.getCardType();
+                            } else {
+                                SnackBar.showError(context, snackBarView, "Please select card first.");
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            if (flagCard == false) {
+                if (alUserSubDetails.size() == 2) {
+                    flagSelectCard = flagCard;
+                    callCardSelectApi(alUserSubDetails.get(0).getId());
+                }
+            } else {
+                MyProgressDialog.hideProgressDialog();
+            }
         }
     }
 
+    private void callCardSelectApi(int id) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(WebFields.SELECT_DELETE_CARD.PARAM_CARD_ID, String.valueOf(id));
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.SELECT_DELETE_CARD.SELECT_CARD_MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+                    MyProgressDialog.hideProgressDialog();
+
+                    if (flagSelectCard == false) {
+                        callUserMeApi();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+    }
 
     private void callDriverRequestAccepted() {
         myReceiver = new MyReceiver();
@@ -445,43 +735,33 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     String paymentStatus, tripTotalAmount;
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
-
-    private void showInternetConnection(boolean isConnected) {
-        if (isConnected) {
-            Toast.makeText(context, "Good intenet connection", Toast.LENGTH_SHORT).show();
-//            message = "Good! Connected to Internet";
-//            color = Color.WHITE;
-        } else {
-            Toast.makeText(context, "Please check intenet connection", Toast.LENGTH_SHORT).show();
-//  message = "Sorry! Not connected to internet";
-//            color = Color.RED;
-        }
-
-    }
-
-
     private class MyReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context arg0, Intent arg1) {
             // TODO Auto-generated method stub
+            UserTripStatus userTripStatus = new UserTripStatus();
 
             userDrTripDetails = arg1.getParcelableArrayListExtra("driverAllData");
 
-            strTripId = arg1.getStringExtra("tripId");
+            strTripId = arg1.getStringExtra("trip_id");
             strTripStatus = arg1.getStringExtra("tripStatus");
+            tripTotalAmount = arg1.getStringExtra("trip_amount");
 
-//            intent.putExtra("trip_id", trip_id);
+            SessionManager.saveTripId(context, strTripId);
+
             paymentTripId = arg1.getStringExtra("payment_trip_id");
             paymentStatus = arg1.getStringExtra("payment_status");
-            tripTotalAmount = arg1.getStringExtra("total_amount");
+
 
             if (strTripStatus != null) {
+
+                if (strTripId != null) {
+                    userTripStatus.setTrip_id(strTripId);
+                    userTripStatus.setTrip_status(strTripStatus);
+
+                    SessionManager.saveTripStaus(context, userTripStatus);
+                }
 
                 if (strTripStatus.matches(GlobalValues.DRIVER_CANCELLED)) {
                     SnackBar.showDriverRequestStatus(context, snackBarView, "Request cancel.");
@@ -500,17 +780,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 //Driver On Going
                 else if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
-
                     setDriverOnGoingTripDetails();
                     SnackBar.showDriverRequestStatus(context, snackBarView, "Driver on going.");
                 }
                 //Trip completed
-                else if (strTripStatus.matches(GlobalValues.DRIVER_COMPLETED)) {
-
-//                String estCost = txtEstMentCost.getText().toString();
-//
-//
-
+                else if (strTripStatus.matches(GlobalValues.DRIVER_TRIP_COMPLETED)) {
+                    showAddTrip(tripTotalAmount, strTripId);
                     SnackBar.showDriverRequestStatus(context, snackBarView, "Trip completed.");
                 }
             } else if (paymentStatus != null) {
@@ -538,24 +813,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void setDriverOnGoingTripDetails() {
 
 //        for (UserDriverTripDetails.DataBean tripDetails : userDrTripDetails) {
-        mGoogleMap.clear();
+            mGoogleMap.clear();
 
+            pickupPoint = new LatLng(userPicUpLat, userPicUpLong);
+            dropPoint = new LatLng(userDropOfLat, userDropOfLng);
 
-        pickupPoint = new LatLng(userPicUpLat, userPicUpLong);
-        dropPoint = new LatLng(userDropOfLat, userDropOfLng);
+            Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
+            statusPickuplocationRout = 0;
+            createRoute(pickupPoint, dropPoint);
 
-        Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
-//                createMarker(drvLat, drvLong, "Driver", "Show");
-        statusPickuplocationRout = 0;
-        createRoute(pickupPoint, dropPoint);
-
+            llVehical.setVisibility(View.GONE);
+            txtAddress.setVisibility(View.GONE);
+            llCostDesign.setVisibility(View.GONE);
+            llDriverPersDetailsMain.setVisibility(View.GONE);
+            rlOnTripUser.setVisibility(View.VISIBLE);
 //        }
-
-        llVehical.setVisibility(View.GONE);
-        txtAddress.setVisibility(View.GONE);
-        llCostDesign.setVisibility(View.GONE);
-        llDriverPersDetailsMain.setVisibility(View.GONE);
-        rlOnTripUser.setVisibility(View.VISIBLE);
     }
 
     double userDropOfLat, userDropOfLng, userPicUpLat, userPicUpLong;
@@ -579,10 +851,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             userDropOfLat = Double.parseDouble(tripDetails.getRequest().getTo_lat());
             userDropOfLng = Double.parseDouble(tripDetails.getRequest().getTo_lng());
 
+            SessionManager.saveUserTripDetails(context, tripDetails);
+
 
             if (tripDetails.getStatus().matches(GlobalValues.DRIVER_ASSIGNED)) {
-
-//                mGoogleMap.clear();
 
                 driverStatus = true;
 
@@ -631,6 +903,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                tvTripTotalCost.setText("$" + totalTripAmount);
                 tvTripTotalCost.setText(totalTripAmount);
                 tvAvanueAddress.setText(strTripToAddress);
+
                 tvAcceptDriverName.setText(tripDetails.getDriver().getName());
                 tvPromoCode.setText(tripDetails.getDriver().getPromocode());
                 strDriverContact = tripDetails.getDriver().getContact_number();
@@ -640,14 +913,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 tvOnTripTime.setText(duratioTime);
                 tvOnTripDrName.setText(tripDetails.getDriver().getName());
                 tvOnTripDrCode.setText(tripDetails.getDriver().getPromocode());
-
-
-//                addCameraToDriverAssignMap(pickupPoint);
             }
-
-
         }
-
     }
 
     private void zoomRoute(GoogleMap googleMap, LatLng pickupPoint, LatLng dropPoint) {
@@ -662,7 +929,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, routePadding));
     }
-
 
     private void callNearDriverAPI(String currentLat, String currentLong) {
         try {
@@ -687,15 +953,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
                     UserNearDriverList nearDriver = new Gson().fromJson(String.valueOf(response), UserNearDriverList.class);
-//                    UserNearDriverList.DataBean nrDriverData = new Gson().fromJson(String.valueOf(response), UserNearDriverList.DataBean.class);
                     alUserNearDriverDtls = new ArrayList<>();
+
                     try {
 //                        MyProgressDialog.hideProgressDialog();
                         if (nearDriver.getError_code() == 0) {
 
+
                             if (nearDriver.getData().size() != 0) {
+
+                                if (txtNoNearByDriver.getVisibility() == View.VISIBLE) {
+                                    txtNoNearByDriver.setVisibility(View.GONE);
+                                    txtAddress.setVisibility(View.VISIBLE);
+                                }
+
+
                                 alUserNearDriverDtls.addAll(nearDriver.getData());
-//                            alUserNearDriverDtls.add(nrDriverData);
+
                                 Applog.E("near array size after==>" + alUserNearDriverDtls.size());
 
                                 if (alUserNearDriverDtls.size() != 0) {
@@ -703,14 +977,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                     setNearDriver();
                                 }
                             } else {
-                                SnackBar.showDriverRequestStatus(context, snackBarView, "No near by driver found.");
+                                mGoogleMap.clear();
+                                if (txtNoNearByDriver.getVisibility() == View.GONE) {
+                                    txtNoNearByDriver.setVisibility(View.VISIBLE);
+                                    txtAddress.setVisibility(View.GONE);
+                                }
+//                                SnackBar.showDriverRequestStatus(context, snackBarView, "No near by driver found.");
                             }
 
                         } else {
+                            if (txtNoNearByDriver.getVisibility() == View.GONE) {
+                                txtNoNearByDriver.setVisibility(View.VISIBLE);
+                                txtAddress.setVisibility(View.GONE);
+                            }
 //                            MyProgressDialog.hideProgressDialog();
-                            SnackBar.showError(context, snackBarView, response.getString("message"));
+//                            SnackBar.showError(context, snackBarView, response.getString("message"));
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -746,7 +1029,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     boolean driverStatus = false;
 
     private void setNearDriver() {
@@ -755,7 +1037,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
 //            for (UserNearDriverList.DataBean nrDriver : alUserNearDriverDtls)
-
 
             for (int i = 0; i < alUserNearDriverDtls.size(); i++) {
 
@@ -777,10 +1058,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                        createMarker(drvLat, drvLong, "Driver", "Show");
                         if (strTripStatus != null) {
                             if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
-                                pickupPoint = new LatLng(Double.parseDouble(toLat), Double.parseDouble(toLong));
+                                dropPoint = new LatLng(Double.parseDouble(toLat), Double.parseDouble(toLong));
                             }
                         }
-                        dropPoint = new LatLng(drvLat, drvLong);
+                        pickupPoint = new LatLng(drvLat, drvLong);
 
                         myCalcTime(pickupPoint.latitude, pickupPoint.longitude, dropPoint.latitude, dropPoint.longitude);
                         statusPickuplocationRout = 0;
@@ -802,7 +1083,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .title(title)
                 .snippet(snippet).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_driver)));
     }
-
 
     // Method to share either text or URL.
     private void shareUserTripDetails() {
@@ -931,19 +1211,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TO_ADDRESS, destLocAddress);
             jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TO_LAT, toLattitude);
             jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TO_LNG, toLongitude);
-//            if (duratioTime != null) {
             jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TOTAL_EST_TRAVEL_TIME, duratioTime);
-//            } else {
-//                jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TOTAL_EST_TRAVEL_TIME, 12);
-//            }
-//            int estTripCost = Math.round(tripCost);
-            String estCost = txtEstMentCost.getText().toString();
 
-//            if (!estCost.matches("")) {
-            jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TOTAL_EST_TRIP_COST, estCost.substring(3));
-//            } else {
-//                jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TOTAL_EST_TRIP_COST, 12.15);
-//            }
+//            String estCost = txtEstMentCost.getText().toString();
+            jsonObject.put(WebFields.USER_ADD_REQUEST.PARAM_TOTAL_EST_TRIP_COST, tripCost);
+
             Applog.E("request: " + jsonObject.toString());
             MyProgressDialog.showProgressDialog(context);
 
@@ -1022,11 +1294,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    double roundTwoDecimals(double d) {
-        DecimalFormat twoDForm = new DecimalFormat("#.####");
-        return Double.valueOf(twoDForm.format(d));
-    }
-
 
     private void showCheckUserUpdateData(String msg) {
         try {
@@ -1060,10 +1327,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return false;
     }
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 
     private synchronized void setUpGoogleApiClient() {
         Log.d(TAG, "createGoogleApi()");
@@ -1081,7 +1344,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
+
         callDriverRequestAccepted();
+
         setUpGoogleApiClient();
         mGoogleApiClient.connect();
     }
@@ -1093,7 +1358,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 unregisterReceiver(myReceiver);
         } catch (Exception e) {
         }
-
 
         super.onDestroy();
     }
@@ -1110,15 +1374,39 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
         initilizeMap();
 
+        // register GCM registration complete receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
 
-        NotificationUtils.clearNotifications(context);
+
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+
+        try {
+
+            String tripId = SessionManager.getTripId(context);
+            String tripStatus = SessionManager.getTripStatus(context);
+
+            Applog.E("tripId===>" + tripId + "tripStatus===>" + tripStatus);
+
+//            remainingTripStatus(tripId,tripStatus);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(myReceiver);
-
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (mGoogleApiClient.isConnected())
             mGoogleApiClient.disconnect();
 
@@ -1138,52 +1426,62 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     // Initialize GoogleMaps
     public void initilizeMap() {
-        mFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mgooleMap);
-        mapView = mFragment.getView();
-
-        mFragment.getMapAsync(new OnMapReadyCallback() {
-            @SuppressLint("MissingPermission")
-            @Override
-            public void onMapReady(GoogleMap googleMap1) {
-                LatLng sydney = new LatLng(-33.867, 151.206);
-                mGoogleMap = googleMap1;
-                getLocationPermission();
-                if (mLocationPermissionGranted == true) {
-                    if (mGoogleApiClient == null) {
-                        setUpGoogleApiClient();
-                    }
-                    mGoogleMap.setMyLocationEnabled(true);
-                    mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                    mGoogleMap.getUiSettings().setCompassEnabled(false);
-                }
-
-
-                /*googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
-
-                googleMap.addMarker(new MarkerOptions()
-                        .title("Sydney")
-                        .snippet("The most populous city in Australia.")
-                        .position(sydney));*/
-
-            }
-        });
-
+        try {
+            mFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mgooleMap);
+            mapView = mFragment.getView();
+            mFragment.getMapAsync(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady()");
         mGoogleMap = googleMap;
 
-      /*  googleMap.setMapStyle(
-                MapStyleOptions.loadRawResourceStyle(
-                        this, R.raw.map_style));*/
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+//        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        MapStyleOptions mapStyle = MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json);
+        mGoogleMap.setMapStyle(mapStyle);
+
+        //Initialize Google Play Services
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                setUpGoogleApiClient();
+                mGoogleMap.setMyLocationEnabled(true);
+            }
+        } else {
+            setUpGoogleApiClient();
+            mGoogleMap.setMyLocationEnabled(true);
+
+        }
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+        mGoogleMap.getUiSettings().setCompassEnabled(false);
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mGoogleMap.getUiSettings().setRotateGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setScrollGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
+        mGoogleMap.setTrafficEnabled(false);
 
         // Showing / hiding your current location
 
         if (Build.VERSION.SDK_INT < 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mGoogleMap.setMyLocationEnabled(true);
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("1"));
 //            View locationButton = ((View) mapView.findViewById(Integer.parseInt("2")).getParent()).findViewById(Integer.parseInt("0"));
@@ -1226,12 +1524,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mGoogleMap.getUiSettings().setScrollGesturesEnabled(true);
         mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
         mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
-        //or mGoogleMap.getUiSettings().setAllGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setAllGesturesEnabled(true);
 
         mGoogleMap.setOnMarkerClickListener(this);
 
         mGoogleMap.setTrafficEnabled(false);
-//        mGoogleMap.setInfoWindowAdapter(new InfoWindowCustom(getActivity()));
 
 
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
@@ -1341,7 +1638,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return result.toString();
     }
 
-
     private float CalculateMile(String strDistance, String strTime) {
         float dis = Float.parseFloat(strDistance);
         float time = Float.parseFloat(strTime);
@@ -1352,7 +1648,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
         return trip_price;
     }
-
 
     //Calculat googgle map timining
     private void myCalcTime(double lat1, double lng1, double lat2, double lng2) {
@@ -1372,11 +1667,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                    MyProgressDialog.hideProgressDialog();
 
                     GetPickUpTime pickUpTime = new Gson().fromJson(String.valueOf(response), GetPickUpTime.class);
-
                     remainingDuration = pickUpTime.getRoutes().get(0).getLegs().get(0).getDuration().getText();
 
-                    tvMarkerTime.setText(remainingDuration);
-                    tvOnTripTime.setText(remainingDuration);
+                    //    tvMarkerTime.setText(remainingDuration);
+                    //tvOnTripTime.setText(remainingDuration);
 
                     Applog.E("success: " + response.toString());
                     Applog.E("totalDuration: " + remainingDuration);
@@ -1411,7 +1705,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     private boolean checkPermission() {
         Log.d(TAG, "checkPermission()");
         // Ask for permission if it wasn't granted yet
@@ -1444,27 +1737,100 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged [" + location + "]");
-        lastLocation = location;
 
-        if (strTripStatus != null) {
-            if (strTripStatus.matches(GlobalValues.DRIVER_ASSIGNED)) {
-                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+        if (isGPSEnable()) {
 
-            } else if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
+            Log.d(TAG, "onLocationChanged [" + location + "]");
+            lastLocation = location;
+
+//            if (strTripStatus != null) {
+//                if (strTripStatus.matches(GlobalValues.DRIVER_ASSIGNED)) {
+//                    callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+//
+//
+//                } else if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
+//////                mGoogleMap.clear();
+//
+//                    callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+//////                pickupPoint = new LatLng(location.getLatitude(), location.getLongitude());
+//////                dropPoint =    new LatLng(userDropOfLat, userDropOfLng);
+//////
+//////                Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
+//////                createMarker(drvLat, drvLong, "Driver", "Show");
+//////                createRoute(pickupPoint, dropPoint);
+//                }
+//            } else if (llCostDesign.getVisibility() == View.VISIBLE) {
 //                mGoogleMap.clear();
-
+//                createRoute(pickupPoint, dropPoint);
+//                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+//            } else {
+//                mGoogleMap.clear();
+//                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+//
+//            }
+            if (strTripStatus != null) {
+//                if (strTripStatus.matches(GlobalValues.DRIVER_ASSIGNED)) {
                 callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+
+//                } else if (strTripStatus.matches(GlobalValues.DRIVER_ONGOING)) {
+//                mGoogleMap.clear();
+//
+//                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
 //                pickupPoint = new LatLng(location.getLatitude(), location.getLongitude());
 //                dropPoint = new LatLng(userDropOfLat, userDropOfLng);
 //
 //                Applog.E("pickupPoint=>" + pickupPoint + " dropPoint=>" + dropPoint);
 //                createMarker(drvLat, drvLong, "Driver", "Show");
 //                createRoute(pickupPoint, dropPoint);
+//                }
+            } else if (llCostDesign.getVisibility() == View.VISIBLE) {
+//                mGoogleMap.clear();
+//                createRoute(pickupPoint, dropPoint);
+//                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
+            } else {
+                mGoogleMap.clear();
+
+                callNearDriverAPI(lastLocation.getLatitude() + "", lastLocation.getLongitude() + "");
             }
-        }
+
+
 //        writeActualLocation(location);
 
+//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//        builder.include(pickupPoint);
+//        builder.include(dropPoint);
+//
+//        //Place current location marker
+//        latitude = location.getLatitude();
+//        longitude = location.getLongitude();
+            LatLng latLng;
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Current Position");
+//        marker = mGoogleMap.addMarker(markerOptions);
+
+            //move map camera
+//        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+//        Log.d("onLocationChanged", String.format("latitude:%.3f longitude:%.3f",latitude,longitude));
+
+            //stop location updates
+//            if (mGoogleApiClient != null) {
+//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            Log.d("onLocationChanged", "Removing Location Updates");
+//            }
+        }
+
+        if (!isGPSEnable()) {
+            CheckGpsStatus();
+        } else {
+            //   if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+            // }
+            initilizeMap();
+        }
 
     }
 
@@ -1478,8 +1844,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "onConnected()");
-
-
         getLastKnownLocation();
     }
 
@@ -1512,14 +1876,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void getLastKnownLocation() {
         Log.d(TAG, "getLastKnownLocation()");
         if (checkPermission()) {
+
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
             if (lastLocation != null) {
                 Log.i(TAG, "LasKnown location. " +
                         "Long: " + lastLocation.getLongitude() +
                         " | Lat: " + lastLocation.getLatitude());
+
                 writeLastLocation();
                 startLocationUpdates();
-
 
                 double lat = lastLocation.getLatitude();
                 double lng = lastLocation.getLongitude();
@@ -1541,6 +1907,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                     }).run();
+
 
                     callNearDriverAPI(currentLat, currentLong);
                     callTripRateAPI(statCode);
@@ -1714,6 +2081,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ReadTask downloadTask = new ReadTask();
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
+
         Applog.E("===========> " + url);
     }
 
@@ -1761,7 +2129,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 PathJSONParser parser = new PathJSONParser();
                 routes = parser.parse(jObject);
                 duration = parser.getDuration(jObject);
-                String[] separated = duration.split(" ");
+                String[] separated = null;
+                if (!duration.isEmpty()) {
+                    separated = duration.split(" ");
+                }
                 duration1 = separated[0]; // this will contain "Fruit"
 
             } catch (Exception e) {
@@ -1821,8 +2192,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     mGoogleMap.animateCamera(cameraUpdate);
 
                     dist = getDistance(pickupPoint.latitude, pickupPoint.longitude, dropPoint.latitude, dropPoint.longitude);
-                    tripCost = CalculateMile(String.valueOf(dist), duration1);
-
+                    tripCost = CalculateMile(String.valueOf(dist), durationOnlyMin);
 
                     if (dist > 2 && dist <= 5) {
                         mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(13.0f));
@@ -1859,10 +2229,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         mapZoomLevel = 14;
                     }
 
-
                     DecimalFormat df = new DecimalFormat();
                     df.setMaximumFractionDigits(2);
-                    txtEstMentCost.setText("US$" + df.format(tripCost));
+                    txtEstMentCost.setText("US $" + df.format(tripCost));
 
                     View customMarker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).
                             inflate(R.layout.custom_marker_layout, null);
@@ -1870,35 +2239,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ImageView ivMarker = (ImageView) customMarker.findViewById(R.id.ivMarker);
                     tvMarkerTime.setText(duratioTime);
 
-
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(pickupPoint)
                             .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(context, customMarker)))
                             .title("Current Location")
                             .snippet("Home"));
 
-
                     try {
-
                         String durationTime1 = duratioTime;
                         durationTime1 = durationTime1.replace("hour", ":");
                         durationTime1 = durationTime1.replace("min", "");
                         durationTime1 = durationTime1.replace("s", "");
-
 
                         if (durationTime1.contains(":")) {
                             hours = Integer.parseInt(durationTime1.substring(0, durationTime1.indexOf(":")).trim());
                         }
                         int minutes = Integer.parseInt(durationTime1.substring(durationTime1.indexOf(":") + 1).trim());
                         Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("kk:mm");
                         calendar.add(Calendar.MINUTE, minutes);
                         calendar.add(Calendar.HOUR, hours);
+
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("kk:mm");
                         durationTimeCalculate = simpleDateFormat.format(calendar.getTime());
 
                         final Date dateObj = simpleDateFormat.parse(durationTimeCalculate);
                         timeFormat = new SimpleDateFormat("K:mm aa").format(dateObj);
+
                         tvMarkerTime.setText(timeFormat);
+                        tvOnTripTime.setText(remainingDuration);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1931,6 +2299,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             super.onPreExecute();
 
         }
+
     }
 
     // Convert a view to bitmap
@@ -2153,7 +2522,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                    if (userData.getData().getProfile_pic().matches("")) {
                         rlVwUpdateMain.setVisibility(View.VISIBLE);
                         rlUpdateData.setVisibility(View.GONE);
-                        txtVwProfile.setTextColor(getResources().getColor(R.color.hint_color));
+                        txtVwProfile.setTextColor(getResources().getColor(R.color.red));
                     } else {
                         txtVwProfile.setTextColor(getResources().getColor(R.color.app_bg));
                     }
@@ -2162,16 +2531,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     if (userData.getData().getCards().size() == 0) {
                         rlVwUpdateMain.setVisibility(View.VISIBLE);
                         rlUpdateData.setVisibility(View.GONE);
-                        txtVwpayment.setTextColor(getResources().getColor(R.color.hint_color));
+                        txtVwpayment.setTextColor(getResources().getColor(R.color.red));
                     } else {
+                        alUserSubDetails.addAll(userData.getData().getCards());
                         txtVwpayment.setTextColor(getResources().getColor(R.color.app_bg));
+                        setCardData();
                     }
 
                     if (userData.getData().getVehicles().size() == 0) {
                         tvEditVehicle.setText(" ");
+                        imgSetting.setImageResource(android.R.color.transparent);
                         rlVwUpdateMain.setVisibility(View.VISIBLE);
                         rlUpdateData.setVisibility(View.GONE);
-                        txtVwVehicleName.setTextColor(getResources().getColor(R.color.hint_color));
+                        txtVwVehicleName.setTextColor(getResources().getColor(R.color.red));
                     } else {
                         alVehicleDetail.addAll(userData.getData().getVehicles());
                         txtVwVehicleName.setTextColor(getResources().getColor(R.color.app_bg));
@@ -2193,6 +2565,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
                     } else {
+
+
 //                        if (userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size() == 0
                         if (userData.getData().getProfile_pic().equals("") && userData.getData().getVehicles().size() == 0
                                 && userData.getData().getCards().size() == 0) {
@@ -2203,6 +2577,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                        if (!userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() == 0) {
                         if (!userData.getData().getProfile_pic().equals("") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() == 0) {
                             tvEditVehicle.setText("");
+                            imgSetting.setImageResource(android.R.color.transparent);
                             txtVwCount.setText("2");
                         }
 //                        else if (userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() == 0) {
@@ -2212,6 +2587,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                        else if (userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                         else if (userData.getData().getProfile_pic().equals("") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                             tvEditVehicle.setText("");
+                            imgSetting.setImageResource(android.R.color.transparent);
                             txtVwCount.setText("2");
                         }
 
@@ -2223,13 +2599,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                        else if (!userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                         else if (!userData.getData().getProfile_pic().equals("") && userData.getData().getVehicles().size() == 0 && userData.getData().getCards().size() != 0) {
                             tvEditVehicle.setText("");
+                            imgSetting.setImageResource(android.R.color.transparent);
                             txtVwCount.setText("1");
                         }
 //                        else if (userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
                         else if (userData.getData().getProfile_pic().equals("") && userData.getData().getVehicles().size() != 0 && userData.getData().getCards().size() != 0) {
                             txtVwCount.setText("1");
                         }
-
 
                         rlVwUpdateMain.setVisibility(View.VISIBLE);
                         rlUpdateData.setVisibility(View.GONE);
@@ -2270,7 +2646,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ivProPicHome.setOnClickListener(this);
         ivPro.setOnClickListener(this);
         tvDrawUsername.setOnClickListener(this);
-
+        drawer_layout.setOnClickListener(this);
         //8/5/2018
         edtCardDetail.setOnClickListener(this);
         rlVwUpdateMain.setOnClickListener(this);
@@ -2295,31 +2671,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         imgVwShare.setOnClickListener(this);
         tvChangeTrip.setOnClickListener(this);
 
-        mFragment.getMapAsync(new OnMapReadyCallback() {
-            @SuppressLint("MissingPermission")
-            @Override
-            public void onMapReady(GoogleMap googleMap1) {
-                mGoogleMap = googleMap1;
-                getLocationPermission();
-                if (mLocationPermissionGranted == true) {
-                    if (mGoogleApiClient == null) {
-                        setUpGoogleApiClient();
-                    }
-                    mGoogleMap.setMyLocationEnabled(true);
-                    mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                    mGoogleMap.getUiSettings().setCompassEnabled(false);
-                }
-
-
-                /*googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
-
-                googleMap.addMarker(new MarkerOptions()
-                        .title("Sydney")
-                        .snippet("The most populous city in Australia.")
-                        .position(sydney));*/
-
-            }
-        });
+//        mFragment.getMapAsync(new OnMapReadyCallback() {
+//            @SuppressLint("MissingPermission")
+//            @Override
+//            public void onMapReady(GoogleMap googleMap1) {
+//                mGoogleMap = googleMap1;
+//                getLocationPermission();
+//                if (mLocationPermissionGranted == true) {
+//                    if (mGoogleApiClient == null) {
+//                        setUpGoogleApiClient();
+//                    }
+//                    mGoogleMap.setMyLocationEnabled(true);
+//                    mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+//                    mGoogleMap.getUiSettings().setCompassEnabled(false);
+//                }
+//
+//
+//                /*googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
+//
+//                googleMap.addMarker(new MarkerOptions()
+//                        .title("Sydney")
+//                        .snippet("The most populous city in Australia.")
+//                        .position(sydney));*/
+//
+//            }
+//        });
 
     }
 
@@ -2341,11 +2717,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void bindView() {
+
+        txtNoNearByDriver = binding.txtNoNearByDriver;
         tvLegal = binding.tvLegal;
         navHeader = binding.navHeader;
         drawer_layout = binding.drawerLayout;
         ivProPicHome = binding.ivProPicHome;
-//        headerBar = binding.headerBar;
         container_body = binding.containerBody;
         drawerlist = binding.drawerlist;
         ivPro = binding.ivPro;
@@ -2355,7 +2732,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         ivProPicHome.setVisibility(View.VISIBLE);
 
-        //8/05/2018
         //User OnTrip
         rlOnTripUser = binding.rlOnTripUser;
         tvOnTripUser = binding.tvOnTripUser;
@@ -2393,7 +2769,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         btnDone = binding.done;
         txtAddress = binding.txtAddress;
-        mFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mgooleMap);
+//        mFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mgooleMap);
 
         rlVwUpdateMain = binding.rlVwUpdateMain;
         rlUpdate = binding.rlUpdate;
@@ -2410,39 +2786,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         rlUpdateData.setVisibility(View.GONE);
         rlVwUpdateMain.setVisibility(View.GONE);
 
-//        strManufacur = SessionManager.getUpdatedVehical(context).getManufacture();
-//        strModel = SessionManager.getUpdatedVehical(context).getModel();
-//        strYear = SessionManager.getUpdatedVehical(context).getYear();
-//        strColor = SessionManager.getUpdatedVehical(context).getColor();
-//
-//        if (strManufacur.matches("Edit your vehicle")) {
-//            tvVehicalData.setText("Edit your vehicle");
-//            imgVwVehicle.setImageResource(R.mipmap.setup);
-//
-//            tvEditVehicle.setText("");
-//            isEditVehical = false;
-//        } else {
-//            isEditVehical = true;
-//            tvVehicalData.setText("Edit your vehicle");
-//            imgVwVehicle.setImageResource(R.mipmap.setup);
-//
-//            if (strYear == 0) {
-//                tvEditVehicle.setText("");
-//            } else {
-//                tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
-//                imgSetting.setImageResource(R.mipmap.ellipse_1);
-//            }
-//
-//
-//        }
     }
 
     Intent in;
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+
             case R.id.tvLegal:
                 in = new Intent(HomeActivity.this, TermsCondiActivity.class);
                 startActivity(in);
@@ -2452,10 +2803,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.ivProPicHome:
+
                 callRegisterUpdateComplete();
                 break;
 
             case R.id.ivPro:
+
                 in = new Intent(HomeActivity.this, UserProfileActivity.class);
                 startActivityForResult(in, HOME_SLIDER_PROFILE_UPDATE);
                 break;
@@ -2468,21 +2821,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             //08/05/2018
             case R.id.txtAddress:
 
-                if (alUserList != null) {
-                    for (GetUserData userData : alUserList) {
+                if (txtNoNearByDriver.getVisibility() == View.GONE) {
+                    if (alUserList != null) {
+                        for (GetUserData userData : alUserList) {
 
 //                        if (!userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size()
-                        if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
-                                != 0 && userData.getData().getCards().size() != 0) {
+                            if (userData.getData().getProfile_pic() != null && userData.getData().getVehicles().size()
+                                    != 0 && userData.getData().getCards().size() != 0) {
 
-                            Intent mIntent = new Intent(context, PickUpLocationActivity.class);
+                                Intent mIntent = new Intent(context, PickUpLocationActivity.class);
 //                            mIntent.putExtra("Currentlocation", location);
 //                            mIntent.putExtra("latitude", sourceLatitude);
 //                            mIntent.putExtra("langitutde", sourceLongitugde);
-                            startActivityForResult(mIntent, PICK_CONTACT_REQUEST);
+                                startActivityForResult(mIntent, PICK_CONTACT_REQUEST);
 
-                        } else {
-                            showCheckUserUpdateData("Please complete your updates before proceeding.");
+                            } else {
+                                showCheckUserUpdateData("Please complete your updates before proceeding.");
+                            }
                         }
                     }
                 }
@@ -2495,6 +2850,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnRequest:
                 String selectCard = edtCardDetail.getText().toString();
+                SessionManager.saveCardDetails(context, selectCard);
 
                 if (!selectCard.isEmpty()) {
                     showRequestAccepterAlert();
@@ -2652,12 +3008,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             for (GetUserData userData : alUserList) {
                 if (!userData.getData().getProfile_pic().matches("") && userData.getData().getVehicles().size()
                         != 0 && userData.getData().getCards().size() != 0) {
+
+                    drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
                     openDrawer();
                 } else {
+                    drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
                     showCheckUserUpdateData("Please complete your updates before proceeding.");
                 }
             }
         } else {
+            drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             openDrawer();
         }
     }
@@ -2666,6 +3028,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void openDrawer() {
         try {
 //            setvalues();
+            drawer_layout.bringToFront();
+            drawer_layout.requestLayout();
 
             container_body.setClickable(false);
             drawerlist.setClickable(true);
@@ -2728,8 +3092,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Fragment fragment = null;
                     Intent in;
+
                     switch (pos) {
                         case 0:
                             in = new Intent(context, HomeActivity.class);
@@ -2737,50 +3101,32 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             finish();
                             break;
                         case 1:
-//                            ivProPicHome.setVisibility(View.GONE);
-                            in = new Intent(HomeActivity.this, PaymentActivity.class);
-                            startActivity(in);
+                            in = new Intent(context, PaymentActivity.class);
+                            startActivityForResult(in, SLIDER_PAYMENT_METHOD);
                             break;
 
                         case 2:
-//                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, TripHistoryActivity.class);
-                            startActivity(in);
-//                            fragment = new TripHistoryFragment().newInstance("", "");
+                            startActivityForResult(in, SLIDER_TRIP_HISTORY);
                             break;
 
                         case 3:
-//                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, FreeTripsActivity.class);
-                            startActivity(in);
-//                            fragment = new FreeTripsFragment().newInstance("", "");
+                            startActivityForResult(in, SLIDER_FREE_TRIP);
                             break;
 
                         case 4:
-//                            ivProPicHome.setVisibility(View.GONE);
-                            in = new Intent(HomeActivity.this, HelpActivity.class);
-                            startActivity(in);
-//                            fragment = new HelpFragment().newInstance("", "");
+                            in = new Intent(HomeActivity.this, HelpCenterActivity.class);
+                            startActivityForResult(in, SLIDER_HELP);
                             break;
 
                         case 5:
-//                            ivProPicHome.setVisibility(View.GONE);
                             in = new Intent(HomeActivity.this, SettingActivity.class);
-                            startActivity(in);
-//                            fragment = new SettingFragment().newInstance("", "");
+                            startActivityForResult(in, SLIDER_SETTING);
                             break;
 
-//                        default:
-//                            break;
                     }
 
-//                    if (fragment != null) {
-//                        FragmentManager fragmentManager = getSupportFragmentManager();
-//                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                        fragmentTransaction.replace(R.id.containerBody, fragment);
-//                        fragmentTransaction.commit();
-//                        mContentFragment = fragment;
-//                    }
 
                     drawer_layout.closeDrawer(drawerlist);
                     drawerLayoutAdapter.setSelectedIndex(pos);
@@ -2800,16 +3146,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //            RelativeLayout rlOnTripLayout = fragmentPro.getOnTripLayout();
 //
             if (llCostDesign.getVisibility() == View.VISIBLE) {
-                showDialog("Request", "Are you Sure to Cancel Request ?", 1);
+                showDialog("Request", "Are you sure to cancel request ?", 1);
 //            finish();
             } else if (llDriverPersDetailsMain.getVisibility() == View.VISIBLE) {
-                showDialog("Request", "Are you Sure to Cancel Request ?", 1);
+                showDialog("Request", "Are you sure to cancel request ?", 1);
 //                finish();
             } else if (rlOnTripUser.getVisibility() == View.VISIBLE) {
-                showDialog("Request", "Are you Sure to Cancel Request ?", 1);
+//                showDialog("Request", "Are you Sure to Exit greego ?", 1);
+                dialog.cancel();
+                Intent in2 = new Intent(context, HomeActivity.class);
+                startActivity(in2);
+                finish();
 //                finish();
             } else {
-                showDialog("Exit", "Are you Sure to Exit greego ?", 0);
+                showDialog("Exit", "Are you sure to exit Greego App ?", 0);
 //                finish();
             }
 
@@ -2910,12 +3260,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 destLocAddress = data.getStringExtra("destLocAddress");
                 duratioTime = data.getStringExtra("departure");
 
-                durationOnlyMin = Integer.parseInt(duratioTime.substring(0, 2).trim());
+                durationOnlyMin = duratioTime.substring(0, 2).trim();
 
                 llVehical.setVisibility(View.GONE);
                 txtAddress.setVisibility(View.GONE);
                 llCostDesign.setVisibility(View.VISIBLE);
                 llDriverPersDetailsMain.setVisibility(View.GONE);
+
+                llDriverPersDetailsMain.setElevation(-10f);
+
 
                 mGoogleMap.clear();
                 pickupPoint = new LatLng(Double.parseDouble(fromLat), Double.parseDouble(fromLong));
@@ -2936,48 +3289,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     createRoute(pickupPoint, dropPoint);
                 }
 
-
-                if (alUserList != null) {
-                    for (GetUserData.DataBean.CardsBean cardData : alUserSubDetails) {
-
-                        if (cardData != null) {
-
-//                            for (int i = 0; i < alUserSubDetails.size(); i++) {
-
-                            if (cardData.getSelected() == 1) {
-
-                                byte[] byteData = Base64.decode(cardData.getCard_number(), Base64.DEFAULT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    cardNo = new String(byteData, StandardCharsets.UTF_8);
-
-//                                edtCardDetail.setSelected(false);
-//                                edtCardDetail.setFocusable(false);
-//                                edtCardDetail.setFocusableInTouchMode(false);
-//                                String cn=cardNo.substring(11,15);
-                                    String s = cardNo;
-
-                                    String s4 = s.substring(12, 16);
-                                    String strCardNumber = "**** **** **** " + s4;
-                                    if (strCardNumber != null) {
-                                        edtCardDetail.getCardNumber(cardNo);
-                                        edtCardDetail.isValid(cardNo);
-                                        edtCardDetail.setText(strCardNumber);
-
-                                        imgVwYrCard.getCardNumber(cardNo);
-                                        imgVwYrCard.isValid(cardNo);
-
-                                        edtCardDetail.getCardType();
-                                    } else {
-                                        SnackBar.showError(context, snackBarView, "Please select card first.");
-                                    }
-                                }
-                            }
-//                            }
-
-
-                        }
-                    }
-                }
+                setCardData();
 
             }
         } else if (requestCode == ADD_EDIT_VEHICAL_REQUEST) {
@@ -2988,49 +3300,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 strYear = SessionManager.getUpdatedVehical(context).getYear();
                 strColor = SessionManager.getUpdatedVehical(context).getColor();
 
-                String manu = data.getStringExtra("manufacture");
-                String model = data.getStringExtra("model");
-                String yr = data.getStringExtra("year");
-                String clo = data.getStringExtra("color");
-               /* tvVehicalData.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
-                tvEditVehicle.setText("Edit your vehicle");
-                imgSetting.setImageResource(R.mipmap.setup);
-                imgVwVehicle.setImageResource(R.mipmap.ellipse_1);*/
                 callUserMeApi();
-//                setVehicleData();
-//                if (strManufacur.matches("Edit your vehicle") && strYear == 0) {
-//                    tvVehicalData.setText("Edit your vehicle");
-//                    imgVwVehicle.setImageResource(R.mipmap.setup);
-//
-////                    tvEditVehicle.setText("");
-//                    isEditVehical = false;
-//                } else {
-//                    isEditVehical = true;
-//                    tvVehicalData.setText("Edit your vehicle");
-//                    imgVwVehicle.setImageResource(R.mipmap.setup);
-//
-////                    tvEditVehicle.setText(manu + " " + model + " " + yr + " " + clo);
-//                    tvEditVehicle.setText(strManufacur + " " + strModel + " " + strYear + " " + strColor);
-//                    imgSetting.setImageResource(R.mipmap.ellipse_1);
-//                }
-
             }
 
         } else if (requestCode == EDIT_VEHICAL_REQUEST) {
             callUserMeApi();
-//            setVehicleData();
         } else if (requestCode == REQUEST_ADD_VEHICLE) {
             callUserMeApi();
-//            setVehicleData();
         } else if (requestCode == MAP_HOME_PROFILE_UPDATE) {
             callUserMeApi();
-//            setVehicleData();
         } else if (requestCode == REQUEST_ADD_PAYMENT) {
             callUserMeApi();
-//            setVehicleData();
         } else if (requestCode == HOME_SLIDER_PROFILE_UPDATE) {
             callUserMeApi();
-//            setVehicleData();
         } else if (requestCode == CHANGE_CONTACT_NO) {
 
             String changeCardNo = data.getStringExtra("changeCardNo");
@@ -3041,10 +3323,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         cardNo = new String(data1, StandardCharsets.UTF_8);
 
-//                                edtCardDetail.setSelected(false);
-//                                edtCardDetail.setFocusable(false);
-//                                edtCardDetail.setFocusableInTouchMode(false);
-//                                String cn=cardNo.substring(11,15);
                         String s = cardNo;
 
                         String s4 = s.substring(12, 16);
@@ -3067,49 +3345,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (requestCode == SLIDER_PAYMENT_METHOD) {
+            callUserMeApi();
         } else if (requestCode == REQUEST_CHECK_SETTINGS) {
             setHomeValues();
         } else if (requestCode == RESULT_CANCELED) {
-        }
-//        else if (requestCode == HOME_SLIDER_PROFILE_UPDATE) {
-////                if (ConnectivityDetector.isConnectingToInternet(context)) {
-////                    callUserMeApi();
-////                } else {
-////                    Toast.makeText(context, "Please Connect Internet", Toast.LENGTH_SHORT).show();
-////                }
-//            profilePic = data.getStringExtra("profilePic");
-//            userName = data.getStringExtra("name");
-//
-//            if (profilePic != null) {
-//                Glide.clear(ivPro);
-//                Glide.with(getApplicationContext())
-//                        .load(profilePic)
-//                        .centerCrop()
-//                        .signature(new StringSignature(UUID.randomUUID().toString()))
-//                        .crossFade().skipMemoryCache(true)
-//                        .into(ivPro);
-//
-//            } else {
-//                ivPro.setImageResource(R.mipmap.ic_place_holder);
-//            }
-//
-//            if (profilePic != null) {
-//                Glide.clear(ivProPicHome);
-//                Glide.with(getApplicationContext())
-//                        .load(profilePic)
-//                        .centerCrop()
-//                        .signature(new StringSignature(UUID.randomUUID().toString()))
-//                        .crossFade().skipMemoryCache(true)
-//                        .into(ivProPicHome);
-//
-//            } else {
-//                ivProPicHome.setImageResource(R.mipmap.ic_place_holder);
-//            }
-//
-//
-//            tvDrawUsername.setText(userName);
-//        }
-        else if (requestCode == COMPLETE_UPDATE_USER_DETAILS) {
+        } else if (requestCode == COMPLETE_UPDATE_USER_DETAILS) {
             callRegisterUpdateComplete();
         } else if (requestCode == 1212) {
             new Thread(new Runnable() {
@@ -3184,8 +3425,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             setUpGoogleApiClient();
                         }
                         mGoogleMap.setMyLocationEnabled(true);
-                        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                        mGoogleMap.getUiSettings().setCompassEnabled(false);
+//                        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+//                        mGoogleMap.getUiSettings().setCompassEnabled(false);
                     }
                 }
                 break;
@@ -3303,7 +3544,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             alUserList.add(userDetail);
                             alVehicleDetail.addAll(userDetail.getData().getVehicles());
 
-
                             Applog.E("UserUpdate==>Dg==>" + userDetail);
 
                             String userName = userDetail.getData().getName();
@@ -3338,8 +3578,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 ivProPicHome.setImageResource(R.mipmap.ic_place_holder);
                             }
 
-                            setHomeValues();
-                            setVehicleData();
+
+//                            setVehicleData();
 
 
                             if (Build.VERSION.SDK_INT < 23) {
@@ -3437,7 +3677,416 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void callVehicleSelectApi(int vehicle_id) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(WebFields.SELECT_VEHICLE.PARAM_VEHICLE_ID, vehicle_id);
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
 
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.SELECT_VEHICLE.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+                    MyProgressDialog.hideProgressDialog();
+                    if (flagSelectVehical == false) {
+                        callUserMeApi();
+                    }
+//                    notifyDataSetChanged();
+
+
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void callUserTripDetailsAPI(String tripId) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(WebFields.GET_USER_TRIP_DETAILS.PARAM_TRIP_ID, Integer.parseInt(tripId));
+
+            Applog.E("request: trip " + jsonObject.toString());
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.GET_USER_TRIP_DETAILS.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+                    try {
+                        UserDriverTripDetails driverTripDetails = new Gson().fromJson(String.valueOf(response), UserDriverTripDetails.class);
+
+                        alUserDrTripDetails = new ArrayList<>();
+
+                        if (driverTripDetails.getError_code() == 0) {
+
+                            alUserDrTripDetails.add(driverTripDetails.getData());
+
+                            Applog.E("size==>" + alUserDrTripDetails);
+                            MyProgressDialog.hideProgressDialog();
+
+                            setDriverTripDetails(alUserDrTripDetails);
+
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+//                    SnackBar.showError(this, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+
+            MyProgressDialog.hideProgressDialog();
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    int diffTotelMin;
+    String tripToatalTime;
+
+    private int CalculateTime(String tripStartTime, String tripEndTime) {
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+
+            Date startDate = simpleDateFormat.parse(tripStartTime);
+            Date endDate = simpleDateFormat.parse(tripEndTime);
+
+            long difference = endDate.getTime() - startDate.getTime();
+
+            int timeInSeconds = (int) (difference / 1000);
+            int hours, minutes, seconds;
+            hours = timeInSeconds / 3600;
+            timeInSeconds = timeInSeconds - (hours * 3600);
+            minutes = timeInSeconds / 60;
+            timeInSeconds = timeInSeconds - (minutes * 60);
+            seconds = timeInSeconds;
+
+            String diffTime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds) + " h";
+            Applog.E("Total Time==>" + diffTime);
+            tripToatalTime = (timeInSeconds) + "";
+            double a = timeInSeconds * 0.0166667;
+            Applog.E("Total Time===>" + a);
+      /*      if (difference < 0) {
+                Date dateMax = simpleDateFormat.parse("24:00");
+                Date dateMin = simpleDateFormat.parse("00:00");
+                difference = (dateMax.getTime() - startDate.getTime()) + (endDate.getTime() - dateMin.getTime());
+            }
+            int days = (int) (difference / (1000  60  60 * 24));
+            int hours = (int) ((difference - (1000  60  60  24  days)) / (1000  60  60));
+            int min = (int) (difference - (1000  60  60  24  days) - (1000  60  60  hours)) / (1000  60);
+            Log.i("log_tag", "Hours: " + hours + ", Mins: " + min);
+*/
+            diffTotelMin = Integer.parseInt(diffTime);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return diffTotelMin;
+    }
+
+    double addTip, totalTip, tip10Per, tip15Per, tip20Per;
+    double amount;
+
+    private void showAddTrip(final String tripAmount, final String strTripId) {
+        dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.dialog_add_trip);
+
+        final RelativeLayout rl10PerTip = (RelativeLayout) dialog.findViewById(R.id.rl10PerTip);
+        final RelativeLayout rl15PerTip = (RelativeLayout) dialog.findViewById(R.id.rl15PerTip);
+        final RelativeLayout rl20PerTip = (RelativeLayout) dialog.findViewById(R.id.rl20PerTip);
+
+        final TextView tvTotalAmount = (TextView) dialog.findViewById(R.id.tvTotalAmount);
+
+        final TextView tv10PerTip = (TextView) dialog.findViewById(R.id.tv10PerTip);
+        final TextView tv15PerTip = (TextView) dialog.findViewById(R.id.tv15PerTip);
+        final TextView tv20PerTip = (TextView) dialog.findViewById(R.id.tv20PerTip);
+        final EditText edtTvAddTip = (EditText) dialog.findViewById(R.id.edtTvAddTip);
+
+        CheckBox chkNoTip = (CheckBox) dialog.findViewById(R.id.chkNoTip);
+        Button btnSubmitTip = (Button) dialog.findViewById(R.id.btnSubmitTip);
+
+        tvTotalAmount.setText("$" + new DecimalFormat("##.#").format(Double.valueOf(tripAmount)));
+
+        try {
+            if (tripAmount != null) {
+
+                amount = Double.parseDouble(tripAmount);
+
+                tip10Per = (amount * 10) / 100;
+                tv10PerTip.setText("$" + new DecimalFormat("##.#").format(Double.valueOf(tip10Per)));
+
+                tip20Per = (amount * 20) / 100;
+                tv20PerTip.setText("$" + new DecimalFormat("##.#").format(Double.valueOf(tip20Per)));
+
+                tip15Per = (amount * 15) / 100;
+                tv15PerTip.setText("$" + new DecimalFormat("##.#").format(Double.valueOf(tip15Per)));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        edtTvAddTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTip = 0.00;
+                rl10PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv10PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                rl15PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv15PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                rl20PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv20PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+            }
+        });
+
+        rl10PerTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rl10PerTip.setBackground(getResources().getDrawable(R.drawable.round_bg));
+                tv10PerTip.setTextColor(getResources().getColor(R.color.white));
+
+                rl15PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv15PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                rl20PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv20PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                addTip = tip10Per;
+            }
+        });
+
+        rl15PerTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rl15PerTip.setBackground(getResources().getDrawable(R.drawable.round_bg));
+                tv15PerTip.setTextColor(getResources().getColor(R.color.white));
+
+                rl10PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv10PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                rl20PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv20PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                addTip = tip15Per;
+            }
+        });
+
+        rl20PerTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                rl20PerTip.setBackground(getResources().getDrawable(R.drawable.round_bg));
+                tv20PerTip.setTextColor(getResources().getColor(R.color.white));
+
+                rl10PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv10PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                rl15PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                tv15PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                addTip = tip20Per;
+            }
+        });
+
+        chkNoTip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    rl20PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                    tv20PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                    rl10PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                    tv10PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+
+                    rl15PerTip.setBackground(getResources().getDrawable(R.drawable.round_white_bg));
+                    tv15PerTip.setTextColor(getResources().getColor(R.color.app_bg));
+                    edtTvAddTip.setEnabled(false);
+                    rl10PerTip.setEnabled(false);
+                    rl15PerTip.setEnabled(false);
+                    rl20PerTip.setEnabled(false);
+                    addTip = 0.00;
+
+                } else {
+                    rl10PerTip.setEnabled(true);
+                    rl15PerTip.setEnabled(true);
+                    rl20PerTip.setEnabled(true);
+                    edtTvAddTip.setEnabled(true);
+                    edtTvAddTip.requestFocus();
+                }
+            }
+        });
+        btnSubmitTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String addTipValues = edtTvAddTip.getText().toString();
+
+                if (!addTipValues.isEmpty()) {
+                    totalTip = Double.parseDouble(addTipValues);
+                } else {
+                    totalTip = addTip;
+                }
+
+                callAddTipDriver(tripAmount, totalTip, strTripId);
+
+//                SnackBar.showSuccess(context, snackBarView, "Tip Add successfully.");
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void callAddTipDriver(final String tripAmount, final double totalTipFinal, final String strTripId) {
+        try {
+
+            JSONObject jsonObject = new JSONObject();
+
+            if (totalTipFinal != 0) {
+                jsonObject.put(WebFields.TIP_UPDATE.TIP_AMOUNT, totalTipFinal);
+            } else {
+                jsonObject.put(WebFields.TIP_UPDATE.TIP_AMOUNT, 0);
+            }
+
+            Applog.E("Trip Id =====>" + SessionManager.getTripId(context) + "===trip iD===>" + strTripId);
+
+            jsonObject.put(WebFields.TIP_UPDATE.TRIP_ID, strTripId);
+
+            Applog.E("request: " + jsonObject.toString());
+            MyProgressDialog.showProgressDialog(context);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    WebFields.BASE_URL + WebFields.TIP_UPDATE.MODE, jsonObject, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    Applog.E("success: " + response.toString());
+
+                    try {
+                        if (response.getString("error_code").equals("0")) {
+
+                            MyProgressDialog.hideProgressDialog();
+
+                            double tempAmt = Double.valueOf(tripAmount);
+                            double tempAmtount = tempAmt + totalTipFinal;
+
+                            Intent in = new Intent(context, TripCompleteChargePayActivity.class);
+                            in.putExtra("totalCost", new DecimalFormat("##.##").format(Double.valueOf(tempAmtount)));
+                            in.putExtra("driverName", strTripDriverName);
+                            in.putExtra("driverPic", driverPicUrl);
+                            in.putExtra("fromAddress", strTripToAddress);
+                            in.putExtra("tripId", strTripId);
+                            in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(in);
+                            finish();
+                        } else {
+                            MyProgressDialog.hideProgressDialog();
+                            SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                        }
+                    } catch (Exception e) {
+//                        callUserTripDetailsAPI(strTripId);
+                        MyProgressDialog.hideProgressDialog();
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MyProgressDialog.hideProgressDialog();
+                    Applog.E("Error: " + error.getMessage());
+
+                    SnackBar.showError(context, snackBarView, getResources().getString(R.string.something_went_wrong));
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put(WebFields.PARAM_ACCEPT, "application/json");
+                    Applog.E("Token==>" + SessionManager.getToken(context));
+                    params.put(WebFields.PARAM_AUTHOTIZATION, GlobalValues.BEARER_TOKEN + SessionManager.getToken(context));
+
+                    return params;
+                }
+            };
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                    GlobalValues.TIME_OUT,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }
 
 

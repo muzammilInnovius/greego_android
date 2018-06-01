@@ -87,6 +87,7 @@
 
 
         <!--Live API KEY: AIzaSyCTrxbYVywgkAucxesBR94U5okFlj5_RNo-->
+        <!--AIzaSyD6u-6cJShNF92ne8Y-avgjCL9uFkMZYQQ-->
         <!--Live key with Ravi sir: AIzaSyB8Xgq9gbjb0_cKpNsolSCuLq9FHLm-->
         <!--Innovius id key:AIzaSyCgtckieZat_3oUIcNIW2Wv782coeHctzw -->
         <!--Jay key : AIzaSyDuLTaJL-tMzdBoTZtCQfCz4m66iEZ1eQc-->
@@ -100,7 +101,6 @@
 
         <!-- AIzaSyAv3vGXFwzvjXktBy9VuxeBZFZwjtp0fGA-->
         <!-- AIzaSyD_TmqiDuhMA22OEdKtGm3cGB-uVvOq9Kg -->
-        <!-- AIzaSyBSTPbkofgt1eknGU2KkHhK_GQtoXYvt2A -->
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -128,10 +128,6 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".Activity.FreeTripsActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity
-            android:name=".Activity.HelpActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
@@ -188,6 +184,15 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
 
+        <activity
+            android:name=".Activity.HelpCenterActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+
+        <activity
+            android:name=".Activity.HelpCenterDetailActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <receiver
             android:name=".Utils.ConnectivityReceiver"
@@ -198,6 +203,7 @@
                 
             </intent-filter>
         </receiver>
+
 
     </application>
 

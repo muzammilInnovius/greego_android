@@ -127,7 +127,8 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/imgVwPhone"
                     android:background="@null"
-                    android:clickable="true"
+                    android:editable="false"
+                    android:clickable="false"
                     android:hint="@string/hint_email"
                     android:paddingLeft="@dimen/scale_2dp"
                     android:textColor="@color/black"
@@ -138,6 +139,7 @@
                     android:id="@+id/imgVwCancel"
                     android:layout_width="@dimen/scale_10dp"
                     android:layout_height="@dimen/scale_10dp"
+                    android:visibility="gone"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:src="@mipmap/ic_cancel" />

@@ -32,6 +32,7 @@ import com.greegoapp.databinding.ActivityTripCompleteChargePayBinding;
 
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,7 +49,7 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
     RatingBar rtgBarDriver;
     ImageView ivDriverProPic;
     Button btnSubmit;
-    String totalCost, driverName, driverPic, fromAddress,tripId;
+    String totalCost, driverName, driverPic, fromAddress, tripId;
     float userRating;
 
     @Override
@@ -64,29 +65,55 @@ public class TripCompleteChargePayActivity extends AppCompatActivity implements 
         driverPic = getIntent().getStringExtra("driverPic");
         fromAddress = getIntent().getStringExtra("fromAddress");
         tripId = getIntent().getStringExtra("tripId");
-        Applog.E("Trip id ===> " +tripId);
+        Applog.E("Trip id ===> " + tripId);
 
         bindViews();
         setListners();
+//tvTotalCost.setText(totalCost);
 
-        tvTotalCost.setText(totalCost);
-        tvTripDriverName.setText(driverName + "?");
-        Applog.E("tripId==>" + tripId);
-        tvUserFrmAddress.setText(fromAddress);
+        try {
+            if (totalCost != null) {
+                tvTotalCost.setText(new DecimalFormat("##.##").format(Double.valueOf(totalCost)));
+            }
+
+            if (driverName.isEmpty()) {
+                driverName = SessionManager.getDriverTripDtl(context).getName();
+                tvTripDriverName.setText(driverName + "?");
+            } else {
+                tvTripDriverName.setText(driverName + "?");
+            }
+
+            Applog.E("tripId==>" + tripId);
+            tvUserFrmAddress.setText(fromAddress);
 
 //        driverPic = "http://kroslinkstech.in/greego/storage/app/profile_pic/9Ad7LDsTSFdWUno5kQ6h3ZQHrzohKJ9zpSpODQpW.png";
 
-        if (driverPic != null) {
-            Glide.clear(ivDriverProPic);
-            Glide.with(context)
-                    .load(driverPic)
-                    .centerCrop()
-                    .signature(new StringSignature(UUID.randomUUID().toString()))
-                    .crossFade().skipMemoryCache(true)
-                    .into(ivDriverProPic);
+            if (driverPic != null) {
+                Glide.clear(ivDriverProPic);
+                Glide.with(context)
+                        .load(driverPic)
+                        .centerCrop()
+                        .signature(new StringSignature(UUID.randomUUID().toString()))
+                        .crossFade().skipMemoryCache(true)
+                        .into(ivDriverProPic);
 
-        } else {
-            ivDriverProPic.setImageResource(R.mipmap.ic_driver_profile);
+            } else {
+                driverPic = SessionManager.getDriverTripDtl(context).getProfile_pic();
+                if (driverPic != null) {
+                    Glide.clear(ivDriverProPic);
+                    Glide.with(context)
+                            .load(driverPic)
+                            .centerCrop()
+                            .signature(new StringSignature(UUID.randomUUID().toString()))
+                            .crossFade().skipMemoryCache(true)
+                            .into(ivDriverProPic);
+                } else {
+                    ivDriverProPic.setImageResource(R.mipmap.ic_driver_profile);
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }

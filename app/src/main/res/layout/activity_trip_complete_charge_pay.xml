@@ -172,6 +172,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvUserFrmAddress"
                         android:numStars="5"
+                        android:rating="5"
                         android:paddingTop="@dimen/scale_10dp"
                         android:shadowColor="@color/black" />
                 </RelativeLayout>

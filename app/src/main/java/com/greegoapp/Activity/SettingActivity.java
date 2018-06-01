@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -72,6 +74,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         bindViews();
 
         setListner();
+
+
         if (ConnectivityDetector.isConnectingToInternet(context)) {
             callUserMeApi();
 //            CheckGpsStatus();
@@ -101,6 +105,15 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         ivProPic = binding.ivProPic;
         tvJoinDate = binding.tvJoinDate;
         tvEmailVerify = binding.tvEmailVerify;
+
+
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//
+//        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collaps);
+//        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
+//        collapsingToolbar.setTitle("Setting");
     }
 
     Intent in;
@@ -136,28 +149,32 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         switch (requestCode) {
 
             case SETTING_PROFILE_UPDATE:
+                if (data != null) {
 //                callUserMeApi();
-                userName = data.getStringExtra("name");
-                profilePic = data.getStringExtra("profilePic");
+                    userName = data.getStringExtra("name");
+                    profilePic = data.getStringExtra("profilePic");
 
-                if (profilePic != null) {
-                    Glide.clear(ivProPic);
-                    Glide.with(getApplicationContext())
-                            .load(profilePic)
-                            .centerCrop()
-                            .signature(new StringSignature(UUID.randomUUID().toString()))
-                            .crossFade().skipMemoryCache(true)
-                            .into(ivProPic);
-                } else {
-                    ivProPic.setImageResource(R.mipmap.ic_place_holder);
+                    if (profilePic != null) {
+                        Glide.clear(ivProPic);
+                        Glide.with(getApplicationContext())
+                                .load(profilePic)
+                                .centerCrop()
+                                .signature(new StringSignature(UUID.randomUUID().toString()))
+                                .crossFade().skipMemoryCache(true)
+                                .into(ivProPic);
+                    } else {
+                        ivProPic.setImageResource(R.mipmap.ic_place_holder);
+                    }
+
+                    tvUserName.setText(userName);
                 }
-
-                tvUserName.setText(userName);
                 break;
 
             case SETTING_EMAIL_UPDATE:
-                emailId = data.getStringExtra("email");
-                tvUserEmail.setText(emailId);
+                if (data != null) {
+                    emailId = data.getStringExtra("email");
+                    tvUserEmail.setText(emailId);
+                }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -234,7 +251,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                             profilePic = userDetails.getData().getProfile_pic();
                             emailVerify = userDetails.getData().getEmail_verified();
 
-                            if (emailVerify != 0){
+                            if (emailVerify == 1){
                                 tvEmailVerify.setText("Verified");
                             }else {
                                 tvEmailVerify.setText("Unverified");
@@ -300,5 +317,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

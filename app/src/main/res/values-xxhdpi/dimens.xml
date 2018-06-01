@@ -88,6 +88,8 @@
     <dimen name="scale_210dp">216dp</dimen>
     <dimen name="scale_225dp">231dp</dimen>
     <dimen name="scale_150dp_rad">80dp</dimen>
+    <dimen name="scale_300dp">306dp</dimen>
+    <dimen name="scale_326dp">332dp</dimen>
     <dimen name="scale_336dp">342dp</dimen>
 
     <dimen name="scale_260dp">266dp</dimen>

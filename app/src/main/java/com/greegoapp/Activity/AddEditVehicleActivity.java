@@ -1,11 +1,12 @@
 package com.greegoapp.Activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -44,10 +46,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.greegoapp.Activity.UserProfileActivity.SELECT_CHOISE_VEHICLE;
 
 
 public class AddEditVehicleActivity extends AppCompatActivity implements View.OnClickListener {
@@ -210,6 +211,23 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
         tvManual.setOnClickListener(this);
         tvAutoMatic.setOnClickListener(this);
         ibBack.setOnClickListener(this);
+
+        edtTvColor.setFilters(new InputFilter[] {
+                new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence cs, int start,
+                                               int end, Spanned spanned, int dStart, int dEnd) {
+                        // TODO Auto-generated method stub
+                        if(cs.equals("")){ // for backspace
+                            return cs;
+                        }
+                        if(cs.toString().matches("[a-zA-Z ]+")){
+                            return cs;
+                        }
+                        return "";
+                    }
+                }
+        });
     }
 
     private void bindViews() {
@@ -241,7 +259,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
     }
 
     int transmissionType;
-    boolean autoType,manualType;
+    boolean autoType, manualType;
 
     @Override
     public void onClick(View view) {
@@ -296,13 +314,19 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                 finish();
                 break;
             case R.id.edtTvYear:
+                KeyboardUtility.showKeyboard(context, edtTvColor);
+               /* DatePicker datePicker = (DatePicker) findViewById(R.id.datePicker);
+                openYearView();*/
                 break;
 
             case R.id.edtTvColor:
-                KeyboardUtility.hideKeyboard(context, view);
+                KeyboardUtility.showKeyboard(context, edtTvColor);
                 break;
 
             case R.id.edtTvCarType:
+
+                KeyboardUtility.hideKeyboard(context, view);
+
                 edtTvCarType.requestFocus();
                 if (carType != null) {
                     spinnerCarType.performClick();
@@ -355,6 +379,7 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
                     if (ConnectivityDetector
                             .isConnectingToInternet(context)) {
 
+
                         callSaveVehicleAPI();
 
                     } else {
@@ -367,6 +392,37 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
         }
     }
 
+    private int mYear, mMonth, mDay;
+
+    private void openYearView() {
+//        try {
+//            final Calendar c = Calendar.getInstance();
+//            mYear = c.get(Calendar.YEAR);
+//            mMonth = c.get(Calendar.MONTH);
+//            mDay = c.get(Calendar.DAY_OF_MONTH);
+//
+//            DatePickerDialog dpd = new DatePickerDialog(this,
+//                    new DatePickerDialog.OnDateSetListener() {
+//
+//                        @Override
+//                        public void onDateSet(DatePicker view, int year,
+//                                              int monthOfYear, int dayOfMonth) {
+//
+//                            edtTvYear.setText((monthOfYear + 1) + "-" + (dayOfMonth) + "-" + year);
+//                        }
+//                    }, mMonth, mDay, mYear);
+//
+//            dpd.getDatePicker().setMinDate(System.currentTimeMillis());
+//
+//            dpd.show();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+    }
+
+    String todayYear;
 
     private boolean isValid() {
         String make = edtTvMake.getText().toString().trim();
@@ -375,30 +431,39 @@ public class AddEditVehicleActivity extends AppCompatActivity implements View.On
         String type = edtTvCarType.getText().toString().trim();
         strColor = edtTvColor.getText().toString().trim();
 
-        if (make.isEmpty()) {
-            edtTvMake.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_make_empty));
-            return false;
-        } else if (model.isEmpty()) {
-            edtTvModel.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_model_empty));
-            return false;
-        } else if (strYear.isEmpty()) {
-            edtTvYear.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_year_empty));
-            return false;
-        } else if (strColor.isEmpty()) {
-            edtTvColor.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_color_empty));
-            return false;
-        } else if (type.isEmpty()) {
-            edtTvCarType.requestFocus();
-            SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_car_empty));
-            return false;
+        todayYear = Calendar.getInstance().get(Calendar.YEAR) + "";
+
+        try {
+            if (make.isEmpty()) {
+                edtTvMake.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_make_empty));
+                return false;
+            } else if (model.isEmpty()) {
+                edtTvModel.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_model_empty));
+                return false;
+            } else if (strYear.isEmpty()) {
+                edtTvYear.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_year_empty));
+                return false;
+            } else if (Integer.parseInt(strYear) > Integer.parseInt(todayYear)) {
+                edtTvYear.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.invalid_year));
+                return false;
+            } else if (strColor.isEmpty()) {
+                edtTvColor.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_color_empty));
+                return false;
+            } else if (type.isEmpty()) {
+                edtTvCarType.requestFocus();
+                SnackBar.showValidationError(context, snackBarView, getString(R.string.vehicle_car_empty));
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return true;
     }
-
 
 
     private void callSaveVehicleAPI() {

@@ -81,7 +81,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
     String strCardNo, cardToken;
     MYEditCard edtTvCardNumber;
 
-
     CardMultilineWidget mCardInputWidget;
     Card cardToSave;
     String cvv, strExpDate;
@@ -127,8 +126,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                 try {
                     MyProgressDialog.showProgressDialog(context);
                     stripe = new Stripe(context, "pk_test_GF0y48SCqViKdCSA8LwOPFVj");
-//            googleMap.clear();
-//            customGoogleMap.clear();
                     stripe.createToken(
                             card,
                             new TokenCallback() {
@@ -138,12 +135,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                                     Log.e("check token", ":::::" + token.getId());
                                     Log.e("check token all data", ":::::" + token);
 
-
-//                                final Map<String, Object> parames = new HashMap<>();
-//                                parames.put("amount", 88);
-//                                parames.put("currency", "usd");
-//                                parames.put("description", "ajit payment");
-//                                parames.put("source", token.getId());
 
                                     try {
                                         new AsyncTask<Void, Void, Void>() {
@@ -156,7 +147,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                                                 try {
 
                                                     com.stripe.Stripe.apiKey = "sk_test_BXg8CAB9wtNTm1lNBe3HMK2X";
-
 
                                                     Map<String, Object> chargeParams = new HashMap<>();
                                                     chargeParams.put("source", token.getId());
@@ -424,8 +414,6 @@ public class AddPaymentMethodActivity extends AppCompatActivity implements View.
                                 SessionManager.setIsUserLoggedin(context, true);
                                 Applog.E("UserDetails" + cardDetails);
 //                                String card_number = cardDetails.getData().get(0).getCard_number();
-
-                                SessionManager.saveCardDetails(context, cardDetails);
 
                                 if (REQUEST_ADD_PAYMENT == 110) {
                                     Intent data = new Intent();

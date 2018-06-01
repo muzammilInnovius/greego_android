@@ -91,6 +91,7 @@
     <dimen name="dialogsize">300dp</dimen>
     <dimen name="scale_250dp">252dp</dimen>
     <dimen name="scale_260dp">262dp</dimen>
+    <dimen name="scale_300dp">302dp</dimen>
     <dimen name="scale_326dp">328dp</dimen>
     <dimen name="scale_336dp">338dp</dimen>
 
